@@ -27,13 +27,14 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "ruff>=0.11.3",
 ]
 
 
 
-# ruff config 
+# ruff config
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
