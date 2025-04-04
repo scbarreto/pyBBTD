@@ -6,3 +6,16 @@ class BTD:
     def __init__(self, rank, L1):
         self.rank = rank
         self.L1 = L1
+        self.factors
+
+    def fit(algorithm="ALS"):
+        pass
+
+    def get_constraint_matrices(self):
+        pass
+
+    def to_cpd_format():
+        """
+        Convert the BTD to CPD format.
+        """
+        pass
