@@ -1,12 +1,24 @@
 import numpy as np
+from pybbtd.uniqueness import check_uniqueness_LL1
 
 
 class BTD:
     """
-    Class for Tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms. Block-Term Decomposition
+    Class for Tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
     """
 
-    def __init__(self, R: int, L: int, mode="LL1"):
+    def __init__(self, dims, R: int, L: int, block_mode="LL1"):
+        # Validate dims
+        if (
+            not isinstance(dims, (list, tuple))
+            or len(dims) != 3
+            or not all(isinstance(d, int) and d > 0 for d in dims)
+        ):
+            raise ValueError(
+                "dims should be a list or tuple of three positive integers."
+            )
+        self.dims = tuple(dims)
+
         # Validate R
         if not isinstance(R, int) or R <= 0:
             raise ValueError("R should be a positive integer.")
@@ -14,7 +26,7 @@ class BTD:
 
         # Validate L
         if isinstance(L, int):
-            self.L = np.ones(self.rank) * L
+            self.L = np.ones(self.rank, dtype=int) * L
         elif isinstance(L, (list, np.ndarray)) and len(L) == R:
             self.L = np.array(L)
         else:
@@ -23,19 +35,41 @@ class BTD:
             )
 
         # Validate mode
-        valid_modes = {"LL1", "L1L", "1LL"}
-        if mode not in valid_modes:
+        valid_block_modes = {"LL1", "L1L", "1LL"}
+        if block_mode not in valid_block_modes:
             raise ValueError(
-                f"Invalid mode '{mode}'. Mode must be one of {valid_modes}."
+                f"Invalid mode '{block_mode}'. Block mode must be one of {valid_block_modes}."
             )
-        self.mode = mode
+        self.block_mode = block_mode
+
+        # check uniqueness, raise warning if parameters cannot be guaranteed to lead to unique solution
+        self.check_uniqueness()
 
         # Initialize additional variables
         self.factors = None
         self.T = None
         self.unfoldings = None
 
-    def fit(algorithm="ALS"):
+    def check_uniqueness(self):
+        N1, N2, N3 = self.dims
+        if self.block_mode == "LL1":
+            unique = check_uniqueness_LL1(
+                N1, N2, N3, self.rank, self.L[0]
+            )  # should fix value of L
+        elif self.block_mode == "L1L":
+            unique = check_uniqueness_LL1(
+                N1, N3, N2, self.rank, self.L[0]
+            )  # should fix value of L
+        elif self.block_mode == "1LL":
+            unique = check_uniqueness_LL1(
+                N2, N3, N1, self.rank, self.L[0]
+            )  # should fix value of L
+        if unique is True:
+            print("Sufficient condition for uniqueness satisfied")
+        else:
+            raise UserWarning("Cannot guarantee uniqueness. Proceed at your own risk.")
+
+    def fit(T, algorithm="ALS"):
         pass
 
     def get_constraint_matrices(self):
