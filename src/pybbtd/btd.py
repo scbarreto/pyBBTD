@@ -5,6 +5,7 @@ from tensorly.cp_tensor import cp_to_tensor
 from pybbtd.solvers.btd_als import BTD_ALS
 
 
+# main class for tensors in BTD format
 class BTD:
     """
     Class for Tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
