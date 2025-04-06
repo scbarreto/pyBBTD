@@ -1,6 +1,8 @@
 import numpy as np
 from pybbtd.uniqueness import check_uniqueness_LL1
 
+from pybbtd.solvers.btd_als import _constraint_matrix
+
 
 class BTD:
     """
@@ -66,8 +68,8 @@ class BTD:
     def fit(T, algorithm="ALS"):
         pass
 
-    def get_constraint_matrices(self):
-        pass
+    def get_constraint_matrix(self):
+        return _constraint_matrix(self.rank, self.L)
 
     def to_cpd_format():
         """
