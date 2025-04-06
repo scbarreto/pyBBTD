@@ -51,7 +51,13 @@ class BTD:
         self.unfoldings = None
 
     def check_uniqueness(self):
+        if not np.all(self.L == self.L[0]):
+            return print(
+                "Uniqueness checks are currently implemented for the constant L case.\nSkipping uniqueness tests."
+            )
+
         N1, N2, N3 = self.dims
+
         if self.block_mode == "LL1":
             unique = check_uniqueness_LL1(
                 N1, N2, N3, self.rank, self.L[0]
@@ -67,7 +73,7 @@ class BTD:
         if unique is True:
             print("Sufficient condition for uniqueness satisfied")
         else:
-            raise UserWarning("Cannot guarantee uniqueness. Proceed at your own risk.")
+            print("Cannot guarantee uniqueness. Proceed at your own risk.")
 
     def fit(T, algorithm="ALS"):
         pass
