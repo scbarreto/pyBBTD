@@ -109,9 +109,9 @@ def test_fit_1LL():
     R = X.rank
     L = X.L
     Lsum = np.array(L).sum()
-    A0 = np.random.rand(dims[0], R)
-    B0 = np.random.rand(dims[1], Lsum)
-    C0 = np.random.rand(dims[2], Lsum)
+    A0 = np.random.randn(dims[0], R)
+    B0 = np.random.randn(dims[1], Lsum)
+    C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
     Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
 
@@ -131,9 +131,9 @@ def test_fit_L1L():
     R = X.rank
     L = X.L
     Lsum = np.array(L).sum()
-    A0 = np.random.rand(dims[0], Lsum)
-    B0 = np.random.rand(dims[1], R)
-    C0 = np.random.rand(dims[2], Lsum)
+    A0 = np.random.randn(dims[0], Lsum)
+    B0 = np.random.randn(dims[1], R)
+    C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
     Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
 
