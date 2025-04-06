@@ -1,16 +1,17 @@
 import numpy as np
+from scipy.linalg import block_diag
+
+from pybbtd.btd import validate_R_L
 
 
-def _constraint_matrix(N, R, L):
+def _constraint_matrix(R, L):
     """Compute the constraint matrix repeating columsn
 
     Args:
-        N (_type_): dim of the mode to be repeated
-        R (_type_): rank of the decomposition
-        L (_type_): sequence of L values for each block
+        R: rank of the decomposition
+        L: int or sequence of L values for each block
     """
-
-    Lsum = np.array(L).sum()
-    theta = np.zeros(N, Lsum)
+    _, Larray = validate_R_L(R, L)
+    theta = block_diag(*[np.ones(Lr) for Lr in Larray])
 
     return theta
