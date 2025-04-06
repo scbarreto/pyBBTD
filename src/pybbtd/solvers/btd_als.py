@@ -39,7 +39,7 @@ def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e
     T2 = unfold(transp_T, 2)
 
     # init factors
-    Ak, Bk, Ck = init_BTD_factors(transp_BTD_model, strat=init)
+    Ak, Bk, Ck = init_BTD_factors(transp_BTD_model, strat=init, T=transp_T)
     theta = transp_BTD_model.get_constraint_matrix()
 
     k = 0
@@ -101,7 +101,22 @@ def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e
     return factors, np.array(fit_error)
 
 
-def init_BTD_factors(BTD_model, strat="random"):
+def init_BTD_factors(BTD_model, strat="random", T=None):
+    """LL1-based init
+
+    Args:
+        BTD_model (_type_): _description_
+        strat (str, optional): _description_. Defaults to "random".
+        T (_type_, optional): _description_. Defaults to None.
+
+    Raises:
+        ValueError: _description_
+        ValueError: _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     # get BTD model params
     dims = BTD_model.dims
     R = BTD_model.rank
@@ -113,6 +128,17 @@ def init_BTD_factors(BTD_model, strat="random"):
         A = np.random.rand(dims[0], Lsum)
         B = np.random.rand(dims[1], Lsum)
         C = np.random.rand(dims[2], R)
+    elif strat == "svd":
+        if T is None:
+            raise ValueError("SVD init requires input data T")
+        u0, s0, __ = np.linalg.svd(unfold(T, 0))
+        u1, s1, __ = np.linalg.svd(unfold(T, 1))
+        u2, s2, __ = np.linalg.svd(unfold(T, 2))
+
+        A = u0[:, :Lsum] @ np.diag(s0[:Lsum] ** 0.5)
+        B = u1[:, :Lsum] @ np.diag(s1[:Lsum] ** 0.5)
+        C = u2[:, :R] @ np.diag(s2[:R] ** 0.5)
+
     else:
         raise ValueError("not implemented")
 
