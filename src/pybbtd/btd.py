@@ -1,7 +1,6 @@
 import numpy as np
 from pybbtd.uniqueness import check_uniqueness_LL1
-
-from pybbtd.solvers.btd_als import _constraint_matrix
+from scipy.linalg import block_diag
 
 
 class BTD:
@@ -69,7 +68,7 @@ class BTD:
         pass
 
     def get_constraint_matrix(self):
-        return _constraint_matrix(self.rank, self.L)
+        return constraint_matrix(self.rank, self.L)
 
     def to_cpd_format():
         """
@@ -94,3 +93,17 @@ def validate_R_L(R, L):
         )
 
     return R, Larray
+
+
+def constraint_matrix(R, L):
+    """Compute the constraint matrix repeating columns
+    for the BTD model
+
+    Args:
+        R: rank of the decomposition
+        L: int or sequence of L values for each block
+    """
+    _, Larray = validate_R_L(R, L)
+    theta = block_diag(*[np.ones(Lr) for Lr in Larray])
+
+    return theta
