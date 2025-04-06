@@ -2,6 +2,7 @@ import numpy as np
 from pybbtd.uniqueness import check_uniqueness_LL1
 
 
+# main class for tensors in BTD format
 class BTD:
     """
     Class for Tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
