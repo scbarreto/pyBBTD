@@ -69,7 +69,9 @@ class BTD:
     def fit(self, data, algorithm="ALS", **kwargs):
         if algorithm == "ALS":
             self.factors, self.fit_error = BTD_ALS(self, data, **kwargs)
-            self.tensor = factors_to_tensor(*self.factors, self.get_constraint_matrix())
+            self.tensor = factors_to_tensor(
+                *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
+            )
         else:
             raise UserWarning("Algorithm not implemented yet")
 
@@ -115,5 +117,11 @@ def constraint_matrix(R, L):
     return theta
 
 
-def factors_to_tensor(A, B, C, theta):
-    return cp_to_tensor((np.ones(theta.shape[1]), [A, B, C @ theta]))
+def factors_to_tensor(A, B, C, theta, block_mode="LL1"):
+    if block_mode == "LL1":
+        Trec = cp_to_tensor((np.ones(theta.shape[1]), [A, B, C @ theta]))
+    elif block_mode == "1LL":
+        Trec = cp_to_tensor((np.ones(theta.shape[1]), [A @ theta, B, C]))
+    elif block_mode == "L1L":
+        Trec = cp_to_tensor((np.ones(theta.shape[1]), [A, B @ theta, C]))
+    return Trec
