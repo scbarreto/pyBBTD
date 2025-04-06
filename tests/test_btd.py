@@ -86,12 +86,56 @@ def test_fit_LL1():
     np.random.seed(202505)
 
     # init class
-    X = BTD([20, 18, 16], 2, 2, block_mode="LL1")
+    X = BTD([20, 18, 16], 3, 2, block_mode="LL1")
 
     # init random ground truth
     A0, B0, C0 = init_BTD_factors(X)
     theta = X.get_constraint_matrix()
     Trec = factors_to_tensor(A0, B0, C0, theta)  # GT tensor
+
+    # perfom the fit with usual parameters
+    X.fit(Trec, abs_tol=1e-14)
+    assert np.allclose(X.tensor, Trec)
+
+
+def test_fit_1LL():
+    np.random.seed(202505)
+
+    # init class
+    X = BTD([16, 20, 21], 2, 2, block_mode="1LL")
+
+    # init random ground truth
+    dims = X.dims
+    R = X.rank
+    L = X.L
+    Lsum = np.array(L).sum()
+    A0 = np.random.rand(dims[0], R)
+    B0 = np.random.rand(dims[1], Lsum)
+    C0 = np.random.rand(dims[2], Lsum)
+    theta = X.get_constraint_matrix()
+    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
+
+    # perfom the fit with usual parameters
+    X.fit(Trec, abs_tol=1e-14)
+    assert np.allclose(X.tensor, Trec)
+
+
+def test_fit_L1L():
+    np.random.seed(202505)
+
+    # init class
+    X = BTD([22, 10, 21], 2, 2, block_mode="L1L")
+
+    # init random ground truth
+    dims = X.dims
+    R = X.rank
+    L = X.L
+    Lsum = np.array(L).sum()
+    A0 = np.random.rand(dims[0], Lsum)
+    B0 = np.random.rand(dims[1], R)
+    C0 = np.random.rand(dims[2], Lsum)
+    theta = X.get_constraint_matrix()
+    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)
