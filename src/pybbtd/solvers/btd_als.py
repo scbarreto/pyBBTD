@@ -125,9 +125,9 @@ def init_BTD_factors(BTD_model, strat="random", T=None):
 
     if strat == "random":
         # init factor matrices and constraint matrix
-        A = np.random.rand(dims[0], Lsum)
-        B = np.random.rand(dims[1], Lsum)
-        C = np.random.rand(dims[2], R)
+        A = np.random.randn(dims[0], Lsum)
+        B = np.random.randn(dims[1], Lsum)
+        C = np.random.randn(dims[2], R)
     elif strat == "svd":
         if T is None:
             raise ValueError("SVD init requires input data T")
@@ -141,5 +141,16 @@ def init_BTD_factors(BTD_model, strat="random", T=None):
 
     else:
         raise ValueError("not implemented")
+
+    # if normalize is True:
+    #     if T is None:
+    #         raise ValueError("normalization requires input data T")
+    #     Tnorm = np.linalg.norm(T)
+    #     Tnorm_rec = np.linalg.norm(btd.factors_to_tensor(A, B, C, BTD_model.get_constraint_matrix()))
+    #     ratio = Tnorm/Tnorm_rec
+    #     A = A/(ratio)**(1/3)
+    #     B = B/(ratio)**(1/3)
+    #     C = C/(ratio)**(1/3)
+    #     print(np.linalg.norm(btd.factors_to_tensor(A, B, C, BTD_model.get_constraint_matrix()))/Tnorm)
 
     return A, B, C
