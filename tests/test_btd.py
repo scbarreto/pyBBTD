@@ -1,6 +1,9 @@
 import pytest
 import numpy as np
-from pybbtd.btd import BTD
+import tensorly as tly
+from tensorly.tenalg import outer, khatri_rao
+
+from pybbtd.btd import BTD, validate_R_L, constraint_matrix
 
 
 def test_valid_initialization_with_int_L():
@@ -46,3 +49,33 @@ def test_invalid_L_type():
 def test_invalid_block_mode():
     with pytest.raises(ValueError):
         BTD(dims=(10, 10, 10), R=3, L=2, block_mode="invalid")
+
+
+def test_unfoldings():
+    R, L = validate_R_L(3, 2)
+    Lsum = np.array(L).sum()
+    dims = (13, 12, 11)
+    theta = constraint_matrix(R, L)
+    # random factors for LL1
+    A = np.random.rand(dims[0], Lsum)
+    B = np.random.rand(dims[1], Lsum)
+    C = np.random.rand(dims[2], R)
+
+    # compute tensor from definition
+    T = np.zeros(dims)
+    ind = 0
+    for r in range(R):
+        Ar = A[:, ind : ind + L[r]]
+        Br = B[:, ind : ind + L[r]]
+        ind += L[r]
+        T += outer([Ar @ Br.T, C[:, r]])
+
+    # compare with unfoldings
+    T0 = A @ (khatri_rao([B, C @ theta])).T
+    assert np.allclose(tly.unfold(T, 0), T0)
+
+    T1 = B @ (khatri_rao([A, C @ theta])).T
+    assert np.allclose(tly.unfold(T, 1), T1)
+
+    T2 = C @ theta @ (khatri_rao([A, B])).T
+    assert np.allclose(tly.unfold(T, 2), T2)
