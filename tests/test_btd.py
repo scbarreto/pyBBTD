@@ -3,7 +3,8 @@ import numpy as np
 import tensorly as tly
 from tensorly.tenalg import outer, khatri_rao
 
-from pybbtd.btd import BTD, validate_R_L, constraint_matrix
+from pybbtd.btd import BTD, validate_R_L, constraint_matrix, factors_to_tensor
+from pybbtd.solvers.btd_als import init_BTD_factors
 
 
 def test_valid_initialization_with_int_L():
@@ -79,3 +80,19 @@ def test_unfoldings():
 
     T2 = C @ theta @ (khatri_rao([A, B])).T
     assert np.allclose(tly.unfold(T, 2), T2)
+
+
+def test_fit_LL1():
+    np.random.seed(202505)
+
+    # init class
+    X = BTD([20, 18, 16], 2, 2, block_mode="LL1")
+
+    # init random ground truth
+    A0, B0, C0 = init_BTD_factors(X)
+    theta = X.get_constraint_matrix()
+    Trec = factors_to_tensor(A0, B0, C0, theta)  # GT tensor
+
+    # perfom the fit with usual parameters
+    X.fit(Trec, abs_tol=1e-14)
+    assert np.allclose(X.tensor, Trec)

@@ -1,6 +1,8 @@
 import numpy as np
 from pybbtd.uniqueness import check_uniqueness_LL1
 from scipy.linalg import block_diag
+from tensorly.cp_tensor import cp_to_tensor
+from pybbtd.solvers.btd_als import BTD_ALS
 
 
 class BTD:
@@ -36,8 +38,8 @@ class BTD:
 
         # Initialize additional variables
         self.factors = None
-        self.T = None
-        self.unfoldings = None
+        self.tensor = None
+        self.fit_error = None  # stores last fit error
 
     def check_uniqueness(self):
         if not np.all(self.L == self.L[0]):
@@ -64,8 +66,12 @@ class BTD:
         else:
             print("Cannot guarantee uniqueness. Proceed at your own risk.")
 
-    def fit(T, algorithm="ALS"):
-        pass
+    def fit(self, data, algorithm="ALS", **kwargs):
+        if algorithm == "ALS":
+            self.factors, self.fit_error = BTD_ALS(self, data, **kwargs)
+            self.tensor = factors_to_tensor(*self.factors, self.get_constraint_matrix())
+        else:
+            raise UserWarning("Algorithm not implemented yet")
 
     def get_constraint_matrix(self):
         return constraint_matrix(self.rank, self.L)
@@ -107,3 +113,7 @@ def constraint_matrix(R, L):
     theta = block_diag(*[np.ones(Lr) for Lr in Larray])
 
     return theta
+
+
+def factors_to_tensor(A, B, C, theta):
+    return cp_to_tensor((np.ones(theta.shape[1]), [A, B, C @ theta]))
