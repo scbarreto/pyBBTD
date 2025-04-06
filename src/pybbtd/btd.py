@@ -19,20 +19,8 @@ class BTD:
             )
         self.dims = tuple(dims)
 
-        # Validate R
-        if not isinstance(R, int) or R <= 0:
-            raise ValueError("R should be a positive integer.")
-        self.rank = R
-
-        # Validate L
-        if isinstance(L, int):
-            self.L = np.ones(self.rank, dtype=int) * L
-        elif isinstance(L, (list, np.ndarray)) and len(L) == R:
-            self.L = np.array(L)
-        else:
-            raise ValueError(
-                "L should be either a single integer or a list/array of length R."
-            )
+        # validate R, L values
+        self.rank, self.L = validate_R_L(R, L)
 
         # Validate mode
         valid_block_modes = {"LL1", "L1L", "1LL"}
@@ -86,3 +74,21 @@ class BTD:
         Convert the BTD to CPD format.
         """
         pass
+
+
+def validate_R_L(R, L):
+    # check R
+    if not isinstance(R, int) or R <= 0:
+        raise ValueError("R should be a positive integer.")
+
+    # Validate L
+    if isinstance(L, int):
+        Larray = np.ones(R, dtype=int) * L
+    elif isinstance(L, (list, np.ndarray)) and len(L) == R:
+        Larray = np.array(L)
+    else:
+        raise ValueError(
+            "L should be either a single integer or a list/array of length R."
+        )
+
+    return R, Larray
