@@ -2,12 +2,13 @@ from pybbtd.btd import BTD
 import numpy as np
 import pybbtd.btd as btd
 
-
 # Class for Stokes tensors
 
 
 class Stokes(BTD):
+
     def __init__(self, spatial_dims, R, L, **kwargs):
+
         dims = (spatial_dims[0], spatial_dims[1], 4)
         self.block_mode = "LL1"
         super().__init__(dims=dims, R=R, L=L, block_mode=self.block_mode, **kwargs)
@@ -16,20 +17,12 @@ class Stokes(BTD):
             f"Stokes tensor initialized with dimensions {self.dims} on {self.block_mode} mode."
         )
 
-    def load_stokes_tensor(self, X):
-        """
-        Load a Stokes tensor from a numpy array.
-        """
-        self.tensor = X
-        self.dims = X.shape
-        self.validate_dims()
-        self.validate_stokes_tensor()
-
     def validate_dims(self):
         if self.block_mode != "LL1":
             raise ValueError("Error: Stokes Class only admits LL1 block mode.")
         if self.block_mode == "LL1" and self.dims[2] != 4:
-            raise ValueError("Error: Stokes dimension (Rank-1) of tensor must be 4.")
+            raise ValueError(
+                "Error: Stokes dimension (Rank-1) of tensor must be 4.")
 
     def generate_stokes_factors(self, dims, R, L):
         """
@@ -41,7 +34,8 @@ class Stokes(BTD):
         C = np.zeros((dims[2], R))
 
         for r in range(R):
-            cr = 1.0 / np.sqrt(2) * (np.random.randn(2) + 1j * np.random.randn(2))
+            cr = 1.0 / np.sqrt(2) * (np.random.randn(2) +
+                                     1j * np.random.randn(2))
             cr = cr / np.linalg.norm(cr)
 
             C[:, r] = coh2stokes(np.outer(cr, cr.conj()))
@@ -74,11 +68,28 @@ class Stokes(BTD):
         print("All pixels satisfy the Stokes constraints.")
 
 
+def hello():
+    print("hello again testing")
+    return 0
+
+
+def load_stokes_tensor(T0, R, L):
+    print('entered here')
+    spatial_dims = T0.shape[:2]  #
+    stokes_tensor = Stokes(spatial_dims=spatial_dims, R=R, L=L)
+
+    # Assign the tensor data
+    stokes_tensor.tensor = T0
+    stokes_tensor.dims = T0.shape
+
+    # Validate the tensor
+    stokes_tensor.validate_dims()
+    stokes_tensor.validate_stokes_tensor()
+
+    return stokes_tensor
+
+
 def check_stokes_constraints(S):
-    """
-    Check the constraints for Stokes tensors.
-    """
-    # Check if the first element is non-negative and the sum of squares of the other elements is less than or equal to the square of the first element
     return (
         0
         if (
