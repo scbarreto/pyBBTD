@@ -50,12 +50,11 @@ class Stokes(BTD):
 
     def generate_stokes_tensor(self):
         """
-        Generate a random Stokes tensor.
-        """
-        A, B, C = self.generate_stokes_factors(self.dims, self.rank, self.L)
+        Generate a random Stokes tensor."""
 
+        A, B, C = self.generate_stokes_factors(self.dims, self.rank, self.L)
         # Generate the tensor using the factors
-        self.factors = {"A": A, "B": B, "C": C}
+        self.factors = [A, B, C]
         self.tensor = btd.factors_to_tensor(
             A, B, C, self.get_constraint_matrix(), block_mode=self.block_mode
         )
