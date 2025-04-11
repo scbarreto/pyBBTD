@@ -96,6 +96,8 @@ def validate_R_L(R, L):
         Larray = np.ones(R, dtype=int) * L
     elif isinstance(L, (list, np.ndarray)) and len(L) == R:
         Larray = np.array(L)
+        if np.any(Larray <= 0):
+            raise ValueError("Each element in L should be greater than zero.")
     else:
         raise ValueError(
             "L should be either a single integer or a list/array of length R."
