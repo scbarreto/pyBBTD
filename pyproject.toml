@@ -4,14 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
+    { name = "scbarreto", email = "sbarreto.cardoso@gmail.com" },
     { name = "jflamant", email = "flamantjf@gmail.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.10.1",
     "numpy>=2.2.4",
-    "scipy>=1.15.2",
+    "scipy>=1.13.1",
     "tensorly>=0.9.0",
+    "palettable>=3.0.1",
 ]
 
 [project.scripts]
