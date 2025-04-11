@@ -44,7 +44,7 @@ class Stokes(BTD):
             cr = 1.0 / np.sqrt(2) * (np.random.randn(2) + 1j * np.random.randn(2))
             cr = cr / np.linalg.norm(cr)
 
-            C[:, r] = coh2Stokes(np.outer(cr, cr.conj()))
+            C[:, r] = coh2stokes(np.outer(cr, cr.conj()))
 
         return A, B, C
 
@@ -89,7 +89,7 @@ def check_stokes_constraints(S):
     )
 
 
-def Stokes2coh(S):
+def stokes2coh(S):
     "construct Coherence matrix from Stokes parameters"
     S0 = S[0]
     S1 = S[1]
@@ -99,7 +99,7 @@ def Stokes2coh(S):
     return coh
 
 
-def coh2Stokes(coh):
+def coh2stokes(coh):
     "return Stokes parameters from coherence matrix"
     S0 = np.real(coh[0, 0] + coh[1, 1])
     S1 = np.real(coh[0, 0] - coh[1, 1])
@@ -124,9 +124,9 @@ def projPSD(M):
 
 
 def stokesProjection(S):
-    coh = Stokes2coh(S)
+    coh = stokes2coh(S)
     proj = projPSD(coh)
-    newS = coh2Stokes(proj)
+    newS = coh2stokes(proj)
     return newS
 
 
