@@ -29,7 +29,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
 
-      - run: uv run pytest
+      # Run tests
+      - name: Run tests
+        run: uv run pytest
 
   # code-cov:
   #   name: Check coverage with CodeCov
