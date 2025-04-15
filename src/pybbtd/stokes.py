@@ -1,7 +1,8 @@
 from pybbtd.btd import BTD
 import numpy as np
 import pybbtd.btd as btd
-
+from pybbtd.solvers.stokes_admm import Stokes_ADMM
+import warnings
 # Class for Stokes tensors
 
 
@@ -18,38 +19,54 @@ class Stokes(BTD):
         if self.block_mode != "LL1":
             raise ValueError("Error: Stokes Class only admits LL1 block mode.")
         if self.block_mode == "LL1" and self.dims[2] != 4:
-            raise ValueError("Error: Stokes dimension (Rank-1) of tensor must be 4.")
+            raise ValueError(
+                "Error: Stokes dimension (Rank-1) of tensor must be 4.")
         else:
             return True
-
-    def generate_stokes_factors(self, dims, R, L):
-        """
-        Generate random factors for Stokes tensor.
-        """
-
-        A = np.random.rand(dims[0], L[0] * R)
-        B = np.random.rand(dims[1], L[0] * R)
-        C = np.zeros((dims[2], R))
-
-        for r in range(R):
-            cr = 1.0 / np.sqrt(2) * (np.random.randn(2) + 1j * np.random.randn(2))
-            cr = cr / np.linalg.norm(cr)
-
-            C[:, r] = coh2stokes(np.outer(cr, cr.conj()))
-
-        return A, B, C
 
     def generate_stokes_tensor(self):
         """
         Generate a random Stokes tensor."""
-        print("inside function: ", self.L)
-        A, B, C = self.generate_stokes_factors(self.dims, self.rank, self.L)
+
+        A, B, C = generate_stokes_factors(self.dims, self.rank, self.L)
         # Generate the tensor using the factors
         self.factors = [A, B, C]
         self.tensor = btd.factors_to_tensor(
             A, B, C, self.get_constraint_matrix(), block_mode=self.block_mode
         )
         return self.factors, self.tensor
+
+    def fit(self, data, algorithm="ADMM", **kwargs):
+        if algorithm == "ADMM":
+            self.factors, self.fit_error = Stokes_ADMM(
+                self, data, **kwargs)
+            self.tensor = btd.factors_to_tensor(
+                *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
+            )
+        else:
+            raise UserWarning("Algorithm not implemented yet")
+
+    def get_constraint_matrix(self):
+        return btd.constraint_matrix(self.rank, self.L)
+
+
+def generate_stokes_factors(dims, R, L):
+    """
+    Generate random factors for Stokes tensor.
+    """
+
+    A = np.random.rand(dims[0], L[0] * R)
+    B = np.random.rand(dims[1], L[0] * R)
+    C = np.zeros((dims[2], R))
+
+    for r in range(R):
+        cr = 1.0 / np.sqrt(2) * (np.random.randn(2) +
+                                 1j * np.random.randn(2))
+        cr = cr / np.linalg.norm(cr)
+
+        C[:, r] = coh2stokes(np.outer(cr, cr.conj()))
+
+    return A, B, C
 
 
 def validate_stokes_tensor(T0):
@@ -68,29 +85,10 @@ def validate_stokes_tensor(T0):
 
     if invalid_count > 0:
         percentage = (invalid_count / total_pixels) * 100
-        print(f"{percentage:.2f}% of pixels do not satisfy the Stokes constraints.")
-        return False
+        warnings.warn(
+            f"{percentage:.2f}% of pixels do not satisfy the Stokes constraints.", UserWarning)
     else:
         print("All pixels satisfy the Stokes constraints.")
-        return True
-
-
-def load_stokes_tensor(T0, R, L):
-    if not isinstance(T0, np.ndarray):
-        raise ValueError("Error: T0 must be a NumPy array.")
-
-    spatial_dims = T0.shape[:2]  #
-    stokes_tensor = Stokes(spatial_dims=spatial_dims, R=R, L=L)
-
-    # Assign the tensor data
-    stokes_tensor.tensor = T0
-    stokes_tensor.dims = T0.shape
-
-    # Validate the tensor
-    stokes_tensor.validate_dims()
-    validate_stokes_tensor(T0)
-
-    return stokes_tensor
 
 
 def check_stokes_constraints(S):

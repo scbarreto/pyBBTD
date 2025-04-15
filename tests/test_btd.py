@@ -2,22 +2,22 @@ import pytest
 import numpy as np
 import tensorly as tly
 from tensorly.tenalg import outer, khatri_rao
-
 from pybbtd.btd import BTD, validate_R_L, constraint_matrix, factors_to_tensor
 from pybbtd.solvers.btd_als import init_BTD_factors
+import numpy.testing as npt
 
 
 def test_valid_initialization_with_int_L():
     btd = BTD(dims=(15, 16, 10), R=3, L=2, block_mode="LL1")
     assert btd.rank == 3
-    np.testing.assert_array_equal(btd.L, np.array([2, 2, 2]))
+    npt.assert_array_equal(btd.L, np.array([2, 2, 2]))
     assert btd.block_mode == "LL1"
 
 
 def test_valid_initialization_with_list_L():
     btd = BTD(dims=(20, 19, 18), R=3, L=[2, 3, 4], block_mode="L1L")
     assert btd.rank == 3
-    np.testing.assert_array_equal(btd.L, np.array([2, 3, 4]))
+    npt.assert_array_equal(btd.L, np.array([2, 3, 4]))
     assert btd.block_mode == "L1L"
 
 
@@ -66,8 +66,8 @@ def test_unfoldings():
     T = np.zeros(dims)
     ind = 0
     for r in range(R):
-        Ar = A[:, ind : ind + L[r]]
-        Br = B[:, ind : ind + L[r]]
+        Ar = A[:, ind: ind + L[r]]
+        Br = B[:, ind: ind + L[r]]
         ind += L[r]
         T += outer([Ar @ Br.T, C[:, r]])
 
@@ -113,7 +113,8 @@ def test_fit_1LL():
     B0 = np.random.randn(dims[1], Lsum)
     C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
-    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
+    Trec = factors_to_tensor(
+        A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)
@@ -135,7 +136,8 @@ def test_fit_L1L():
     B0 = np.random.randn(dims[1], R)
     C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
-    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
+    Trec = factors_to_tensor(
+        A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)
