@@ -15,3 +15,17 @@ source .venv/bin/activate  # macOS/Linux
 uv pip install ipykernel
 uv pip install -e .
 ```
+
+## before commit + push
+
+```
+uv run ruff check
+uv run ruff format
+```
+
+## testing
+
+```
+uv run pytest
+uv run ruff format
+```

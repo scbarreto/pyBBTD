@@ -17,7 +17,7 @@ def plot_Stokes_terms(outA, outB, outC, R, Lr):
     result = np.zeros((R, outA.shape[0], outB.shape[0]))
 
     for i in range(0, Lr * R, Lr):
-        result[int(i / Lr)] = outA[:, i: (i + Lr)] @ outB[:, i: (i + Lr)].T
+        result[int(i / Lr)] = outA[:, i : (i + Lr)] @ outB[:, i : (i + Lr)].T
         normalized = (result[int(i / Lr)] - result[int(i / Lr)].min()) / result[
             int(i / Lr)
         ].max()
@@ -49,12 +49,10 @@ def compute_ellipse(S):
     psi, _, _, _ = stokes.stokes_2_elip(S)
 
     a = np.sqrt(
-        1 / 2 * ((S[1] ** 2 + S[2] ** 2 + S[3] ** 2) +
-                 (np.sqrt(S[1] ** 2 + S[2] ** 2)))
+        1 / 2 * ((S[1] ** 2 + S[2] ** 2 + S[3] ** 2) + (np.sqrt(S[1] ** 2 + S[2] ** 2)))
     )
     b = np.sqrt(
-        1 / 2 * ((S[1] ** 2 + S[2] ** 2 + S[3] ** 2) -
-                 (np.sqrt(S[1] ** 2 + S[2] ** 2)))
+        1 / 2 * ((S[1] ** 2 + S[2] ** 2 + S[3] ** 2) - (np.sqrt(S[1] ** 2 + S[2] ** 2)))
     )
 
     b = b / a
