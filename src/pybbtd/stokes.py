@@ -19,8 +19,7 @@ class Stokes(BTD):
         if self.block_mode != "LL1":
             raise ValueError("Error: Stokes Class only admits LL1 block mode.")
         if self.block_mode == "LL1" and self.dims[2] != 4:
-            raise ValueError(
-                "Error: Stokes dimension (Rank-1) of tensor must be 4.")
+            raise ValueError("Error: Stokes dimension (Rank-1) of tensor must be 4.")
         else:
             return True
 
@@ -38,8 +37,7 @@ class Stokes(BTD):
 
     def fit(self, data, algorithm="ADMM", **kwargs):
         if algorithm == "ADMM":
-            self.factors, self.fit_error = Stokes_ADMM(
-                self, data, **kwargs)
+            self.factors, self.fit_error = Stokes_ADMM(self, data, **kwargs)
             self.tensor = btd.factors_to_tensor(
                 *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
             )
@@ -60,8 +58,7 @@ def generate_stokes_factors(dims, R, L):
     C = np.zeros((dims[2], R))
 
     for r in range(R):
-        cr = 1.0 / np.sqrt(2) * (np.random.randn(2) +
-                                 1j * np.random.randn(2))
+        cr = 1.0 / np.sqrt(2) * (np.random.randn(2) + 1j * np.random.randn(2))
         cr = cr / np.linalg.norm(cr)
 
         C[:, r] = coh2stokes(np.outer(cr, cr.conj()))
@@ -86,7 +83,9 @@ def validate_stokes_tensor(T0):
     if invalid_count > 0:
         percentage = (invalid_count / total_pixels) * 100
         warnings.warn(
-            f"{percentage:.2f}% of pixels do not satisfy the Stokes constraints.", UserWarning)
+            f"{percentage:.2f}% of pixels do not satisfy the Stokes constraints.",
+            UserWarning,
+        )
     else:
         print("All pixels satisfy the Stokes constraints.")
 

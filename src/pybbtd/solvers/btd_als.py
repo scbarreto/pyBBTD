@@ -23,13 +23,11 @@ def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e
     # algo is for LL1; convert to equivalent LL1 if not
     if BTD_model.block_mode == "1LL":
         newdims = (BTD_model.dims[1], BTD_model.dims[2], BTD_model.dims[0])
-        transp_BTD_model = btd.BTD(
-            dims=newdims, R=BTD_model.rank, L=BTD_model.L)
+        transp_BTD_model = btd.BTD(dims=newdims, R=BTD_model.rank, L=BTD_model.L)
         transp_T = transpose(T, (1, 2, 0))
     elif BTD_model.block_mode == "L1L":
         newdims = (BTD_model.dims[0], BTD_model.dims[2], BTD_model.dims[1])
-        transp_BTD_model = btd.BTD(
-            dims=newdims, R=BTD_model.rank, L=BTD_model.L)
+        transp_BTD_model = btd.BTD(dims=newdims, R=BTD_model.rank, L=BTD_model.L)
         transp_T = transpose(T, (0, 2, 1))
     else:
         transp_BTD_model = deepcopy(BTD_model)
