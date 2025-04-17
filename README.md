@@ -27,7 +27,8 @@ uv run ruff format
 
 ```
 uv run pytest
-uv run ruff format
 ```
+
+## running coverage locally
 
 pytest --cov=pybbtd --cov-report=html tests/

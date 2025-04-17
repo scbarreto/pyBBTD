@@ -162,8 +162,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 def stokes_kmeans(R, T):
     unfolding = unfold(T, 2).T
 
-    clustered = KMeans(n_clusters=R, random_state=0,
-                       n_init="auto").fit(unfolding)
+    clustered = KMeans(n_clusters=R, random_state=0, n_init="auto").fit(unfolding)
 
     initialC = clustered.cluster_centers_.T
 
@@ -264,8 +263,7 @@ def Stokes_ADMM(
 
     # Check that Stokes_model is an instance of the Stokes class
     if not isinstance(Stokes_model, stokes.Stokes):
-        raise TypeError(
-            "Stokes_model must be an instance of the Stokes class.")
+        raise TypeError("Stokes_model must be an instance of the Stokes class.")
 
     # Check that T is a numpy array
     if not isinstance(T, np.ndarray):
@@ -341,6 +339,7 @@ def Stokes_ADMM(
         if k >= max_iter:
             exit_criterion = True
             warnings.warn(
-                "Reached max number of iteration. Check convergence.", RuntimeWarning)
+                "Reached max number of iteration. Check convergence.", RuntimeWarning
+            )
 
     return estimated_factors, fit_error
