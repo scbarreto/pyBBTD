@@ -83,7 +83,7 @@ def test_fit_admm_random_init():
         rho=1,
         max_admm=1,
         rel_tol=10**-3,
-        abs_tol=-10**-15,
+        abs_tol=-(10**-15),
         admm_tol=10**-10,
     )
 
@@ -131,16 +131,16 @@ def test_fit_invalid_algorithm_raises_warning():
 def test_stokes_NMF_shapes_and_reconstruction():
     L = 3
     R = 2
-    I, J = 5, 4
+    N, M = 5, 4
 
     rng = np.random.default_rng(seed=42)
-    maps = rng.random((R, I, J))
+    maps = rng.random((R, N, M))
 
     product, initA, initB = stokes_admm.stokes_NMF(L, R, maps)
 
-    assert product.shape == (R, I, J)
-    assert initA.shape == (I, L * R), "Incorrect shape for 'initA'"
-    assert initB.shape == (J, L * R), "Incorrect shape for 'initB'"
+    assert product.shape == (R, N, M)
+    assert initA.shape == (N, L * R), "Incorrect shape for 'initA'"
+    assert initB.shape == (M, L * R), "Incorrect shape for 'initB'"
 
     # Check non-negativity
     assert np.all(product >= 0), "'product' contains negative values"
@@ -148,15 +148,15 @@ def test_stokes_NMF_shapes_and_reconstruction():
     assert np.all(initB >= 0), "'initB' contains negative values"
 
     # Check if reconstruction is close to input
-    for i in range(R):
-        approx = initA[:, i * L: (i + 1) * L] @ initB[:, i * L: (i + 1) * L].T
-        assert np.allclose(approx, product[i], atol=1e-1), (
-            f"Reconstruction mismatch at index {i}"
+    for r in range(R):
+        # Explicit slicing and matrix multiplication for each R component
+        approx = initA[:, r * L : (r + 1) * L] @ initB[:, r * L : (r + 1) * L].T
+        assert np.allclose(approx, product[r], atol=1e-1), (
+            f"Reconstruction mismatch at index {r}"
         )
 
 
 def test_wrong_tensor_init_kmeans():
-
     # Create Stokes model
     R = 2
     L = 2
@@ -165,23 +165,14 @@ def test_wrong_tensor_init_kmeans():
     Twrong = np.random.rand(3, 2, 5)
     Tright = np.random.rand(2, 3, 4)
     with pytest.raises(ValueError, match="do not match"):
-        X.fit(
-            init='kmeans',
-            data=Twrong
-        )
+        X.fit(init="kmeans", data=Twrong)
     with pytest.raises(TypeError, match="must be a numpy"):
-        X.fit(init="kmeans",
-              data=None
-              )
+        X.fit(init="kmeans", data=None)
     with pytest.raises(ValueError, match="not implemented"):
-        X.fit(
-            init='wrong_one',
-            data=Tright
-        )
+        X.fit(init="wrong_one", data=Tright)
 
 
 def test_admm_convergence():
-
     np.random.seed(10)
 
     R = 3

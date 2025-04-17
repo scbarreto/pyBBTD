@@ -9,7 +9,7 @@ import warnings
 class Stokes(BTD):
     def __init__(self, spatial_dims, R, L, **kwargs):
         dims = (spatial_dims[0], spatial_dims[1], 4)
-        kwargs['block_mode'] = "LL1"
+        kwargs["block_mode"] = "LL1"
         super().__init__(dims=dims, R=R, L=L, **kwargs)
         print(
             f"Stokes tensor initialized with dimensions {self.dims} on {self.block_mode} mode."
