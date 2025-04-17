@@ -7,6 +7,7 @@ from tensorly.tenalg import khatri_rao
 import pybbtd.btd as btd
 from sklearn.decomposition import NMF
 from sklearn.cluster import KMeans
+import warnings
 
 
 def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
@@ -161,7 +162,8 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 def stokes_kmeans(R, T):
     unfolding = unfold(T, 2).T
 
-    clustered = KMeans(n_clusters=R, random_state=0, n_init="auto").fit(unfolding)
+    clustered = KMeans(n_clusters=R, random_state=0,
+                       n_init="auto").fit(unfolding)
 
     initialC = clustered.cluster_centers_.T
 
@@ -242,17 +244,7 @@ def init_Stokes_factors(Stokes_model, init="random", T=None):
         A, B, C = stokes.generate_stokes_factors(dims, R, L)
 
     elif init == "kmeans":
-        # Check that T is provided
-        if T is None:
-            raise ValueError("T must be provided for kmeans initialization.")
-        # Check that T's dimensions match Stokes_model.dims
-        if T.shape != Stokes_model.dims:
-            raise ValueError(
-                f"T's dimensions ({T.shape}) do not match Stokes_model.dims ({Stokes_model.dims})."
-            )
         A, B, C = kmeans_init(L, R, T, theta)
-    else:
-        raise ValueError("Unknown initialization strategy.")
 
     return A, B, C
 
@@ -270,10 +262,10 @@ def Stokes_ADMM(
 ):
     import pybbtd.stokes as stokes
 
-    theta = Stokes_model.get_constraint_matrix()
     # Check that Stokes_model is an instance of the Stokes class
     if not isinstance(Stokes_model, stokes.Stokes):
-        raise TypeError("Stokes_model must be an instance of the Stokes class.")
+        raise TypeError(
+            "Stokes_model must be an instance of the Stokes class.")
 
     # Check that T is a numpy array
     if not isinstance(T, np.ndarray):
@@ -296,6 +288,8 @@ def Stokes_ADMM(
     T1 = unfold(T, 0)
     T2 = unfold(T, 1)
     T3 = unfold(T, 2)
+
+    theta = Stokes_model.get_constraint_matrix()
 
     L = Stokes_model.L
     R = Stokes_model.rank
@@ -346,6 +340,7 @@ def Stokes_ADMM(
 
         if k >= max_iter:
             exit_criterion = True
-            print("Reached max number of iteration. Check convergence.")
+            warnings.warn(
+                "Reached max number of iteration. Check convergence.", RuntimeWarning)
 
     return estimated_factors, fit_error

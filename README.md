@@ -11,7 +11,7 @@ Packaging uses `uv` : [see here for detailed installation instructions](https://
 ```
 curl -Ls https://astral.sh/uv/install.sh | sh
 uv venv
-source .venv/bin/activate  # macOS/Linux
+source .venv/bin/activate
 uv pip install ipykernel
 uv pip install -e .
 ```
@@ -29,3 +29,5 @@ uv run ruff format
 uv run pytest
 uv run ruff format
 ```
+
+pytest --cov=pybbtd --cov-report=html tests/
