@@ -56,16 +56,20 @@ jobs:
     name: Deploy Coverage Report to GitHub Pages
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: test # wait for tests to pass
+    needs: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - uses: astral-sh/setup-uv@v5
-      - name: Install test dependencies
+
+      - name: Install test dependencies (system-wide)
         run: |
-          uv pip install pytest pytest-cov
+          uv pip install --system pytest pytest-cov
+
       - name: Run pytest with coverage
         run: uv run pytest --cov=pybbtd --cov-report=html tests/
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
