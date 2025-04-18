@@ -83,8 +83,7 @@ def test_fit_admm_random_init():
         rho=1,
         max_admm=1,
         rel_tol=10**-3,
-        abs_tol=-(10**-15),
-        admm_tol=10**-10,
+        abs_tol=10**-15,
     )
 
     print(X.fit_error[-1])

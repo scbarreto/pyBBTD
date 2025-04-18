@@ -87,7 +87,7 @@ class BTD:
 
 
 def validate_R_L(R, L):
-    # Add chek to see if L > Dimensions
+    # Add check to see if L > Dimensions
     # check R
     if not isinstance(R, int) or R <= 0:
         raise ValueError("R should be a positive integer.")
