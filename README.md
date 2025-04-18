@@ -11,9 +11,7 @@ Packaging uses `uv` : [see here for detailed installation instructions](https://
 ```
 curl -Ls https://astral.sh/uv/install.sh | sh
 uv venv
-source .venv/bin/activate
-uv pip install ipykernel
-uv pip install -e .
+uv sync --all-extras
 ```
 
 ## before commit + push
