@@ -56,6 +56,7 @@ def compute_ellipse(S):
     )
 
     b = b / a
+    # Check why this is one when updating the function
     a = 1
 
     t = np.linspace(0, 2 * np.pi, 100)

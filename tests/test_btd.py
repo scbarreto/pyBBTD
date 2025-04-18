@@ -2,22 +2,22 @@ import pytest
 import numpy as np
 import tensorly as tly
 from tensorly.tenalg import outer, khatri_rao
-
 from pybbtd.btd import BTD, validate_R_L, constraint_matrix, factors_to_tensor
 from pybbtd.solvers.btd_als import init_BTD_factors
+import numpy.testing as npt
 
 
 def test_valid_initialization_with_int_L():
     btd = BTD(dims=(15, 16, 10), R=3, L=2, block_mode="LL1")
     assert btd.rank == 3
-    np.testing.assert_array_equal(btd.L, np.array([2, 2, 2]))
+    npt.assert_array_equal(btd.L, np.array([2, 2, 2]))
     assert btd.block_mode == "LL1"
 
 
 def test_valid_initialization_with_list_L():
     btd = BTD(dims=(20, 19, 18), R=3, L=[2, 3, 4], block_mode="L1L")
     assert btd.rank == 3
-    np.testing.assert_array_equal(btd.L, np.array([2, 3, 4]))
+    npt.assert_array_equal(btd.L, np.array([2, 3, 4]))
     assert btd.block_mode == "L1L"
 
 
