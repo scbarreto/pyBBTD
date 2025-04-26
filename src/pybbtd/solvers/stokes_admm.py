@@ -33,7 +33,9 @@ def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
     while (n < nitermax) & exitCriterion:
         # update A_{l+1}
         # Solve A @ X = B  ⇒  A = B @ inv(X)
-        A_T = solve(M1M1T.T, RHS.T, assume_a="sym")
+        A_T = solve(
+            (M1M1T + rho * np.eye(Ainit.shape[1])).T, (RHS + rho * (Atl - Ul)).T
+        )
         Al1 = A_T.T
 
         # update \tilde{A}_{l+1}
@@ -48,7 +50,12 @@ def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
 
         if (primalResidue < epsPri) and (dualResidue < epsDual):
             exitCriterion = False
-
+        if primalResidue > 10 * dualResidue:
+            rho *= 2
+            Ul1 /= 2
+        elif dualResidue > 10 * primalResidue:
+            rho /= 2
+            Ul1 *= 2
         # update all variables
         Al = Al1.copy()
         Atl = Atl1.copy()
@@ -56,7 +63,7 @@ def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
 
         n += +1
 
-    return Al, Atl, Ul
+    return Atl, Al, primalResidue
 
 
 def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
@@ -82,7 +89,9 @@ def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
     exitCriterion = True
     while (n < nitermax) & exitCriterion:
         # update B_(l+1)
-        B_T = solve(M2M2T.T, RHS.T, assume_a="sym")
+        B_T = solve(
+            (M2M2T + rho * np.eye(Binit.shape[1])).T, (RHS + rho * (Btl - Ul)).T
+        )
         Bl1 = B_T.T
 
         # update \tilde{B}_{l+1}
@@ -98,7 +107,14 @@ def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
 
         if (primalResidue < epsPri) and (dualResidue < epsDual):
             exitCriterion = False
-
+        if (primalResidue < epsPri) and (dualResidue < epsDual):
+            exitCriterion = False
+        if primalResidue > 10 * dualResidue:
+            rho *= 2
+            Ul1 /= 2
+        elif dualResidue > 10 * primalResidue:
+            rho /= 2
+            Ul1 *= 2
         # update all variables
         Bl = Bl1.copy()
         Btl = Btl1.copy()
@@ -106,7 +122,7 @@ def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
 
         n += +1
 
-    return Bl, Btl, Ul
+    return Btl, Bl, primalResidue
 
 
 def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14):
@@ -131,7 +147,9 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     exitCriterion = True
     while (n < nitermax) & exitCriterion:
         # update C_(l+1)
-        C_T = solve(M3M3T.T, RHS.T, assume_a="sym")
+        C_T = solve(
+            (M3M3T + rho * np.eye(Cinit.shape[1])).T, (RHS + rho * (Ctl - Ul)).T
+        )
         Cl1 = C_T.T
 
         # update \tilde{C}_{l+1}
@@ -149,6 +167,14 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
         if (primalResidue < epsPri) and (dualResidue < epsDual):
             exitCriterion = False
 
+        if (primalResidue < epsPri) and (dualResidue < epsDual):
+            exitCriterion = False
+        if primalResidue > 10 * dualResidue:
+            rho *= 2
+            Ul1 /= 2
+        elif dualResidue > 10 * primalResidue:
+            rho /= 2
+            Ul1 *= 2
         # update all variables
         Cl = Cl1.copy()
         Ctl = Ctl1.copy()
@@ -156,7 +182,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 
         n += +1
 
-    return Cl, Ctl, Ul
+    return Ctl, Cl, primalResidue
 
 
 def stokes_kmeans(R, T):
@@ -278,8 +304,8 @@ def Stokes_ADMM(
         Ak, Bk, Ck = init_Stokes_factors(Stokes_model, init="random")
         Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, init="random")
     elif init == "kmeans":
-        Ak, Bk, Ck = init_Stokes_factors(Stokes_model, "kmeans", T)
-        Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, init="random")
+        Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, "kmeans", T)
+        Ak, Bk, Ck = init_Stokes_factors(Stokes_model, "random")
     else:
         raise ValueError("not implemented")
 
@@ -292,25 +318,25 @@ def Stokes_ADMM(
     L = Stokes_model.L
     R = Stokes_model.rank
 
-    Tfit_0 = btd.factors_to_tensor(Ak, Bk, Ck, theta)
+    Tfit_0 = btd.factors_to_tensor(Atk, Btk, Ctk, theta)
     fit_error = [np.linalg.norm(Tfit_0 - T) ** 2]
 
     k = 0
     exit_criterion = False
     while exit_criterion is False:
         # update A
-        Ak1, Atk1, _ = ADMM_A(
-            T1, Bk, (Ck @ theta), Ak, Atk, rho, L, nitermax=max_admm, tol=admm_tol
+        Atk1, Ak1, _ = ADMM_A(
+            T1, Btk, (Ctk @ theta), Ak, Atk, rho, L, nitermax=max_admm, tol=admm_tol
         )
 
         # update B
-        Bk1, Btk1, _ = ADMM_B(
-            T2, Ak1, (Ck @ theta), Bk, Btk, rho, L, nitermax=max_admm, tol=admm_tol
+        Btk1, Bk1, _ = ADMM_B(
+            T2, Atk1, (Ctk @ theta), Bk, Btk, rho, L, nitermax=max_admm, tol=admm_tol
         )
 
         # update C
-        Ck1, Ctk1, _ = ADMM_C(
-            T3, Ak1, Bk1, Ck, Ctk, theta, rho, L, R, nitermax=max_admm, tol=admm_tol
+        Ctk1, Ck1, _ = ADMM_C(
+            T3, Atk1, Btk1, Ck, Ctk, theta, rho, L, R, nitermax=max_admm, tol=admm_tol
         )
 
         # update variables
@@ -321,12 +347,13 @@ def Stokes_ADMM(
         Atk = Atk1.copy()
         Btk = Btk1.copy()
         Ctk = Ctk1.copy()
-        estimated_factors = [Ak1, Bk1, Ck1]
+
+        estimated_factors = [Atk1, Btk1, Ctk1]
         k += 1
 
         # compute reconstruction error
 
-        Tfit_k = btd.factors_to_tensor(Ak, Bk, Ck, theta)
+        Tfit_k = btd.factors_to_tensor(Atk1, Btk1, Ctk1, theta)
         fit_error.append(np.linalg.norm(Tfit_k - T) ** 2)
 
         if np.abs(fit_error[-1] - fit_error[-2]) / fit_error[-1] < rel_tol:

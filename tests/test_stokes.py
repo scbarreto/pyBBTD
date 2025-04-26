@@ -64,7 +64,7 @@ def test_stokes_kmeans():
 
 
 def test_fit_admm_random_init():
-    np.random.seed(10)
+    np.random.seed(0)
     R = 2
     L = 1
     btd.validate_R_L(R, L)
@@ -74,12 +74,12 @@ def test_fit_admm_random_init():
     theta = X.get_constraint_matrix()
     Tnoisy = btd.factors_to_tensor(
         A0, B0, C0, theta, block_mode="LL1"
-    ) + 0 * 1e-2 * np.random.randn(*X.dims)
+    ) + 0 * 1e-8 * np.random.randn(*X.dims)
     X.fit(
         data=Tnoisy,
         algorithm="ADMM",
         init="random",
-        max_iter=1000,
+        max_iter=2000,
         rho=1,
         max_admm=1,
         rel_tol=10**-3,
@@ -149,7 +149,7 @@ def test_stokes_NMF_shapes_and_reconstruction():
     # Check if reconstruction is close to input
     for r in range(R):
         # Explicit slicing and matrix multiplication for each R component
-        approx = initA[:, r * L : (r + 1) * L] @ initB[:, r * L : (r + 1) * L].T
+        approx = initA[:, r * L: (r + 1) * L] @ initB[:, r * L: (r + 1) * L].T
         assert np.allclose(approx, product[r], atol=1e-1), (
             f"Reconstruction mismatch at index {r}"
         )

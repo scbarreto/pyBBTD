@@ -1,7 +1,7 @@
 from pybbtd.btd import BTD
 import numpy as np
 import pybbtd.btd as btd
-from pybbtd.solvers.stokes_admm import Stokes_ADMM
+
 import warnings
 # Class for Stokes tensors
 
@@ -28,6 +28,8 @@ class Stokes(BTD):
         return self.factors, self.tensor
 
     def fit(self, data, algorithm="ADMM", **kwargs):
+        from pybbtd.solvers.stokes_admm import Stokes_ADMM
+
         if algorithm == "ADMM":
             self.factors, self.fit_error = Stokes_ADMM(self, data, **kwargs)
             self.tensor = btd.factors_to_tensor(
