@@ -149,7 +149,7 @@ def test_stokes_NMF_shapes_and_reconstruction():
     # Check if reconstruction is close to input
     for r in range(R):
         # Explicit slicing and matrix multiplication for each R component
-        approx = initA[:, r * L: (r + 1) * L] @ initB[:, r * L: (r + 1) * L].T
+        approx = initA[:, r * L : (r + 1) * L] @ initB[:, r * L : (r + 1) * L].T
         assert np.allclose(approx, product[r], atol=1e-1), (
             f"Reconstruction mismatch at index {r}"
         )
