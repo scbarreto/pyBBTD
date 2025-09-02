@@ -3,10 +3,30 @@ import numpy as np
 import pybbtd.btd as btd
 
 import warnings
-# Class for Stokes tensors
 
 
 class Stokes(BTD):
+    """
+    Generate random factors that follow Stokes-BTD decomposition.
+
+    This class generates the factor matrices (A, B, C) according to the
+    Stokes-BTD model for a tensor of given dimensions and rank.
+
+    :param dims: Dimensions `(I, J, K)` of the tensor.
+    :type dims: Tuple[int, int, int]
+    :param R: The rank of the decomposition (number of components).
+    :type R: int
+    :param L: Rank of the spatial maps.
+    :type L: int
+
+    :ivar A: Factor matrix of shape `(dims[0], L * R)`.
+    :vartype A: np.ndarray
+    :ivar B: Factor matrix of shape `(dims[1], L * R)`.
+    :vartype B: np.ndarray
+    :ivar C: Factor matrix of shape `(dims[2], R)`, where each column is a Stokes vector.
+    :vartype C: np.ndarray
+    """
+
     def __init__(self, spatial_dims, R, L, **kwargs):
         dims = (spatial_dims[0], spatial_dims[1], 4)
         kwargs["block_mode"] = "LL1"
@@ -17,7 +37,8 @@ class Stokes(BTD):
 
     def generate_stokes_tensor(self):
         """
-        Generate a random Stokes tensor."""
+        Generate a random Stokes tensor.
+        """
 
         A, B, C = generate_stokes_factors(self.dims, self.rank, self.L)
         # Generate the tensor using the factors
@@ -28,6 +49,9 @@ class Stokes(BTD):
         return self.factors, self.tensor
 
     def fit(self, data, algorithm="ADMM", **kwargs):
+        """
+        Computes Stokes-BTD factor matrices for provided data
+        """
         from pybbtd.solvers.stokes_admm import Stokes_ADMM
 
         if algorithm == "ADMM":
@@ -39,12 +63,31 @@ class Stokes(BTD):
             raise UserWarning("Algorithm not implemented yet")
 
     def get_constraint_matrix(self):
+        """
+        Returns contraint matrix for BTD-LL1 model (useful to CP-equivalent model)
+        """
         return btd.constraint_matrix(self.rank, self.L)
 
 
 def generate_stokes_factors(dims, R, L):
     """
-    Generate random factors for Stokes tensor.
+    Generate random factors that follow Stokes-BTD decomposition.
+
+    Args:
+        dims (Tuple[int, int, int]):
+            Dimensions `(I, J, K)` of the tensor.
+        R (int):
+            The rank of the decomposition (number of components).
+        L (int):
+            Rank of the spatial maps.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray]:
+            A tuple containing the three factor matrices `(A, B, C)`:
+
+            - A (np.ndarray): Shape `(dims[0], L * R)`.
+            - B (np.ndarray): Shape `(dims[1], L * R)`.
+            - C (np.ndarray): Shape `(dims[2], R)`, where each column is a Stokes vector.
     """
 
     A = np.random.rand(dims[0], L[0] * R)

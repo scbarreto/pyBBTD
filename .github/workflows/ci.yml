@@ -1,5 +1,5 @@
-# Basic CI setup: Lint with ruff, run tests with pytest
-name: Test
+# Basic CI setup: Lint with ruff, run tests with pytest, build & deploy docs
+name: CI
 
 on:
   pull_request:
@@ -28,10 +28,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-
-      # Run tests
       - name: Run tests
         run: uv run pytest
+
+  docs:
+    name: Build and Deploy Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+
+      # Install Sphinx + your docs requirements
+      - name: Install docs dependencies
+        run: uv pip install sphinx myst-parser furo # add other extensions here
+
+      # Build documentation
+      - name: Build docs
+        run: uv run sphinx-build -b html docs/ docs/_build/html
+
+      # Deploy to GitHub Pages (only on main)
+      - name: Deploy docs
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
 
   # code-cov:
   #   name: Check coverage with CodeCov
