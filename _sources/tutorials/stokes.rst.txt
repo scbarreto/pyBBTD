@@ -1,4 +1,4 @@
 Stokes Tutorial
 ===============
 
-Test
+Tutorial for usage of Stokes Class
