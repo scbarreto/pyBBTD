@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyBBTD docs &mdash; pyBBTD  documentation</title>
+  <title>pybbtd.uniqueness &mdash; pyBBTD  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tutorials" href="tutorials/index.html" /> 
+    <link rel="prev" title="pybbtd.draw" href="reference_draw.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -30,7 +30,7 @@
 
           
           
-          <a href="#" class="icon icon-home">
+          <a href="index.html" class="icon icon-home">
             pyBBTD
           </a>
 <div role="search">
@@ -41,9 +41,19 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_draw.html">pybbtd.draw</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pybbtd.uniqueness</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.uniqueness.check_uniqueness_LL1"><code class="docutils literal notranslate"><span class="pre">check_uniqueness_LL1()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -52,17 +62,18 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">pyBBTD</a>
+          <a href="index.html">pyBBTD</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">pyBBTD docs</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="reference.html">Reference manual</a></li>
+      <li class="breadcrumb-item active">pybbtd.uniqueness</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/reference_uniqueness.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -70,32 +81,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pybbtd-docs">
-<h1>pyBBTD docs<a class="headerlink" href="#pybbtd-docs" title="Link to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD Tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorial</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_draw.html">pybbtd.draw</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
-</ul>
-</li>
-</ul>
-</div>
+  <section id="module-pybbtd.uniqueness">
+<span id="pybbtd-uniqueness"></span><span id="reference-uniqueness"></span><h1>pybbtd.uniqueness<a class="headerlink" href="#module-pybbtd.uniqueness" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.uniqueness.check_uniqueness_LL1">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.uniqueness.</span></span><span class="sig-name descname"><span class="pre">check_uniqueness_LL1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/uniqueness.html#check_uniqueness_LL1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.uniqueness.check_uniqueness_LL1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tutorials/index.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="reference_draw.html" class="btn btn-neutral float-left" title="pybbtd.draw" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

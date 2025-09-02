@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pybbtd.solvers.btd_als &mdash; pyBBTD  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyBBTD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference.html">Reference manual</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyBBTD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pybbtd.solvers.btd_als</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pybbtd.solvers.btd_als</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorly</span><span class="w"> </span><span class="kn">import</span> <span class="n">unfold</span><span class="p">,</span> <span class="n">transpose</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorly.tenalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">khatri_rao</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+
+
+<div class="viewcode-block" id="BTD_ALS">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.btd_als.BTD_ALS">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">BTD_ALS</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+    <span class="c1"># Check that BTD_model is an instance of the BTD class</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">,</span> <span class="n">btd</span><span class="o">.</span><span class="n">BTD</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;BTD_model must be an instance of the BTD class.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check that T is a numpy array</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;T must be a numpy array.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check that T&#39;s dimensions match BTD_model.dims</span>
+    <span class="k">if</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;T&#39;s dimensions (</span><span class="si">{</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">) do not match BTD_model.dims (</span><span class="si">{</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="p">)</span>
+    <span class="c1"># algo is for LL1; convert to equivalent LL1 if not</span>
+    <span class="k">if</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;1LL&quot;</span><span class="p">:</span>
+        <span class="n">newdims</span> <span class="o">=</span> <span class="p">(</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">transp_BTD_model</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">BTD</span><span class="p">(</span><span class="n">dims</span><span class="o">=</span><span class="n">newdims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+        <span class="n">transp_T</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;L1L&quot;</span><span class="p">:</span>
+        <span class="n">newdims</span> <span class="o">=</span> <span class="p">(</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">transp_BTD_model</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">BTD</span><span class="p">(</span><span class="n">dims</span><span class="o">=</span><span class="n">newdims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">BTD_model</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+        <span class="n">transp_T</span> <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">transp_BTD_model</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">)</span>
+        <span class="n">transp_T</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># precompute unfoldings</span>
+    <span class="n">T0</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">transp_T</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">T1</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">transp_T</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">transp_T</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># init factors</span>
+    <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_BTD_factors</span><span class="p">(</span><span class="n">transp_BTD_model</span><span class="p">,</span> <span class="n">strat</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">transp_T</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">transp_BTD_model</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">()</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">Tfit_0</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">fit_error</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Tfit_0</span> <span class="o">-</span> <span class="n">transp_T</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">while</span> <span class="n">exit_criterion</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="c1"># udpdate A</span>
+        <span class="n">M0</span> <span class="o">=</span> <span class="n">khatri_rao</span><span class="p">([</span><span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">@</span> <span class="n">theta</span><span class="p">])</span>
+
+        <span class="n">LHS</span> <span class="o">=</span> <span class="n">M0</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M0</span>
+        <span class="n">RHS</span> <span class="o">=</span> <span class="n">M0</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T0</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">Ak1</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">LHS</span><span class="p">,</span> <span class="n">RHS</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># udpdate B</span>
+        <span class="n">M1</span> <span class="o">=</span> <span class="n">khatri_rao</span><span class="p">([</span><span class="n">Ak1</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">@</span> <span class="n">theta</span><span class="p">])</span>
+        <span class="n">LHS</span> <span class="o">=</span> <span class="n">M1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M1</span>
+        <span class="n">RHS</span> <span class="o">=</span> <span class="n">M1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T1</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">Bk1</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">LHS</span><span class="p">,</span> <span class="n">RHS</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># update C</span>
+        <span class="n">M2</span> <span class="o">=</span> <span class="n">khatri_rao</span><span class="p">([</span><span class="n">Ak1</span><span class="p">,</span> <span class="n">Bk1</span><span class="p">])</span> <span class="o">@</span> <span class="n">theta</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">LHS</span> <span class="o">=</span> <span class="n">M2</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">M2</span>
+        <span class="n">RHS</span> <span class="o">=</span> <span class="n">M2</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">T2</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">Ck1</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">LHS</span><span class="p">,</span> <span class="n">RHS</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># compute reconstruction error</span>
+        <span class="n">Tfit_k</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">Ak1</span><span class="p">,</span> <span class="n">Bk1</span><span class="p">,</span> <span class="n">Ck1</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+        <span class="n">fit_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Tfit_k</span> <span class="o">-</span> <span class="n">transp_T</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># exit criterion</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">rel_tol</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting early due to unsufficient decrease of cost&quot;</span><span class="p">)</span>
+            <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">transp_T</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">abs_tol</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reached absolute tolerance threshold. Exiting.&quot;</span><span class="p">)</span>
+            <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reached max number of iteration. Check convergence.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># pass variables</span>
+        <span class="n">Ak</span> <span class="o">=</span> <span class="n">Ak1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Bk</span> <span class="o">=</span> <span class="n">Bk1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ck</span> <span class="o">=</span> <span class="n">Ck1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># transpose variables back to actual model</span>
+    <span class="k">if</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;LL1&quot;</span><span class="p">:</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;1LL&quot;</span><span class="p">:</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ck</span><span class="p">,</span> <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;L1L&quot;</span><span class="p">:</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ak</span><span class="p">,</span> <span class="n">Ck</span><span class="p">,</span> <span class="n">Bk</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">factors</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fit_error</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="init_BTD_factors">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.btd_als.init_BTD_factors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_BTD_factors</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">,</span> <span class="n">strat</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LL1-based init</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        BTD_model (_type_): _description_</span>
+<span class="sd">        strat (str, optional): _description_. Defaults to &quot;random&quot;.</span>
+<span class="sd">        T (_type_, optional): _description_. Defaults to None.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: _description_</span>
+<span class="sd">        ValueError: _description_</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        _type_: _description_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get BTD model params</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">dims</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">rank</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">BTD_model</span><span class="o">.</span><span class="n">L</span>
+    <span class="n">Lsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">strat</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span>
+        <span class="c1"># init factor matrices and constraint matrix</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Lsum</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Lsum</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">R</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">strat</span> <span class="o">==</span> <span class="s2">&quot;svd&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">T</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SVD init requires input data T&quot;</span><span class="p">)</span>
+        <span class="n">u0</span><span class="p">,</span> <span class="n">s0</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">u1</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">u2</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[:,</span> <span class="p">:</span><span class="n">Lsum</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s0</span><span class="p">[:</span><span class="n">Lsum</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">u1</span><span class="p">[:,</span> <span class="p">:</span><span class="n">Lsum</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s1</span><span class="p">[:</span><span class="n">Lsum</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">u2</span><span class="p">[:,</span> <span class="p">:</span><span class="n">R</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s2</span><span class="p">[:</span><span class="n">R</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not implemented&quot;</span><span class="p">)</span>
+
+    <span class="c1"># if normalize is True:</span>
+    <span class="c1">#     if T is None:</span>
+    <span class="c1">#         raise ValueError(&quot;normalization requires input data T&quot;)</span>
+    <span class="c1">#     Tnorm = np.linalg.norm(T)</span>
+    <span class="c1">#     Tnorm_rec = np.linalg.norm(btd.factors_to_tensor(A, B, C, BTD_model.get_constraint_matrix()))</span>
+    <span class="c1">#     ratio = Tnorm/Tnorm_rec</span>
+    <span class="c1">#     A = A/(ratio)**(1/3)</span>
+    <span class="c1">#     B = B/(ratio)**(1/3)</span>
+    <span class="c1">#     C = C/(ratio)**(1/3)</span>
+    <span class="c1">#     print(np.linalg.norm(btd.factors_to_tensor(A, B, C, BTD_model.get_constraint_matrix()))/Tnorm)</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Saulo Barreto.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

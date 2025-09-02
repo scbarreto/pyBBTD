@@ -46,6 +46,10 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reference manual</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_draw.html">pybbtd.draw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
 </ul>
 </li>
 </ul>
@@ -87,6 +91,36 @@
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.stokes2coh"><code class="docutils literal notranslate"><span class="pre">stokes2coh()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.stokesProjection"><code class="docutils literal notranslate"><span class="pre">stokesProjection()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.validate_stokes_tensor"><code class="docutils literal notranslate"><span class="pre">validate_stokes_tensor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.constraint_matrix"><code class="docutils literal notranslate"><span class="pre">constraint_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.validate_R_L"><code class="docutils literal notranslate"><span class="pre">validate_R_L()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_A"><code class="docutils literal notranslate"><span class="pre">ADMM_A()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_B"><code class="docutils literal notranslate"><span class="pre">ADMM_B()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.Stokes_ADMM"><code class="docutils literal notranslate"><span class="pre">Stokes_ADMM()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.init_Stokes_factors"><code class="docutils literal notranslate"><span class="pre">init_Stokes_factors()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.stokes_NMF"><code class="docutils literal notranslate"><span class="pre">stokes_NMF()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.stokes_admm.stokes_kmeans"><code class="docutils literal notranslate"><span class="pre">stokes_kmeans()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.btd_als.BTD_ALS"><code class="docutils literal notranslate"><span class="pre">BTD_ALS()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html#pybbtd.solvers.btd_als.init_BTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BTD_factors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference_draw.html">pybbtd.draw</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference_draw.html#pybbtd.draw.stokes_draw.add_arrow"><code class="docutils literal notranslate"><span class="pre">add_arrow()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_draw.html#pybbtd.draw.stokes_draw.compute_ellipse"><code class="docutils literal notranslate"><span class="pre">compute_ellipse()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_draw.html#pybbtd.draw.stokes_draw.plot_Stokes_terms"><code class="docutils literal notranslate"><span class="pre">plot_Stokes_terms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html#pybbtd.uniqueness.check_uniqueness_LL1"><code class="docutils literal notranslate"><span class="pre">check_uniqueness_LL1()</span></code></a></li>
 </ul>
 </li>
 </ul>

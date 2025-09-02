@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pybbtd.solvers.stokes_admm &mdash; pyBBTD  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyBBTD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference.html">Reference manual</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyBBTD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pybbtd.solvers.stokes_admm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pybbtd.solvers.stokes_admm</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorly</span><span class="w"> </span><span class="kn">import</span> <span class="n">unfold</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorly.tenalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">khatri_rao</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">NMF</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+
+<div class="viewcode-block" id="ADMM_A">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_A">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ADMM_A</span><span class="p">(</span><span class="n">Y1</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span><span class="p">,</span> <span class="n">Ainit</span><span class="p">,</span> <span class="n">Atinit</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+    <span class="c1"># init variables</span>
+    <span class="n">Al</span> <span class="o">=</span> <span class="n">Ainit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Atl</span> <span class="o">=</span> <span class="n">Atinit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Ul</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Ainit</span><span class="p">)</span>
+
+    <span class="n">M1</span> <span class="o">=</span> <span class="n">khatri_rao</span><span class="p">([</span><span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># Build system</span>
+    <span class="n">M1M1T</span> <span class="o">=</span> <span class="n">M1</span> <span class="o">@</span> <span class="n">M1</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># K x K</span>
+    <span class="n">RHS</span> <span class="o">=</span> <span class="n">Y1</span> <span class="o">@</span> <span class="n">M1</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># I x K</span>
+
+    <span class="n">epsPri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Al</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">tol</span>
+    <span class="n">epsDual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Atl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">tol</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">primalResidue</span> <span class="o">=</span> <span class="n">epsPri</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">dualResidue</span> <span class="o">=</span> <span class="n">epsDual</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">nitermax</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">exitCriterion</span><span class="p">:</span>
+        <span class="c1"># update A_{l+1}</span>
+        <span class="c1"># Solve A @ X = B  ⇒  A = B @ inv(X)</span>
+        <span class="n">A_T</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">M1M1T</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">Ainit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">RHS</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">Atl</span> <span class="o">-</span> <span class="n">Ul</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="p">)</span>
+        <span class="n">Al1</span> <span class="o">=</span> <span class="n">A_T</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># update \tilde{A}_{l+1}</span>
+        <span class="n">Atl1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Al1</span> <span class="o">+</span> <span class="n">Ul</span><span class="p">)</span>
+
+        <span class="c1"># update dual</span>
+        <span class="n">Ul1</span> <span class="o">=</span> <span class="n">Ul</span> <span class="o">+</span> <span class="n">Al1</span> <span class="o">-</span> <span class="n">Atl1</span>
+
+        <span class="c1"># compute convergence metrics residuals</span>
+        <span class="n">primalResidue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Al1</span> <span class="o">-</span> <span class="n">Atl1</span><span class="p">)</span>
+        <span class="n">dualResidue</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Atl1</span> <span class="o">-</span> <span class="n">Atl</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">primalResidue</span> <span class="o">&lt;</span> <span class="n">epsPri</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dualResidue</span> <span class="o">&lt;</span> <span class="n">epsDual</span><span class="p">):</span>
+            <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">primalResidue</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">dualResidue</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">*=</span> <span class="mi">2</span>
+            <span class="n">Ul1</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">dualResidue</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">primalResidue</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">/=</span> <span class="mi">2</span>
+            <span class="n">Ul1</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="c1"># update all variables</span>
+        <span class="n">Al</span> <span class="o">=</span> <span class="n">Al1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Atl</span> <span class="o">=</span> <span class="n">Atl1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ul</span> <span class="o">=</span> <span class="n">Ul1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">n</span> <span class="o">+=</span> <span class="o">+</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">Atl</span><span class="p">,</span> <span class="n">Al</span><span class="p">,</span> <span class="n">primalResidue</span></div>
+
+
+
+<div class="viewcode-block" id="ADMM_B">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_B">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ADMM_B</span><span class="p">(</span><span class="n">Y2</span><span class="p">,</span> <span class="n">Ak</span><span class="p">,</span> <span class="n">Ck</span><span class="p">,</span> <span class="n">Binit</span><span class="p">,</span> <span class="n">Btinit</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+    <span class="c1"># init variables</span>
+    <span class="n">Bl</span> <span class="o">=</span> <span class="n">Binit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Btl</span> <span class="o">=</span> <span class="n">Btinit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Ul</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Bl</span><span class="p">)</span>
+
+    <span class="c1"># iteration</span>
+    <span class="n">M2</span> <span class="o">=</span> <span class="n">khatri_rao</span><span class="p">([</span><span class="n">Ak</span><span class="p">,</span> <span class="n">Ck</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># Build system</span>
+    <span class="n">M2M2T</span> <span class="o">=</span> <span class="n">M2</span> <span class="o">@</span> <span class="n">M2</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># K x K</span>
+    <span class="n">RHS</span> <span class="o">=</span> <span class="n">Y2</span> <span class="o">@</span> <span class="n">M2</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># I x K</span>
+
+    <span class="n">epsPri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Bl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">tol</span>
+    <span class="n">epsDual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Btl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">tol</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">primalResidue</span> <span class="o">=</span> <span class="n">epsPri</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">dualResidue</span> <span class="o">=</span> <span class="n">epsDual</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">nitermax</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">exitCriterion</span><span class="p">:</span>
+        <span class="c1"># update B_(l+1)</span>
+        <span class="n">B_T</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">M2M2T</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">Binit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">RHS</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">Btl</span> <span class="o">-</span> <span class="n">Ul</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="p">)</span>
+        <span class="n">Bl1</span> <span class="o">=</span> <span class="n">B_T</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># update \tilde{B}_{l+1}</span>
+        <span class="n">Btl1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Bl1</span> <span class="o">+</span> <span class="n">Ul</span><span class="p">)</span>
+
+        <span class="c1"># update dual</span>
+        <span class="n">Ul1</span> <span class="o">=</span> <span class="n">Ul</span> <span class="o">+</span> <span class="n">Bl1</span> <span class="o">-</span> <span class="n">Btl1</span>
+
+        <span class="c1"># compute convergence metrics residuals</span>
+
+        <span class="n">primalResidue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Bl1</span> <span class="o">-</span> <span class="n">Btl1</span><span class="p">)</span>
+        <span class="n">dualResidue</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Btl1</span> <span class="o">-</span> <span class="n">Btl</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">primalResidue</span> <span class="o">&lt;</span> <span class="n">epsPri</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dualResidue</span> <span class="o">&lt;</span> <span class="n">epsDual</span><span class="p">):</span>
+            <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">primalResidue</span> <span class="o">&lt;</span> <span class="n">epsPri</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dualResidue</span> <span class="o">&lt;</span> <span class="n">epsDual</span><span class="p">):</span>
+            <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">primalResidue</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">dualResidue</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">*=</span> <span class="mi">2</span>
+            <span class="n">Ul1</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">dualResidue</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">primalResidue</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">/=</span> <span class="mi">2</span>
+            <span class="n">Ul1</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="c1"># update all variables</span>
+        <span class="n">Bl</span> <span class="o">=</span> <span class="n">Bl1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Btl</span> <span class="o">=</span> <span class="n">Btl1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ul</span> <span class="o">=</span> <span class="n">Ul1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">n</span> <span class="o">+=</span> <span class="o">+</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">Btl</span><span class="p">,</span> <span class="n">Bl</span><span class="p">,</span> <span class="n">primalResidue</span></div>
+
+
+
+<div class="viewcode-block" id="ADMM_C">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_C">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ADMM_C</span><span class="p">(</span><span class="n">Y3</span><span class="p">,</span> <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Cinit</span><span class="p">,</span> <span class="n">Ctinit</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+    <span class="c1"># init variables</span>
+
+    <span class="n">Cl</span> <span class="o">=</span> <span class="n">Cinit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Ctl</span> <span class="o">=</span> <span class="n">Ctinit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">Ul</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Cl</span><span class="p">)</span>
+
+    <span class="c1"># iteration</span>
+    <span class="n">M3</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">@</span> <span class="n">khatri_rao</span><span class="p">([</span><span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">M3M3T</span> <span class="o">=</span> <span class="n">M3</span> <span class="o">@</span> <span class="n">M3</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">RHS</span> <span class="o">=</span> <span class="n">Y3</span> <span class="o">@</span> <span class="n">M3</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">epsPri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Cl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">tol</span>
+    <span class="n">epsDual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Ctl</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">tol</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">primalResidue</span> <span class="o">=</span> <span class="n">epsPri</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">dualResidue</span> <span class="o">=</span> <span class="n">epsDual</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">nitermax</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">exitCriterion</span><span class="p">:</span>
+        <span class="c1"># update C_(l+1)</span>
+        <span class="n">C_T</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">M3M3T</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">Cinit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">RHS</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">Ctl</span> <span class="o">-</span> <span class="n">Ul</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="p">)</span>
+        <span class="n">Cl1</span> <span class="o">=</span> <span class="n">C_T</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># update \tilde{C}_{l+1}</span>
+        <span class="n">Ctl1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Ctl</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+            <span class="n">Ctl1</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">stokesProjection</span><span class="p">((</span><span class="n">Cl1</span> <span class="o">+</span> <span class="n">Ul</span><span class="p">)[:,</span> <span class="n">r</span><span class="p">])</span>
+
+        <span class="c1"># update dual</span>
+        <span class="n">Ul1</span> <span class="o">=</span> <span class="n">Ul</span> <span class="o">+</span> <span class="n">Cl1</span> <span class="o">-</span> <span class="n">Ctl1</span>
+
+        <span class="c1"># compute convergence metrics residuals</span>
+        <span class="n">primalResidue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Cl1</span> <span class="o">-</span> <span class="n">Ctl1</span><span class="p">)</span>
+        <span class="n">dualResidue</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Ctl1</span> <span class="o">-</span> <span class="n">Ctl</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">primalResidue</span> <span class="o">&lt;</span> <span class="n">epsPri</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dualResidue</span> <span class="o">&lt;</span> <span class="n">epsDual</span><span class="p">):</span>
+            <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">primalResidue</span> <span class="o">&lt;</span> <span class="n">epsPri</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dualResidue</span> <span class="o">&lt;</span> <span class="n">epsDual</span><span class="p">):</span>
+            <span class="n">exitCriterion</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">primalResidue</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">dualResidue</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">*=</span> <span class="mi">2</span>
+            <span class="n">Ul1</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">dualResidue</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">primalResidue</span><span class="p">:</span>
+            <span class="n">rho</span> <span class="o">/=</span> <span class="mi">2</span>
+            <span class="n">Ul1</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="c1"># update all variables</span>
+        <span class="n">Cl</span> <span class="o">=</span> <span class="n">Cl1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ctl</span> <span class="o">=</span> <span class="n">Ctl1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ul</span> <span class="o">=</span> <span class="n">Ul1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">n</span> <span class="o">+=</span> <span class="o">+</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">Ctl</span><span class="p">,</span> <span class="n">Cl</span><span class="p">,</span> <span class="n">primalResidue</span></div>
+
+
+
+<div class="viewcode-block" id="stokes_kmeans">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.stokes_kmeans">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stokes_kmeans</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="n">unfolding</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">clustered</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">unfolding</span><span class="p">)</span>
+
+    <span class="n">initialC</span> <span class="o">=</span> <span class="n">clustered</span><span class="o">.</span><span class="n">cluster_centers_</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="n">initialC</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">stokesProjection</span><span class="p">(</span><span class="n">initialC</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">initialC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">initialC</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">initialC</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">initialC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+
+    <span class="n">Rterms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clustered</span><span class="o">.</span><span class="n">labels_</span><span class="p">)):</span>
+        <span class="c1"># Rterms[clustered.labels_[i], i] = np.random.rand(</span>
+        <span class="c1">#     np.size(clustered.labels_[i]))</span>
+        <span class="n">Rterms</span><span class="p">[</span><span class="n">clustered</span><span class="o">.</span><span class="n">labels_</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">Rterms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">features</span><span class="p">,</span> <span class="n">initialC</span></div>
+
+
+
+<div class="viewcode-block" id="stokes_NMF">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.stokes_NMF">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stokes_NMF</span><span class="p">(</span><span class="n">Lr</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">maps</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">Lr</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">maps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Lr</span><span class="p">))</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">Lr</span><span class="p">,</span> <span class="n">maps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="n">product</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">maps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">maps</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">maps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">components_</span>
+        <span class="n">product</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="n">initA</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">initB</span> <span class="o">=</span> <span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">if</span> <span class="n">R</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+            <span class="n">initA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">initA</span><span class="p">,</span> <span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">initB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">initB</span><span class="p">,</span> <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">product</span><span class="p">,</span> <span class="n">initA</span><span class="p">,</span> <span class="n">initB</span></div>
+
+
+
+<div class="viewcode-block" id="kmeans_init">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.kmeans_init">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">kmeans_init</span><span class="p">(</span><span class="n">Lr</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">Lr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">featureMaps</span><span class="p">,</span> <span class="n">kmeansC</span> <span class="o">=</span> <span class="n">stokes_kmeans</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+
+    <span class="n">outputNMF</span><span class="p">,</span> <span class="n">kmeansA</span><span class="p">,</span> <span class="n">kmeansB</span> <span class="o">=</span> <span class="n">stokes_NMF</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">featureMaps</span><span class="p">)</span>
+
+    <span class="n">Tkmeans</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">kmeansA</span><span class="p">,</span> <span class="n">kmeansB</span><span class="p">,</span> <span class="n">kmeansC</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">lamb</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Tkmeans</span><span class="p">)</span>
+
+    <span class="n">kmeansA</span> <span class="o">=</span> <span class="n">kmeansA</span> <span class="o">*</span> <span class="n">lamb</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">kmeansB</span> <span class="o">=</span> <span class="n">kmeansB</span> <span class="o">*</span> <span class="n">lamb</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">kmeansA</span><span class="p">,</span> <span class="n">kmeansB</span><span class="p">,</span> <span class="n">kmeansC</span></div>
+
+
+
+<div class="viewcode-block" id="init_Stokes_factors">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.init_Stokes_factors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Add check to see if T has coherent dimensions</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">()</span>
+    <span class="c1"># get BTD model params</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">dims</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">rank</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">L</span>
+
+    <span class="k">if</span> <span class="n">init</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">generate_stokes_factors</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">init</span> <span class="o">==</span> <span class="s2">&quot;kmeans&quot;</span><span class="p">:</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">kmeans_init</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span></div>
+
+
+
+<div class="viewcode-block" id="Stokes_ADMM">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.Stokes_ADMM">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">Stokes_ADMM</span><span class="p">(</span>
+    <span class="n">Stokes_model</span><span class="p">,</span>
+    <span class="n">T</span><span class="p">,</span>
+    <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">rho</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_admm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">rel_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">8</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
+
+    <span class="c1"># Check that Stokes_model is an instance of the Stokes class</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">stokes</span><span class="o">.</span><span class="n">Stokes</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Stokes_model must be an instance of the Stokes class.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check that T is a numpy array</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;T must be a numpy array.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check that T&#39;s dimensions match Stokes_model.dims</span>
+    <span class="k">if</span> <span class="n">T</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;T&#39;s dimensions (</span><span class="si">{</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">) do not match Stokes_model.dims (</span><span class="si">{</span><span class="n">Stokes_model</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">init</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span>
+        <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+        <span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">init</span> <span class="o">==</span> <span class="s2">&quot;kmeans&quot;</span><span class="p">:</span>
+        <span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="s2">&quot;kmeans&quot;</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not implemented&quot;</span><span class="p">)</span>
+
+    <span class="n">T1</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">T3</span> <span class="o">=</span> <span class="n">unfold</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">()</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">L</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">rank</span>
+
+    <span class="n">Tfit_0</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">fit_error</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Tfit_0</span> <span class="o">-</span> <span class="n">T</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="n">exit_criterion</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_iter</span> <span class="o">/</span> <span class="mi">5</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Progress:&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span> <span class="o">/</span> <span class="n">max_iter</span> <span class="o">*</span> <span class="mi">100</span><span class="p">),</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span>
+        <span class="c1"># update A</span>
+        <span class="n">Atk1</span><span class="p">,</span> <span class="n">Ak1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ADMM_A</span><span class="p">(</span>
+            <span class="n">T1</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="p">(</span><span class="n">Ctk</span> <span class="o">@</span> <span class="n">theta</span><span class="p">),</span> <span class="n">Ak</span><span class="p">,</span> <span class="n">Atk</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="n">max_admm</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">admm_tol</span>
+        <span class="p">)</span>
+
+        <span class="c1"># update B</span>
+        <span class="n">Btk1</span><span class="p">,</span> <span class="n">Bk1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ADMM_B</span><span class="p">(</span>
+            <span class="n">T2</span><span class="p">,</span> <span class="n">Atk1</span><span class="p">,</span> <span class="p">(</span><span class="n">Ctk</span> <span class="o">@</span> <span class="n">theta</span><span class="p">),</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="n">max_admm</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">admm_tol</span>
+        <span class="p">)</span>
+
+        <span class="c1"># update C</span>
+        <span class="n">Ctk1</span><span class="p">,</span> <span class="n">Ck1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ADMM_C</span><span class="p">(</span>
+            <span class="n">T3</span><span class="p">,</span> <span class="n">Atk1</span><span class="p">,</span> <span class="n">Btk1</span><span class="p">,</span> <span class="n">Ck</span><span class="p">,</span> <span class="n">Ctk</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="n">max_admm</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">admm_tol</span>
+        <span class="p">)</span>
+
+        <span class="c1"># update variables</span>
+        <span class="n">Ak</span> <span class="o">=</span> <span class="n">Ak1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Bk</span> <span class="o">=</span> <span class="n">Bk1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ck</span> <span class="o">=</span> <span class="n">Ck1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">Atk</span> <span class="o">=</span> <span class="n">Atk1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Btk</span> <span class="o">=</span> <span class="n">Btk1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">Ctk</span> <span class="o">=</span> <span class="n">Ctk1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">estimated_factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Atk1</span><span class="p">,</span> <span class="n">Btk1</span><span class="p">,</span> <span class="n">Ctk1</span><span class="p">]</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># compute reconstruction error</span>
+
+        <span class="n">Tfit_k</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">Atk1</span><span class="p">,</span> <span class="n">Btk1</span><span class="p">,</span> <span class="n">Ctk1</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+        <span class="n">fit_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Tfit_k</span> <span class="o">-</span> <span class="n">T</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">rel_tol</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting early due to unsufficient decrease of cost&quot;</span><span class="p">)</span>
+            <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">fit_error</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">abs_tol</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reached absolute tolerance threshold. Exiting.&quot;</span><span class="p">)</span>
+            <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="n">exit_criterion</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Reached max number of iteration. Check convergence.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">estimated_factors</span><span class="p">,</span> <span class="n">fit_error</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Saulo Barreto.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
