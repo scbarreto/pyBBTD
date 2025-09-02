@@ -110,9 +110,12 @@ def constraint_matrix(R, L):
     """Compute the constraint matrix repeating columns
     for the BTD model
 
-    Args:
-        R: rank of the decomposition
+    Parameters:
+        R: rank of the decomposition (number of terms)
         L: int or sequence of L values for each block
+
+    Returns:
+        theta: BTD constraint matrix
     """
     _, Larray = validate_R_L(R, L)
     theta = block_diag(*[np.ones(Lr) for Lr in Larray])
