@@ -14,7 +14,7 @@ dependencies = [
     "scipy>=1.13.1",
     "tensorly>=0.9.0",
     "palettable>=3.0.1",
-    "scikit-learn>=0.24.2"
+    "scikit-learn>=0.24.2"    
 ]
     
 [project.scripts]
@@ -24,7 +24,10 @@ pybbtd = "pybbtd:main"
 notebooks = [
     "ipykernel>=6.29.5",
 ]
-
+docs = [
+    "sphinx>=8.2.0",
+    "sphinx_rtd_theme>=3.0.2"
+]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
