@@ -64,7 +64,7 @@ class Stokes(BTD):
 
     def get_constraint_matrix(self):
         """
-        Returns contraint matrix for BTD-LL1 model (useful to CP-equivalent model)
+        Returns constraint matrix for BTD-LL1 model (useful to CP-equivalent model)
         """
         return btd.constraint_matrix(self.rank, self.L)
 
