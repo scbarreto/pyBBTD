@@ -34,8 +34,7 @@ def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
         # update A_{l+1}
         # Solve A @ X = B  ⇒  A = B @ inv(X)
         A_T = solve(
-            (M1M1T + rho * np.eye(Ainit.shape[1])
-             ).T, (RHS + rho * (Atl - Ul)).T
+            (M1M1T + rho * np.eye(Ainit.shape[1])).T, (RHS + rho * (Atl - Ul)).T
         )
         Al1 = A_T.T
 
@@ -91,8 +90,7 @@ def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
     while (n < nitermax) & exitCriterion:
         # update B_(l+1)
         B_T = solve(
-            (M2M2T + rho * np.eye(Binit.shape[1])
-             ).T, (RHS + rho * (Btl - Ul)).T
+            (M2M2T + rho * np.eye(Binit.shape[1])).T, (RHS + rho * (Btl - Ul)).T
         )
         Bl1 = B_T.T
 
@@ -150,8 +148,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     while (n < nitermax) & exitCriterion:
         # update C_(l+1)
         C_T = solve(
-            (M3M3T + rho * np.eye(Cinit.shape[1])
-             ).T, (RHS + rho * (Ctl - Ul)).T
+            (M3M3T + rho * np.eye(Cinit.shape[1])).T, (RHS + rho * (Ctl - Ul)).T
         )
         Cl1 = C_T.T
 
@@ -191,8 +188,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 def stokes_kmeans(R, T):
     unfolding = unfold(T, 2).T
 
-    clustered = KMeans(n_clusters=R, random_state=0,
-                       n_init="auto").fit(unfolding)
+    clustered = KMeans(n_clusters=R, random_state=0, n_init="auto").fit(unfolding)
 
     initialC = clustered.cluster_centers_.T
 
@@ -293,8 +289,7 @@ def Stokes_ADMM(
 
     # Check that Stokes_model is an instance of the Stokes class
     if not isinstance(Stokes_model, stokes.Stokes):
-        raise TypeError(
-            "Stokes_model must be an instance of the Stokes class.")
+        raise TypeError("Stokes_model must be an instance of the Stokes class.")
 
     # Check that T is a numpy array
     if not isinstance(T, np.ndarray):
@@ -329,8 +324,8 @@ def Stokes_ADMM(
     k = 0
     exit_criterion = False
     while exit_criterion is False:
-        if ((k != 0) and (k % int(max_iter/5)) == 0):
-            print("Progress:", (k/max_iter * 100), "%")
+        if (k != 0) and (k % int(max_iter / 5)) == 0:
+            print("Progress:", (k / max_iter * 100), "%")
         # update A
         Atk1, Ak1, _ = ADMM_A(
             T1, Btk, (Ctk @ theta), Ak, Atk, rho, L, nitermax=max_admm, tol=admm_tol
