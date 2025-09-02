@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pybbtd.stokes &mdash; pyBBTD  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pyBBTD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference manual</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyBBTD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pybbtd.stokes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pybbtd.stokes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="kn">import</span> <span class="n">BTD</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+
+<div class="viewcode-block" id="Stokes">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Stokes</span><span class="p">(</span><span class="n">BTD</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate random factors that follow Stokes-BTD decomposition.</span>
+
+<span class="sd">    This class generates the factor matrices (A, B, C) according to the</span>
+<span class="sd">    Stokes-BTD model for a tensor of given dimensions and rank.</span>
+
+<span class="sd">    :param dims: Dimensions `(I, J, K)` of the tensor.</span>
+<span class="sd">    :type dims: Tuple[int, int, int]</span>
+<span class="sd">    :param R: The rank of the decomposition (number of components).</span>
+<span class="sd">    :type R: int</span>
+<span class="sd">    :param L: Rank of the spatial maps.</span>
+<span class="sd">    :type L: int</span>
+
+<span class="sd">    :ivar A: Factor matrix of shape `(dims[0], L * R)`.</span>
+<span class="sd">    :vartype A: np.ndarray</span>
+<span class="sd">    :ivar B: Factor matrix of shape `(dims[1], L * R)`.</span>
+<span class="sd">    :vartype B: np.ndarray</span>
+<span class="sd">    :ivar C: Factor matrix of shape `(dims[2], R)`, where each column is a Stokes vector.</span>
+<span class="sd">    :vartype C: np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spatial_dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">spatial_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spatial_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;block_mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LL1&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Stokes tensor initialized with dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span><span class="si">}</span><span class="s2"> mode.&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Stokes.generate_stokes_tensor">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes.generate_stokes_tensor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_stokes_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a random Stokes tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">generate_stokes_factors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+        <span class="c1"># Generate the tensor using the factors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span>
+            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">(),</span> <span class="n">block_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span></div>
+
+
+<div class="viewcode-block" id="Stokes.fit">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes Stokes-BTD factor matrices for provided data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.stokes_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stokes_ADMM</span>
+
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;ADMM&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">Stokes_ADMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span>
+                <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">(),</span> <span class="n">block_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Algorithm not implemented yet&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Stokes.get_constraint_matrix">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes.get_constraint_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns constraint matrix for BTD-LL1 model (useful to CP-equivalent model)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">btd</span><span class="o">.</span><span class="n">constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="generate_stokes_factors">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.generate_stokes_factors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_stokes_factors</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate random factors that follow Stokes-BTD decomposition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dims (Tuple[int, int, int]):</span>
+<span class="sd">            Dimensions `(I, J, K)` of the tensor.</span>
+<span class="sd">        R (int):</span>
+<span class="sd">            The rank of the decomposition (number of components).</span>
+<span class="sd">        L (int):</span>
+<span class="sd">            Rank of the spatial maps.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">            A tuple containing the three factor matrices `(A, B, C)`:</span>
+
+<span class="sd">            - A (np.ndarray): Shape `(dims[0], L * R)`.</span>
+<span class="sd">            - B (np.ndarray): Shape `(dims[1], L * R)`.</span>
+<span class="sd">            - C (np.ndarray): Shape `(dims[2], R)`, where each column is a Stokes vector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">R</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="n">cr</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">cr</span> <span class="o">=</span> <span class="n">cr</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cr</span><span class="p">)</span>
+
+        <span class="n">C</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">coh2stokes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">cr</span><span class="p">,</span> <span class="n">cr</span><span class="o">.</span><span class="n">conj</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span></div>
+
+
+
+<div class="viewcode-block" id="validate_stokes_tensor">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.validate_stokes_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_stokes_tensor</span><span class="p">(</span><span class="n">T0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if all pixels satisfy the Stokes constraints.</span>
+<span class="sd">    Shows a warning at the end with the percentage of invalid pixels (if any).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">invalid_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">stokes_vec</span> <span class="o">=</span> <span class="n">T0</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">if</span> <span class="n">check_stokes_constraints</span><span class="p">(</span><span class="n">stokes_vec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">invalid_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">invalid_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">invalid_count</span> <span class="o">/</span> <span class="n">total_pixels</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">% of pixels do not satisfy the Stokes constraints.&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All pixels satisfy the Stokes constraints.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="check_stokes_constraints">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.check_stokes_constraints">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_stokes_constraints</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">round</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">S</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">else</span> <span class="mi">1</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="stokes2coh">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.stokes2coh">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stokes2coh</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="s2">&quot;construct Coherence matrix from Stokes parameters&quot;</span>
+    <span class="n">S0</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">S1</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">S2</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">S3</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">coh</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">S0</span> <span class="o">+</span> <span class="n">S1</span><span class="p">,</span> <span class="n">S2</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">S3</span><span class="p">],</span> <span class="p">[</span><span class="n">S2</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">S3</span><span class="p">,</span> <span class="n">S0</span> <span class="o">-</span> <span class="n">S1</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">coh</span></div>
+
+
+
+<div class="viewcode-block" id="coh2stokes">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.coh2stokes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coh2stokes</span><span class="p">(</span><span class="n">coh</span><span class="p">):</span>
+    <span class="s2">&quot;return Stokes parameters from coherence matrix&quot;</span>
+    <span class="n">S0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">coh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">S1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">coh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">S2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="n">S3</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">S0</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">S3</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">S</span></div>
+
+
+
+<div class="viewcode-block" id="projPSD">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.projPSD">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">projPSD</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="s2">&quot;projection of matrix M onto the set of PSD hermitian matrices&quot;</span>
+
+    <span class="n">symM</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">+</span> <span class="n">M</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">symM</span><span class="p">)</span>
+
+    <span class="n">proj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">symM</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+        <span class="n">proj</span> <span class="o">+=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">v</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">conj</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">proj</span></div>
+
+
+
+<div class="viewcode-block" id="stokesProjection">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.stokesProjection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stokesProjection</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="n">coh</span> <span class="o">=</span> <span class="n">stokes2coh</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">proj</span> <span class="o">=</span> <span class="n">projPSD</span><span class="p">(</span><span class="n">coh</span><span class="p">)</span>
+    <span class="n">newS</span> <span class="o">=</span> <span class="n">coh2stokes</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newS</span></div>
+
+
+
+<span class="c1"># def elip_2_stokes(psi, chi, p=1):</span>
+<span class="c1">#     S1 = p * np.cos(2 * psi) * np.cos(2 * chi)</span>
+<span class="c1">#     S2 = p * np.sin(2 * psi) * np.cos(2 * chi)</span>
+<span class="c1">#     S3 = p * np.sin(2 * chi)</span>
+<span class="c1">#     return np.array([1, S1, S2, S3])</span>
+
+
+<span class="c1"># def stokes_2_elip(S):</span>
+<span class="c1">#     S0 = S[0]</span>
+<span class="c1">#     p = np.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]</span>
+<span class="c1">#     psi = 1 / 2 * np.arctan2(S[2], S[1])</span>
+<span class="c1">#     chi = 1 / 2 * np.arctan2(S[3], np.sqrt(S[1] ** 2 + S[2] ** 2))</span>
+<span class="c1">#     # chi = 1/2 * np.arcsin(S[3] / S[0])</span>
+
+<span class="c1">#     return (psi, chi, p, S0)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Saulo Barreto.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
