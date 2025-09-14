@@ -15,5 +15,5 @@ pyBBTD docs
 Planned releases
 ====================
 
-- **3rd model**: planned for end of September 2025  
-- **4th 4-order model**: planned for mid October 2025
+- **3rd-order model (Cov-LL1 and Stokes-BTD) **: planned for end of September 2025  
+- **4th-order model (BBTD) **: planned for mid October 2025
