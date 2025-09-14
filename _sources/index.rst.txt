@@ -11,3 +11,9 @@ pyBBTD docs
 
    tutorials/index
    reference
+
+Planned releases
+====================
+
+- **3rd model**: planned for end of September 2025  
+- **4th 4-order model**: planned for mid October 2025
