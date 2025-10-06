@@ -9,8 +9,8 @@ Reference manual
 .. toctree::
    :maxdepth: 2
 
-   reference_stokes
    reference_btd
+   reference_stokes
    reference_solvers
    reference_draw
    reference_uniqueness

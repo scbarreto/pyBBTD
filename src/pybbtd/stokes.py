@@ -7,12 +7,9 @@ import warnings
 
 class Stokes(BTD):
     """
-    Generate random factors that follow Stokes-BTD decomposition.
+     Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.
 
-    This class generates the factor matrices (A, B, C) according to the
-    Stokes-BTD model for a tensor of given dimensions and rank.
-
-    :param dims: Dimensions `(I, J, K)` of the tensor.
+    :param dims: Dimensions `(I, J, 4)` of the tensor.
     :type dims: Tuple[int, int, int]
     :param R: The rank of the decomposition (number of components).
     :type R: int
@@ -23,11 +20,22 @@ class Stokes(BTD):
     :vartype A: np.ndarray
     :ivar B: Factor matrix of shape `(dims[1], L * R)`.
     :vartype B: np.ndarray
-    :ivar C: Factor matrix of shape `(dims[2], R)`, where each column is a Stokes vector.
+    :ivar C: Factor matrix of shape `(4, R)`, where each column is a Stokes vector.
     :vartype C: np.ndarray
     """
 
     def __init__(self, spatial_dims, R, L, **kwargs):
+        """
+        Initialize Stokes-BTD model.
+        Parameters:
+            spatial_dims: Tuple[int, int]
+                Spatial dimensions of the tensor (first two modes).
+            R: int
+                Rank of the decomposition (number of components).
+            L: int
+                Rank of the spatial maps.
+        """
+
         dims = (spatial_dims[0], spatial_dims[1], 4)
         kwargs["block_mode"] = "LL1"
         super().__init__(dims=dims, R=R, L=L, **kwargs)
@@ -51,6 +59,13 @@ class Stokes(BTD):
     def fit(self, data, algorithm="ADMM", **kwargs):
         """
         Computes Stokes-BTD factor matrices for provided data
+        using the specified algorithm.
+        Parameters:
+            data: np.ndarray
+                Input tensor data to be approximated.
+            algorithm: str
+                Algorithm to use for fitting. Currently, only "ADMM" is implemented.
+            **kwargs: Additional keyword arguments for the fitting algorithm.
         """
         from pybbtd.solvers.stokes_admm import Stokes_ADMM
 

@@ -9,6 +9,20 @@ from pybbtd.solvers.btd_als import BTD_ALS
 class BTD:
     """
     Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
+
+    :param dims: Dimensions `(I, J, K)` of the tensor.
+    :type dims: Tuple[int, int, int]
+    :param R: The rank of the decomposition (number of components).
+    :type R: int
+    :param L: Rank of the spatial maps.
+    :type L: int
+
+    :ivar A: Factor matrix of shape `(dims[0], L * R)`.
+    :vartype A: np.ndarray
+    :ivar B: Factor matrix of shape `(dims[1], L * R)`.
+    :vartype B: np.ndarray
+    :ivar C: Factor matrix of shape `(dims[2], R)`.
+    :vartype C: np.ndarray
     """
 
     def __init__(self, dims, R: int, L: int, block_mode="LL1"):
@@ -73,6 +87,7 @@ class BTD:
     def fit(self, data, algorithm="ALS", **kwargs):
         """
         Fit a BTD to the given data using the specified algorithm.
+
         Parameters:
             data: ndarray
                 The input tensor data to be decomposed.
@@ -127,7 +142,7 @@ def constraint_matrix(R, L):
 
     Parameters:
         R: rank of the decomposition (number of terms)
-        L: int or sequence of L values for each block
+        L: int or sequence of rank-L values for the spatial map of each block
 
     Returns:
         theta: BTD constraint matrix

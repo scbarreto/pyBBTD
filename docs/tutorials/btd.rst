@@ -1,4 +1,4 @@
-Introduction to BTD with pyBBTD
+BTD-LL1 tutorial with pyBBTD
 ===================================
 
 This tutorial provides an introduction to Block Tensor Decomposition (BTD) using the pyBBTD library.
@@ -20,29 +20,28 @@ We first define the dimensions of the tensor and the BTD parameters.
 
 .. code:: python3
 
-    I, J, K = 80, 100, 4  # dimensions of the tensor
-    R = 3                 # number of BTD terms
-    L = 5                 # rank of each term
+    # Define tensor size and BTD parameters
+    N1, N2, N3 = 80, 100, 4  # dimensions of the tensor
+    R = 3  # number of BTD terms
+    L = 5  # rank of each term
 
-    # Define the BTD model
-    X = btd.BTD([I, J, K], R, L, block_mode="LL1")
+    # Generate BTD model
+    X = btd.BTD([N1, N2, N3], R, L, block_mode="LL1")
 
 Then we create the true BTD components and generate the observed tensor with added noise.
 
 .. code:: python3
 
-    # Generate ground truth BTD factors
+   # Create ground truth tensor and add some noise
     A0, B0, C0 = btd_als.init_BTD_factors(X, strat="random")
-
-    # Generate the observed tensor with noise
-    theta = X.get_constraint_matrix()  # CP equivalent constraint matrix
-    X_observed = btd.factors_to_tensor(A0, B0, C0, theta, block_mode="LL1") + 1 * 1e-10 * np.random.randn(*X.dims)
+    theta = X.get_constraint_matrix()
+    T_observed = btd.factors_to_tensor(A0, B0, C0, theta, block_mode="LL1") + 1 * 1e-6 * np.random.randn(*X.dims)
 
 We now fit a BTD model to the observed tensor.
 
 .. code:: python3
 
-   # Fit the model using random initialization
+    # Fit the model using random initialization
     X.fit(T_observed, max_iter=3000, init="random", rel_tol=1e-9, abs_tol=1e-15)
 
     # Save the fit error for comparison with SVD init
@@ -56,5 +55,23 @@ We now fit a BTD model to the observed tensor.
     ax.semilogy(X.fit_error)
     ax.set_ylabel("fit error")
     _ = ax.set_xlabel("iteration number")
-
 .. image:: btd_files/fit_error_rand.png
+
+Compare with SVD initialization
+---------------------------------
+
+We can also fit the model using SVD initialization and compare the results.
+
+.. code:: python3
+
+    X.fit(T_observed, max_iter=3000, init="svd", rel_tol=1e-9, abs_tol=1e-15)
+    svd_init_fit_error = X.fit_error
+
+    fig, ax = plt.subplots()
+    ax.semilogy(svd_init_fit_error, label="SVD init")
+    ax.semilogy(rand_init_fit_error, label="Random init")
+    ax.set_ylabel("fit error")
+    ax.set_xlabel("iteration number")
+    _ = ax.legend()
+    
+.. image:: btd_files/fit_error_svd.png
