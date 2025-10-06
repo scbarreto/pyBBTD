@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pybbtd.stokes" href="reference_stokes.html" />
-    <link rel="prev" title="Stokes Tutorial" href="tutorials/stokes.html" /> 
+    <link rel="next" title="pybbtd.btd" href="reference_btd.html" />
+    <link rel="prev" title="Example 1: Stokes Tutorial with pyBBTD and noisy data" href="tutorials/stokes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,8 +45,8 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reference manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_draw.html">pybbtd.draw</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
@@ -82,6 +82,13 @@
 <span id="reference-manual"></span><span id="reference"></span><h1>Reference manual<a class="headerlink" href="#module-pybbtd" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.constraint_matrix"><code class="docutils literal notranslate"><span class="pre">constraint_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.validate_R_L"><code class="docutils literal notranslate"><span class="pre">validate_R_L()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.Stokes"><code class="docutils literal notranslate"><span class="pre">Stokes</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.check_stokes_constraints"><code class="docutils literal notranslate"><span class="pre">check_stokes_constraints()</span></code></a></li>
@@ -91,13 +98,6 @@
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.stokes2coh"><code class="docutils literal notranslate"><span class="pre">stokes2coh()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.stokesProjection"><code class="docutils literal notranslate"><span class="pre">stokesProjection()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html#pybbtd.stokes.validate_stokes_tensor"><code class="docutils literal notranslate"><span class="pre">validate_stokes_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.constraint_matrix"><code class="docutils literal notranslate"><span class="pre">constraint_matrix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html#pybbtd.btd.validate_R_L"><code class="docutils literal notranslate"><span class="pre">validate_R_L()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a><ul>
@@ -131,8 +131,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tutorials/stokes.html" class="btn btn-neutral float-left" title="Stokes Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="reference_stokes.html" class="btn btn-neutral float-right" title="pybbtd.stokes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorials/stokes.html" class="btn btn-neutral float-left" title="Example 1: Stokes Tutorial with pyBBTD and noisy data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference_btd.html" class="btn btn-neutral float-right" title="pybbtd.btd" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

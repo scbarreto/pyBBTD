@@ -82,6 +82,20 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">BTD</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.</span>
+
+<span class="sd">    :param dims: Dimensions `(I, J, K)` of the tensor.</span>
+<span class="sd">    :type dims: Tuple[int, int, int]</span>
+<span class="sd">    :param R: The rank of the decomposition (number of components).</span>
+<span class="sd">    :type R: int</span>
+<span class="sd">    :param L: Rank of the spatial maps.</span>
+<span class="sd">    :type L: int</span>
+
+<span class="sd">    :ivar A: Factor matrix of shape `(dims[0], L * R)`.</span>
+<span class="sd">    :vartype A: np.ndarray</span>
+<span class="sd">    :ivar B: Factor matrix of shape `(dims[1], L * R)`.</span>
+<span class="sd">    :vartype B: np.ndarray</span>
+<span class="sd">    :ivar C: Factor matrix of shape `(dims[2], R)`.</span>
+<span class="sd">    :vartype C: np.ndarray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">):</span>
@@ -151,6 +165,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ALS&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit a BTD to the given data using the specified algorithm.</span>
+
 <span class="sd">        Parameters:</span>
 <span class="sd">            data: ndarray</span>
 <span class="sd">                The input tensor data to be decomposed.</span>
@@ -218,7 +233,7 @@
 
 <span class="sd">    Parameters:</span>
 <span class="sd">        R: rank of the decomposition (number of terms)</span>
-<span class="sd">        L: int or sequence of L values for each block</span>
+<span class="sd">        L: int or sequence of rank-L values for the spatial map of each block</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        theta: BTD constraint matrix</span>

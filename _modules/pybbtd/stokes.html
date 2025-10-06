@@ -80,12 +80,9 @@
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Stokes</span><span class="p">(</span><span class="n">BTD</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate random factors that follow Stokes-BTD decomposition.</span>
+<span class="sd">     Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.</span>
 
-<span class="sd">    This class generates the factor matrices (A, B, C) according to the</span>
-<span class="sd">    Stokes-BTD model for a tensor of given dimensions and rank.</span>
-
-<span class="sd">    :param dims: Dimensions `(I, J, K)` of the tensor.</span>
+<span class="sd">    :param dims: Dimensions `(I, J, 4)` of the tensor.</span>
 <span class="sd">    :type dims: Tuple[int, int, int]</span>
 <span class="sd">    :param R: The rank of the decomposition (number of components).</span>
 <span class="sd">    :type R: int</span>
@@ -96,11 +93,22 @@
 <span class="sd">    :vartype A: np.ndarray</span>
 <span class="sd">    :ivar B: Factor matrix of shape `(dims[1], L * R)`.</span>
 <span class="sd">    :vartype B: np.ndarray</span>
-<span class="sd">    :ivar C: Factor matrix of shape `(dims[2], R)`, where each column is a Stokes vector.</span>
+<span class="sd">    :ivar C: Factor matrix of shape `(4, R)`, where each column is a Stokes vector.</span>
 <span class="sd">    :vartype C: np.ndarray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spatial_dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize Stokes-BTD model.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            spatial_dims: Tuple[int, int]</span>
+<span class="sd">                Spatial dimensions of the tensor (first two modes).</span>
+<span class="sd">            R: int</span>
+<span class="sd">                Rank of the decomposition (number of components).</span>
+<span class="sd">            L: int</span>
+<span class="sd">                Rank of the spatial maps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">spatial_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spatial_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;block_mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LL1&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -129,6 +137,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes Stokes-BTD factor matrices for provided data</span>
+<span class="sd">        using the specified algorithm.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            data: np.ndarray</span>
+<span class="sd">                Input tensor data to be approximated.</span>
+<span class="sd">            algorithm: str</span>
+<span class="sd">                Algorithm to use for fitting. Currently, only &quot;ADMM&quot; is implemented.</span>
+<span class="sd">            **kwargs: Additional keyword arguments for the fitting algorithm.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.stokes_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stokes_ADMM</span>
 

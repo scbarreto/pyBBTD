@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stokes Tutorial &mdash; pyBBTD  documentation</title>
+  <title>Example 1: Stokes Tutorial with pyBBTD and noisy data &mdash; pyBBTD  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Reference manual" href="../reference.html" />
-    <link rel="prev" title="Introduction to BTD with pyBBTD" href="btd.html" /> 
+    <link rel="prev" title="BTD-LL1 tutorial with pyBBTD" href="btd.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,8 +44,18 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="btd.html">Introduction to BTD with pyBBTD</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Stokes Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="btd.html">BTD-LL1 tutorial with pyBBTD</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example 1: Stokes Tutorial with pyBBTD and noisy data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load-required-libraries">Load required libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-btd-ll1-data-that-respect-stokes-constraints">Generate BTD-LL1 data that respect Stokes constraints</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#example-2-separating-canonical-polarization-states-with-stokes-btd-and-pybbtd">Example 2: Separating canonical polarization states with Stokes-BTD and pybbtd</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Load required libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load-the-data-tensor-and-define-the-stokes-btd-model-parameters">Load the data tensor and define the Stokes-BTD model parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../reference.html">Reference manual</a></li>
@@ -66,7 +76,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">Stokes Tutorial</li>
+      <li class="breadcrumb-item active">Example 1: Stokes Tutorial with pyBBTD and noisy data</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/stokes.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -76,16 +86,94 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="stokes-tutorial">
-<h1>Stokes Tutorial<a class="headerlink" href="#stokes-tutorial" title="Link to this heading"></a></h1>
-<p>Tutorial for usage of Stokes Class</p>
+  <section id="example-1-stokes-tutorial-with-pybbtd-and-noisy-data">
+<h1>Example 1: Stokes Tutorial with pyBBTD and noisy data<a class="headerlink" href="#example-1-stokes-tutorial-with-pybbtd-and-noisy-data" title="Link to this heading"></a></h1>
+<p>This tutorial provides an introduction to the Stokes Block Tensor Decomposition (Stokes-BTD) using the pyBBTD library.</p>
+<section id="load-required-libraries">
+<h2>Load required libraries<a class="headerlink" href="#load-required-libraries" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd</span><span class="w"> </span><span class="k">as</span>
+</pre></div>
+</div>
+<p>Define Stokes-BTD parameters and spatial map dimensions</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of components</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Rank of Spatial maps</span>
+<span class="n">btd</span><span class="o">.</span><span class="n">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+<span class="c1"># Define spatial maps of size 25x25.</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">Stokes</span><span class="p">([</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="generate-btd-ll1-data-that-respect-stokes-constraints">
+<h2>Generate BTD-LL1 data that respect Stokes constraints<a class="headerlink" href="#generate-btd-ll1-data-that-respect-stokes-constraints" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create ground truth tensor</span>
+<span class="p">[</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">,</span> <span class="n">C0</span><span class="p">],</span> <span class="n">T0</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">generate_stokes_tensor</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then we get the constraint matrix for the equivalent CPD representation of the BTD-Stokes model, and add some noise to the generated tensor.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">theta</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">()</span>
+<span class="n">Tnoisy</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">,</span> <span class="n">C0</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+
+<span class="c1"># We check iff all pixels satisfy the Stokes constraints</span>
+<span class="n">stokes</span><span class="o">.</span><span class="n">validate_stokes_tensor</span><span class="p">(</span><span class="n">Tnoisy</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We now fit a Stokes-BTD model to the observed tensor.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">Tnoisy</span><span class="p">,</span><span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">max_admm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">8</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">14</span><span class="p">,</span><span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">fit_error</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;fit error&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;iteration number&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/fit_error_rand1.png" src="../_images/fit_error_rand1.png" />
+</section>
+</section>
+<section id="example-2-separating-canonical-polarization-states-with-stokes-btd-and-pybbtd">
+<h1>Example 2: Separating canonical polarization states with Stokes-BTD and pybbtd<a class="headerlink" href="#example-2-separating-canonical-polarization-states-with-stokes-btd-and-pybbtd" title="Link to this heading"></a></h1>
+<p>In this tutorial, we demonstrate how to use the pyBBTD library to perform Stokes-BTD with canonical polarization states. We will use a numpy array representing the acronym BBTD, where each letter is defined to have a canonical polarization state. Then we will fit a Stokes-BTD model, and visualize the results.</p>
+<section id="id1">
+<h2>Load required libraries<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pybbtd</span>
+</pre></div>
+</div>
+</section>
+<section id="load-the-data-tensor-and-define-the-stokes-btd-model-parameters">
+<h2>Load the data tensor and define the Stokes-BTD model parameters<a class="headerlink" href="#load-the-data-tensor-and-define-the-stokes-btd-model-parameters" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/BBTD_Stokes.npy&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create Stokes model</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">btd</span><span class="o">.</span><span class="n">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">Stokes</span><span class="p">([</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="fit-the-stokes-btd-model-to-the-data-tensor">
+<h2>Fit the Stokes-BTD model to the data tensor<a class="headerlink" href="#fit-the-stokes-btd-model-to-the-data-tensor" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tensor</span><span class="p">,</span><span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">max_admm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">8</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">7</span><span class="p">,</span> <span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Visualize the results, module pybbtd.draw will be soon have a method to plot the Stokes vectors as ellipses.</p>
+<img alt="../_images/BBTD_board.png" src="../_images/BBTD_board.png" />
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="btd.html" class="btn btn-neutral float-left" title="Introduction to BTD with pyBBTD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="btd.html" class="btn btn-neutral float-left" title="BTD-LL1 tutorial with pyBBTD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../reference.html" class="btn btn-neutral float-right" title="Reference manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

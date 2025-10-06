@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pybbtd.solvers" href="reference_solvers.html" />
-    <link rel="prev" title="pybbtd.stokes" href="reference_stokes.html" /> 
+    <link rel="next" title="pybbtd.stokes" href="reference_stokes.html" />
+    <link rel="prev" title="Reference manual" href="reference.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,7 +45,6 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference manual</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">pybbtd.btd</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
@@ -59,6 +58,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#pybbtd.btd.validate_R_L"><code class="docutils literal notranslate"><span class="pre">validate_R_L()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_draw.html">pybbtd.draw</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
@@ -98,6 +98,22 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">BTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <cite>(I, J, K)</cite> of the tensor.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>A</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[0], L * R)</cite>.</p></li>
+<li><p><strong>B</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[1], L * R)</cite>.</p></li>
+<li><p><strong>C</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[2], R)</cite>.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.check_uniqueness">
 <span class="sig-name descname"><span class="pre">check_uniqueness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.check_uniqueness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.check_uniqueness" title="Link to this definition"></a></dt>
@@ -107,15 +123,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ALS'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.fit" title="Link to this definition"></a></dt>
-<dd><p>Fit a BTD to the given data using the specified algorithm.
-:param data: ndarray</p>
-<blockquote>
-<div><p>The input tensor data to be decomposed.</p>
-</div></blockquote>
+<dd><p>Fit a BTD to the given data using the specified algorithm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>algorithm</strong> – str
-The algorithm to use for fitting.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – ndarray
+The input tensor data to be decomposed.</p></li>
+<li><p><strong>algorithm</strong> – str
+The algorithm to use for fitting.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -143,7 +159,7 @@ for the BTD model</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>R</strong> – rank of the decomposition (number of terms)</p></li>
-<li><p><strong>L</strong> – int or sequence of L values for each block</p></li>
+<li><p><strong>L</strong> – int or sequence of rank-L values for the spatial map of each block</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -173,8 +189,8 @@ for the BTD model</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="reference_stokes.html" class="btn btn-neutral float-left" title="pybbtd.stokes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="reference_solvers.html" class="btn btn-neutral float-right" title="pybbtd.solvers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="reference.html" class="btn btn-neutral float-left" title="Reference manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference_stokes.html" class="btn btn-neutral float-right" title="pybbtd.stokes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
