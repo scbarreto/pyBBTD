@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BTD Tutorial &mdash; pyBBTD  documentation</title>
+  <title>Introduction to BTD with pyBBTD &mdash; pyBBTD  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -44,7 +44,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">BTD Tutorial</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction to BTD with pyBBTD</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#load-required-libraries">Load required libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-noisy-data-with-known-btd-structure-and-fit-a-btd-model">Generate noisy data with known BTD structure and fit a BTD model</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="stokes.html">Stokes Tutorial</a></li>
 </ul>
 </li>
@@ -66,7 +70,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">BTD Tutorial</li>
+      <li class="breadcrumb-item active">Introduction to BTD with pyBBTD</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/btd.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -76,9 +80,57 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="btd-tutorial">
-<h1>BTD Tutorial<a class="headerlink" href="#btd-tutorial" title="Link to this heading"></a></h1>
-<p>Test</p>
+  <section id="introduction-to-btd-with-pybbtd">
+<h1>Introduction to BTD with pyBBTD<a class="headerlink" href="#introduction-to-btd-with-pybbtd" title="Link to this heading"></a></h1>
+<p>This tutorial provides an introduction to Block Tensor Decomposition (BTD) using the pyBBTD library.</p>
+<section id="load-required-libraries">
+<h2>Load required libraries<a class="headerlink" href="#load-required-libraries" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers</span><span class="w"> </span><span class="kn">import</span> <span class="n">btd_als</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+</pre></div>
+</div>
+</section>
+<section id="generate-noisy-data-with-known-btd-structure-and-fit-a-btd-model">
+<h2>Generate noisy data with known BTD structure and fit a BTD model<a class="headerlink" href="#generate-noisy-data-with-known-btd-structure-and-fit-a-btd-model" title="Link to this heading"></a></h2>
+<p>We first define the dimensions of the tensor and the BTD parameters.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">4</span>  <span class="c1"># dimensions of the tensor</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mi">3</span>                 <span class="c1"># number of BTD terms</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mi">5</span>                 <span class="c1"># rank of each term</span>
+
+<span class="c1"># Define the BTD model</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">BTD</span><span class="p">([</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">],</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then we create the true BTD components and generate the observed tensor with added noise.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate ground truth BTD factors</span>
+<span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">,</span> <span class="n">C0</span> <span class="o">=</span> <span class="n">btd_als</span><span class="o">.</span><span class="n">init_BTD_factors</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">strat</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate the observed tensor with noise</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">()</span>  <span class="c1"># CP equivalent constraint matrix</span>
+<span class="n">X_observed</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">,</span> <span class="n">C0</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="mf">1e-10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We now fit a BTD model to the observed tensor.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fit the model using random initialization</span>
+ <span class="n">X</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">T_observed</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-15</span><span class="p">)</span>
+
+ <span class="c1"># Save the fit error for comparison with SVD init</span>
+ <span class="n">rand_init_fit_error</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">fit_error</span>
+
+ <span class="c1"># Retrieve the estimated factors if necessary</span>
+ <span class="n">A_est</span><span class="p">,</span> <span class="n">B_est</span><span class="p">,</span> <span class="n">C_est</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">factors</span>
+
+ <span class="c1"># Check convergence curve</span>
+ <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+ <span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">fit_error</span><span class="p">)</span>
+ <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;fit error&quot;</span><span class="p">)</span>
+ <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;iteration number&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/fit_error_rand.png" src="../_images/fit_error_rand.png" />
+</section>
 </section>
 
 

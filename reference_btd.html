@@ -97,21 +97,34 @@
 <dt class="sig sig-object py" id="pybbtd.btd.BTD">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">BTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for Tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.</p>
+<p>Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.check_uniqueness">
 <span class="sig-name descname"><span class="pre">check_uniqueness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.check_uniqueness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.check_uniqueness" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Check if, for given parameters, uniqueness can be guaranteed.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ALS'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.fit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Fit a BTD to the given data using the specified algorithm.
+:param data: ndarray</p>
+<blockquote>
+<div><p>The input tensor data to be decomposed.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>algorithm</strong> – str
+The algorithm to use for fitting.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.get_constraint_matrix">
 <span class="sig-name descname"><span class="pre">get_constraint_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.get_constraint_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.get_constraint_matrix" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get the constraint matrix for the CP equivalent of the BTD model.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.to_cpd_format">
@@ -145,12 +158,14 @@ for the BTD model</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.btd.factors_to_tensor">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">factors_to_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#factors_to_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.factors_to_tensor" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Convert BTD factor matrices to full tensor.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.btd.validate_R_L">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">validate_R_L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#validate_R_L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.validate_R_L" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Check if R and L are non-negative integers.</p>
+</dd></dl>
 
 </section>
 
