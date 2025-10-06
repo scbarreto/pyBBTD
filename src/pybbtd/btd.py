@@ -8,7 +8,7 @@ from pybbtd.solvers.btd_als import BTD_ALS
 # main class for tensors in BTD format
 class BTD:
     """
-    Class for Tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
+    Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
     """
 
     def __init__(self, dims, R: int, L: int, block_mode="LL1"):
@@ -43,6 +43,9 @@ class BTD:
         self.fit_error = None  # stores last fit error
 
     def check_uniqueness(self):
+        """
+        Check if, for given parameters, uniqueness can be guaranteed.
+        """
         if not np.all(self.L == self.L[0]):
             return print(
                 "Uniqueness checks are currently implemented for the constant L case.\nSkipping uniqueness tests."
@@ -68,6 +71,14 @@ class BTD:
             print("Cannot guarantee uniqueness. Proceed at your own risk.")
 
     def fit(self, data, algorithm="ALS", **kwargs):
+        """
+        Fit a BTD to the given data using the specified algorithm.
+        Parameters:
+            data: ndarray
+                The input tensor data to be decomposed.
+            algorithm: str
+                The algorithm to use for fitting.
+        """
         if algorithm == "ALS":
             self.factors, self.fit_error = BTD_ALS(self, data, **kwargs)
             self.tensor = factors_to_tensor(
@@ -77,6 +88,9 @@ class BTD:
             raise UserWarning("Algorithm not implemented yet")
 
     def get_constraint_matrix(self):
+        """
+        Get the constraint matrix for the CP equivalent of the BTD model.
+        """
         return constraint_matrix(self.rank, self.L)
 
     def to_cpd_format():
@@ -87,6 +101,7 @@ class BTD:
 
 
 def validate_R_L(R, L):
+    """Check if R and L are non-negative integers."""
     # check R
     if not isinstance(R, int) or R <= 0:
         raise ValueError("R should be a positive integer.")
@@ -124,6 +139,7 @@ def constraint_matrix(R, L):
 
 
 def factors_to_tensor(A, B, C, theta, block_mode="LL1"):
+    """Convert BTD factor matrices to full tensor."""
     if block_mode == "LL1":
         Trec = cp_to_tensor((np.ones(theta.shape[1]), [A, B, C @ theta]))
     elif block_mode == "1LL":
