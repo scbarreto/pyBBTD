@@ -11,123 +11,6 @@ import pybbtd.solvers.covll1_admm as covll1_admm
 import warnings
 
 
-def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
-    # init variables
-    Al = Ainit.copy()
-    Atl = Atinit.copy()
-    Ul = np.zeros_like(Ainit)
-
-    M1 = khatri_rao([Bk, Ck]).T
-
-    # Build system
-    M1M1T = M1 @ M1.T  # K x K
-    RHS = Y1 @ M1.T  # I x K
-
-    epsPri = np.size(Al) ** (1 / 2) * tol
-    epsDual = np.size(Atl) ** (1 / 2) * tol
-
-    n = 0
-    primalResidue = epsPri + 1
-    dualResidue = epsDual + 1
-
-    exitCriterion = True
-    while (n < nitermax) & exitCriterion:
-        # update A_{l+1}
-        # Solve A @ X = B  ⇒  A = B @ inv(X)
-        A_T = solve(
-            (M1M1T + rho * np.eye(Ainit.shape[1])
-             ).T, (RHS + rho * (Atl - Ul)).T
-        )
-        Al1 = A_T.T
-
-        # update \tilde{A}_{l+1}
-        Atl1 = np.maximum(0, Al1 + Ul)
-
-        # update dual
-        Ul1 = Ul + Al1 - Atl1
-
-        # compute convergence metrics residuals
-        primalResidue = np.linalg.norm(Al1 - Atl1)
-        dualResidue = rho * np.linalg.norm(Atl1 - Atl)
-
-        if (primalResidue < epsPri) and (dualResidue < epsDual):
-            exitCriterion = False
-        if primalResidue > 10 * dualResidue:
-            rho *= 2
-            Ul1 /= 2
-        elif dualResidue > 10 * primalResidue:
-            rho /= 2
-            Ul1 *= 2
-        # update all variables
-        Al = Al1.copy()
-        Atl = Atl1.copy()
-        Ul = Ul1.copy()
-
-        n += +1
-
-    return Atl, Al, primalResidue
-
-
-def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
-    # init variables
-    Bl = Binit.copy()
-    Btl = Btinit.copy()
-    Ul = np.zeros_like(Bl)
-
-    # iteration
-    M2 = khatri_rao([Ak, Ck]).T
-
-    # Build system
-    M2M2T = M2 @ M2.T  # K x K
-    RHS = Y2 @ M2.T  # I x K
-
-    epsPri = np.size(Bl) ** (1 / 2) * tol
-    epsDual = np.size(Btl) ** (1 / 2) * tol
-
-    n = 0
-    primalResidue = epsPri + 1
-    dualResidue = epsDual + 1
-
-    exitCriterion = True
-    while (n < nitermax) & exitCriterion:
-        # update B_(l+1)
-        B_T = solve(
-            (M2M2T + rho * np.eye(Binit.shape[1])
-             ).T, (RHS + rho * (Btl - Ul)).T
-        )
-        Bl1 = B_T.T
-
-        # update \tilde{B}_{l+1}
-        Btl1 = np.maximum(0, Bl1 + Ul)
-
-        # update dual
-        Ul1 = Ul + Bl1 - Btl1
-
-        # compute convergence metrics residuals
-
-        primalResidue = np.linalg.norm(Bl1 - Btl1)
-        dualResidue = rho * np.linalg.norm(Btl1 - Btl)
-
-        if (primalResidue < epsPri) and (dualResidue < epsDual):
-            exitCriterion = False
-        if (primalResidue < epsPri) and (dualResidue < epsDual):
-            exitCriterion = False
-        if primalResidue > 10 * dualResidue:
-            rho *= 2
-            Ul1 /= 2
-        elif dualResidue > 10 * primalResidue:
-            rho /= 2
-            Ul1 *= 2
-        # update all variables
-        Bl = Bl1.copy()
-        Btl = Btl1.copy()
-        Ul = Ul1.copy()
-
-        n += +1
-
-    return Btl, Bl, primalResidue
-
-
 def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14):
     # init variables
 
@@ -151,8 +34,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     while (n < nitermax) & exitCriterion:
         # update C_(l+1)
         C_T = solve(
-            (M3M3T + rho * np.eye(Cinit.shape[1])
-             ).T, (RHS + rho * (Ctl - Ul)).T
+            (M3M3T + rho * np.eye(Cinit.shape[1])).T, (RHS + rho * (Ctl - Ul)).T
         )
         Cl1 = C_T.T
 
@@ -192,8 +74,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 def stokes_kmeans(R, T):
     unfolding = unfold(T, 2).T
 
-    clustered = KMeans(n_clusters=R, random_state=0,
-                       n_init="auto").fit(unfolding)
+    clustered = KMeans(n_clusters=R, random_state=0, n_init="auto").fit(unfolding)
 
     initialC = clustered.cluster_centers_.T
 
@@ -294,8 +175,7 @@ def Stokes_ADMM(
 
     # Check that Stokes_model is an instance of the Stokes class
     if not isinstance(Stokes_model, stokes.Stokes):
-        raise TypeError(
-            "Stokes_model must be an instance of the Stokes class.")
+        raise TypeError("Stokes_model must be an instance of the Stokes class.")
 
     # Check that T is a numpy array
     if not isinstance(T, np.ndarray):
