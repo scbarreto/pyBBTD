@@ -33,8 +33,7 @@ def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
         # update A_{l+1}
         # Solve A @ X = B  ⇒  A = B @ inv(X)
         A_T = solve(
-            (M1M1T + rho * np.eye(Ainit.shape[1])
-             ).T, (RHS + rho * (Atl - Ul)).T
+            (M1M1T + rho * np.eye(Ainit.shape[1])).T, (RHS + rho * (Atl - Ul)).T
         )
         Al1 = A_T.T
 
@@ -90,8 +89,7 @@ def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
     while (n < nitermax) & exitCriterion:
         # update B_(l+1)
         B_T = solve(
-            (M2M2T + rho * np.eye(Binit.shape[1])
-             ).T, (RHS + rho * (Btl - Ul)).T
+            (M2M2T + rho * np.eye(Binit.shape[1])).T, (RHS + rho * (Btl - Ul)).T
         )
         Bl1 = B_T.T
 
@@ -147,8 +145,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     while (n < nitermax) & exitCriterion:
         # update C_(l+1)
         C_T = solve(
-            (M3M3T + rho * np.eye(Cinit.shape[1])
-             ).T, (RHS + rho * (Ctl - Ul)).T
+            (M3M3T + rho * np.eye(Cinit.shape[1])).T, (RHS + rho * (Ctl - Ul)).T
         )
         Cl1 = C_T.T
 
@@ -287,8 +284,7 @@ def CovLL1_ADMM(
         # compute reconstruction error
         Tfit_k = btd.factors_to_tensor(Atk1, Btk1, Ctk1, theta)
 
-        fit_error.append(np.linalg.norm(Tfit_k - T) **
-                         2 / np.linalg.norm(T) ** 2)
+        fit_error.append(np.linalg.norm(Tfit_k - T) ** 2 / np.linalg.norm(T) ** 2)
 
         if np.abs(fit_error[-1] - fit_error[-2]) / fit_error[-1] < rel_tol:
             print("Exiting early due to insufficient decrease of cost")
@@ -394,8 +390,7 @@ def kmeans_init(T, R, L1, theta):
                     # So reconstruct as purely imaginary conjugate
                     reconstructed_matrix[i, j] = 1j * col_C[k]
                     # Fill upper triangle’s conjugate accordingly
-                    reconstructed_matrix[j,
-                                         i] = reconstructed_matrix[i, j].conjugate()
+                    reconstructed_matrix[j, i] = reconstructed_matrix[i, j].conjugate()
                 k += 1
 
                 vec_cov_matrix_psd, _ = project_to_psd(reconstructed_matrix)
@@ -410,8 +405,7 @@ def kmeans_init(T, R, L1, theta):
 
 
 def _complex_to_real(X):
-    real_tensor = np.zeros(
-        (X.shape[0], X.shape[1], X.shape[2]), dtype="float32")
+    real_tensor = np.zeros((X.shape[0], X.shape[1], X.shape[2]), dtype="float32")
     K = int(np.sqrt(X.shape[2]))
 
     for x in range(X.shape[0]):

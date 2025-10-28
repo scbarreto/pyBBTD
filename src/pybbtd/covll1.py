@@ -67,8 +67,7 @@ class CovLL1(BTD):
         Generate a random covariance tensor.
         """
 
-        A, B, C = generate_covll1_factors(
-            self.dims, self.rank, self.L1, self.L2)
+        A, B, C = generate_covll1_factors(self.dims, self.rank, self.L1, self.L2)
         # Generate the tensor using the factors
         self.factors = [A, B, C]
         self.tensor = btd.factors_to_tensor(
