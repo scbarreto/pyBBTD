@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pybbtd.covll1 &mdash; pyBBTD  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pybbtd.btd" href="reference_btd.html" />
+    <link rel="prev" title="Reference manual" href="reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyBBTD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pybbtd.covll1</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.covll1.CovLL1"><code class="docutils literal notranslate"><span class="pre">CovLL1</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pybbtd.covll1.CovLL1.A"><code class="docutils literal notranslate"><span class="pre">CovLL1.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pybbtd.covll1.CovLL1.B"><code class="docutils literal notranslate"><span class="pre">CovLL1.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pybbtd.covll1.CovLL1.C"><code class="docutils literal notranslate"><span class="pre">CovLL1.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pybbtd.covll1.CovLL1.fit"><code class="docutils literal notranslate"><span class="pre">CovLL1.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pybbtd.covll1.CovLL1.generate_covll1_tensor"><code class="docutils literal notranslate"><span class="pre">CovLL1.generate_covll1_tensor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pybbtd.covll1.CovLL1.get_constraint_matrix"><code class="docutils literal notranslate"><span class="pre">CovLL1.get_constraint_matrix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.covll1.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">check_uniqueness()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.covll1.generate_covll1_factors"><code class="docutils literal notranslate"><span class="pre">generate_covll1_factors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.covll1.is_valid_covariance"><code class="docutils literal notranslate"><span class="pre">is_valid_covariance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.covll1.validate_cov_matrices"><code class="docutils literal notranslate"><span class="pre">validate_cov_matrices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.covll1.validate_dimensions"><code class="docutils literal notranslate"><span class="pre">validate_dimensions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">pybbtd.visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyBBTD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="reference.html">Reference manual</a></li>
+      <li class="breadcrumb-item active">pybbtd.covll1</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/reference_covll1.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pybbtd.covll1">
+<span id="pybbtd-covll1"></span><span id="reference-covll1"></span><h1>pybbtd.covll1<a class="headerlink" href="#module-pybbtd.covll1" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pybbtd.covll1.</span></span><span class="sig-name descname"><span class="pre">CovLL1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#CovLL1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.CovLL1" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD" title="pybbtd.btd.BTD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BTD</span></code></a></p>
+<p>Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each
+vector of size <span class="math notranslate nohighlight">\(K^2\)</span> in the rank-one mode represents a valid covariance
+matrix of size <span class="math notranslate nohighlight">\(K \times K\)</span>, once reshaped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dims</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <span class="math notranslate nohighlight">\((I, J, K^2)\)</span> of the tensor.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
+<li><p><strong>L1</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+<li><p><strong>L2</strong> (<em>int</em>) – Rank of the covariance matrices.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1.A">
+<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#pybbtd.covll1.CovLL1.A" title="Link to this definition"></a></dt>
+<dd><p>Factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(dims[0],</span> <span class="pre">L</span> <span class="pre">*</span> <span class="pre">R)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1.B">
+<span class="sig-name descname"><span class="pre">B</span></span><a class="headerlink" href="#pybbtd.covll1.CovLL1.B" title="Link to this definition"></a></dt>
+<dd><p>Factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(dims[1],</span> <span class="pre">L</span> <span class="pre">*</span> <span class="pre">R)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1.C">
+<span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#pybbtd.covll1.CovLL1.C" title="Link to this definition"></a></dt>
+<dd><p>Factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(K**2,</span> <span class="pre">R)</span></code>, where each column is a vectorized
+covariance matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ADMM'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#CovLL1.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.CovLL1.fit" title="Link to this definition"></a></dt>
+<dd><p>Computes Covll1-BTD factor matrices for provided data
+using the specified algorithm.
+:param data: np.ndarray</p>
+<blockquote>
+<div><p>Input tensor data to be approximated.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>algorithm</strong> – str
+Algorithm to use for fitting. Currently, only “ADMM” is implemented.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments for the fitting algorithm.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1.generate_covll1_tensor">
+<span class="sig-name descname"><span class="pre">generate_covll1_tensor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#CovLL1.generate_covll1_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.CovLL1.generate_covll1_tensor" title="Link to this definition"></a></dt>
+<dd><p>Generate a random covariance tensor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pybbtd.covll1.CovLL1.get_constraint_matrix">
+<span class="sig-name descname"><span class="pre">get_constraint_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#CovLL1.get_constraint_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.CovLL1.get_constraint_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns constraint matrix for CovLL1 model (useful to CP-equivalent model)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.covll1.check_uniqueness">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.covll1.</span></span><span class="sig-name descname"><span class="pre">check_uniqueness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#check_uniqueness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.check_uniqueness" title="Link to this definition"></a></dt>
+<dd><p>Check if, for given parameters, uniqueness can be guaranteed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.covll1.generate_covll1_factors">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.covll1.</span></span><span class="sig-name descname"><span class="pre">generate_covll1_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#generate_covll1_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.generate_covll1_factors" title="Link to this definition"></a></dt>
+<dd><p>Generate random factors that follow Cov-LL1 decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <span class="math notranslate nohighlight">\((I, J, K^2)\)</span> of the tensor.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A tuple containing the three factor matrices <cite>(A, B, C)</cite>:</p>
+<ul class="simple">
+<li><p>A (np.ndarray): Shape <cite>(dims[0], L * R)</cite>.</p></li>
+<li><p>B (np.ndarray): Shape <cite>(dims[1], L * R)</cite>.</p></li>
+<li><p>C (np.ndarray): Shape <cite>(dims[2]^2, R)</cite>, where each column is a vectorized covariance matrix</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.covll1.is_valid_covariance">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.covll1.</span></span><span class="sig-name descname"><span class="pre">is_valid_covariance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#is_valid_covariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.is_valid_covariance" title="Link to this definition"></a></dt>
+<dd><p>Check if a matrix is a valid covariance matrix.</p>
+<p>Conditions:
+1. Square
+2. Hermitian / symmetric
+3. Positive semidefinite (all eigenvalues &gt;= -tol)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Sigma</strong> (<em>np.ndarray</em>) – Matrix to test.</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – Numerical tolerance for eigenvalues and symmetry (default 1e-10).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if Sigma is a valid covariance matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.covll1.validate_cov_matrices">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.covll1.</span></span><span class="sig-name descname"><span class="pre">validate_cov_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#validate_cov_matrices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.validate_cov_matrices" title="Link to this definition"></a></dt>
+<dd><p>Check if all covariance matrices satisfy the positive semidefinite constraint.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.covll1.validate_dimensions">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.covll1.</span></span><span class="sig-name descname"><span class="pre">validate_dimensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/covll1.html#validate_dimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.covll1.validate_dimensions" title="Link to this definition"></a></dt>
+<dd><p>Validate dimensions for Cov-LL1 model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <span class="math notranslate nohighlight">\((I, J, K^2)\)</span> of the tensor.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
+<li><p><strong>L1</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+<li><p><strong>L2</strong> (<em>int</em>) – Rank of the covariance matrices.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reference.html" class="btn btn-neutral float-left" title="Reference manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference_btd.html" class="btn btn-neutral float-right" title="pybbtd.btd" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Saulo Barreto.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
