@@ -107,7 +107,8 @@
     <span class="k">while</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">nitermax</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">exitCriterion</span><span class="p">:</span>
         <span class="c1"># update C_(l+1)</span>
         <span class="n">C_T</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">M3M3T</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">Cinit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">RHS</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">Ctl</span> <span class="o">-</span> <span class="n">Ul</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+            <span class="p">(</span><span class="n">M3M3T</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">Cinit</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+             <span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">RHS</span> <span class="o">+</span> <span class="n">rho</span> <span class="o">*</span> <span class="p">(</span><span class="n">Ctl</span> <span class="o">-</span> <span class="n">Ul</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
         <span class="p">)</span>
         <span class="n">Cl1</span> <span class="o">=</span> <span class="n">C_T</span><span class="o">.</span><span class="n">T</span>
 
@@ -286,7 +287,8 @@
 
     <span class="c1"># Check that Stokes_model is an instance of the Stokes class</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">stokes</span><span class="o">.</span><span class="n">Stokes</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Stokes_model must be an instance of the Stokes class.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;Stokes_model must be an instance of the Stokes class.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Check that T is a numpy array</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>

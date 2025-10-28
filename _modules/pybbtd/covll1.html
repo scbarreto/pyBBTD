@@ -142,7 +142,8 @@
 <span class="sd">        Generate a random covariance tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">generate_covll1_factors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">generate_covll1_factors</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">)</span>
         <span class="c1"># Generate the tensor using the factors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span>
@@ -309,7 +310,7 @@
     <span class="k">if</span> <span class="n">invalid_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">invalid_count</span> <span class="o">/</span> <span class="n">total_pixels</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">% of pixels do not satisfy the Stokes constraints.&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">% of pixels do not satisfy the covariance matrix constraints. (must be square, Hermitian, and positive semidefinite)&quot;</span><span class="p">,</span>
             <span class="ne">UserWarning</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
