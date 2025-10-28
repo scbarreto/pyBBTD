@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pybbtd.visualization &mdash; pyBBTD  documentation</title>
+  <title>pybbtd.draw &mdash; pyBBTD  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -45,11 +45,15 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference manual</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">pybbtd.covll1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">pybbtd.visualization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pybbtd.draw</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.draw.stokes_draw.add_arrow"><code class="docutils literal notranslate"><span class="pre">add_arrow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.draw.stokes_draw.compute_ellipse"><code class="docutils literal notranslate"><span class="pre">compute_ellipse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pybbtd.draw.stokes_draw.plot_Stokes_terms"><code class="docutils literal notranslate"><span class="pre">plot_Stokes_terms()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
 </ul>
 </li>
@@ -70,9 +74,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="reference.html">Reference manual</a></li>
-      <li class="breadcrumb-item active">pybbtd.visualization</li>
+      <li class="breadcrumb-item active">pybbtd.draw</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/reference_visualization.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/reference_draw.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -80,9 +84,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pybbtd-visualization">
-<span id="reference-visualization"></span><h1>pybbtd.visualization<a class="headerlink" href="#pybbtd-visualization" title="Link to this heading"></a></h1>
-<span class="target" id="module-pybbtd.visualization"></span></section>
+  <section id="module-pybbtd.draw.stokes_draw">
+<span id="pybbtd-draw"></span><span id="reference-draw"></span><h1>pybbtd.draw<a class="headerlink" href="#module-pybbtd.draw.stokes_draw" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.draw.stokes_draw.add_arrow">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.draw.stokes_draw.</span></span><span class="sig-name descname"><span class="pre">add_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/draw/stokes_draw.html#add_arrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.draw.stokes_draw.add_arrow" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.draw.stokes_draw.compute_ellipse">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.draw.stokes_draw.</span></span><span class="sig-name descname"><span class="pre">compute_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/draw/stokes_draw.html#compute_ellipse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.draw.stokes_draw.compute_ellipse" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.draw.stokes_draw.plot_Stokes_terms">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.draw.stokes_draw.</span></span><span class="sig-name descname"><span class="pre">plot_Stokes_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/draw/stokes_draw.html#plot_Stokes_terms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.draw.stokes_draw.plot_Stokes_terms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 
 
            </div>

@@ -296,6 +296,23 @@
     <span class="n">newS</span> <span class="o">=</span> <span class="n">coh2stokes</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">newS</span></div>
 
+
+
+<span class="c1"># def elip_2_stokes(psi, chi, p=1):</span>
+<span class="c1">#     S1 = p * np.cos(2 * psi) * np.cos(2 * chi)</span>
+<span class="c1">#     S2 = p * np.sin(2 * psi) * np.cos(2 * chi)</span>
+<span class="c1">#     S3 = p * np.sin(2 * chi)</span>
+<span class="c1">#     return np.array([1, S1, S2, S3])</span>
+
+
+<span class="c1"># def stokes_2_elip(S):</span>
+<span class="c1">#     S0 = S[0]</span>
+<span class="c1">#     p = np.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]</span>
+<span class="c1">#     psi = 1 / 2 * np.arctan2(S[2], S[1])</span>
+<span class="c1">#     chi = 1 / 2 * np.arctan2(S[3], np.sqrt(S[1] ** 2 + S[2] ** 2))</span>
+<span class="c1">#     # chi = 1/2 * np.arcsin(S[3] / S[0])</span>
+
+<span class="c1">#     return (psi, chi, p, S0)</span>
 </pre></div>
 
            </div>

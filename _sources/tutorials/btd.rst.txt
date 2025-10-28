@@ -11,6 +11,7 @@ Load required libraries
     import pybbtd.btd as btd
     from pybbtd.solvers import btd_als
     import numpy as np
+    import matplotlib.pyplot as plt
     
 Generate noisy data with known BTD structure and fit a BTD model
 -------------------------------------------------------------------------------------
@@ -31,16 +32,12 @@ Then we create the true BTD components and generate the observed tensor with add
 
 .. code:: python3
 
-    # Create ground truth tensor
+   # Create ground truth tensor and add some noise
     A0, B0, C0 = btd_als.init_BTD_factors(X, strat="random")
-    # This is the constraint matrix to represent BTD-LL1 as a CPD model
     theta = X.get_constraint_matrix()
+    T_observed = btd.factors_to_tensor(A0, B0, C0, theta, block_mode="LL1") + 1 * 1e-6 * np.random.randn(*X.dims)
 
-    T_observed = btd.factors_to_tensor(
-        A0, B0, C0, theta, block_mode="LL1"
-    ) + 1 * 1e-6 * np.random.randn(*X.dims)
-
-We now fit a BTD model to the observed tensor with random initialization
+We now fit a BTD model to the observed tensor.
 
 .. code:: python3
 
@@ -54,7 +51,10 @@ We now fit a BTD model to the observed tensor with random initialization
     A_est, B_est, C_est = X.factors
 
     # Check convergence curve
-    draw_metrics.plot_error(X.fit_error)
+    fig, ax = plt.subplots()
+    ax.semilogy(X.fit_error)
+    ax.set_ylabel("fit error")
+    _ = ax.set_xlabel("iteration number")
 .. image:: btd_files/fit_error_rand.png
 
 Compare with SVD initialization
@@ -66,6 +66,12 @@ We can also fit the model using SVD initialization and compare the results.
 
     X.fit(T_observed, max_iter=3000, init="svd", rel_tol=1e-9, abs_tol=1e-15)
     svd_init_fit_error = X.fit_error
-    draw_metrics.plot_error([svd_init_fit_error, rand_init_fit_error], labels=[r"SVD init", r"Random init"])
+
+    fig, ax = plt.subplots()
+    ax.semilogy(svd_init_fit_error, label="SVD init")
+    ax.semilogy(rand_init_fit_error, label="Random init")
+    ax.set_ylabel("fit error")
+    ax.set_xlabel("iteration number")
+    _ = ax.legend()
     
 .. image:: btd_files/fit_error_svd.png
