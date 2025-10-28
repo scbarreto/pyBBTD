@@ -34,7 +34,8 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     while (n < nitermax) & exitCriterion:
         # update C_(l+1)
         C_T = solve(
-            (M3M3T + rho * np.eye(Cinit.shape[1])).T, (RHS + rho * (Ctl - Ul)).T
+            (M3M3T + rho * np.eye(Cinit.shape[1])
+             ).T, (RHS + rho * (Ctl - Ul)).T
         )
         Cl1 = C_T.T
 
@@ -204,7 +205,8 @@ def Stokes_ADMM(
 
     # Check that Stokes_model is an instance of the Stokes class
     if not isinstance(Stokes_model, stokes.Stokes):
-        raise TypeError("Stokes_model must be an instance of the Stokes class.")
+        raise TypeError(
+            "Stokes_model must be an instance of the Stokes class.")
 
     # Check that T is a numpy array
     if not isinstance(T, np.ndarray):

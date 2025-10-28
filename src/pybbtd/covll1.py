@@ -67,7 +67,8 @@ class CovLL1(BTD):
         Generate a random covariance tensor.
         """
 
-        A, B, C = generate_covll1_factors(self.dims, self.rank, self.L1, self.L2)
+        A, B, C = generate_covll1_factors(
+            self.dims, self.rank, self.L1, self.L2)
         # Generate the tensor using the factors
         self.factors = [A, B, C]
         self.tensor = btd.factors_to_tensor(
@@ -215,7 +216,7 @@ def validate_cov_matrices(T0):
     if invalid_count > 0:
         percentage = (invalid_count / total_pixels) * 100
         warnings.warn(
-            f"{percentage:.2f}% of pixels do not satisfy the Stokes constraints.",
+            f"{percentage:.2f}% of pixels do not satisfy the covariance matrix constraints. (must be square, Hermitian, and positive semidefinite)",
             UserWarning,
         )
     else:
