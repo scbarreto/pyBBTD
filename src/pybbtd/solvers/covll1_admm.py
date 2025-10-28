@@ -249,7 +249,7 @@ def CovLL1_ADMM(
     theta = CovLL1_model.get_constraint_matrix()
 
     Tfit_0 = btd.factors_to_tensor(Atk, Btk, Ctk, theta)
-    fit_error = [np.linalg.norm(Tfit_0 - T) ** 2]
+    fit_error = [np.linalg.norm(Tfit_0 - T) ** 2 / np.linalg.norm(T) ** 2]
 
     k = 0
     exit_criterion = False
@@ -288,7 +288,7 @@ def CovLL1_ADMM(
 
         fit_error.append(np.linalg.norm(Tfit_k - T) ** 2 / np.linalg.norm(T) ** 2)
 
-        if np.abs(fit_error[-1] - fit_error[-2]) < rel_tol:
+        if np.abs(fit_error[-1] - fit_error[-2]) / fit_error[-1] < rel_tol:
             print("Exiting early due to unsufficient decrease of cost")
             exit_criterion = True
         if fit_error[-1] / np.linalg.norm(T) < abs_tol:
@@ -320,45 +320,48 @@ def init_covll1_factors(CovLL1_model, init="random", T=None):
         A, B, C = covll1.generate_covll1_factors(dims, R, L1, L2)
 
     elif init == "kmeans":
-        A, B, C = kmeans_init(T, R, L1, L2, theta)
+        A, B, C = kmeans_init(T, R, L1, theta)
 
     return A, B, C
 
 
-def kmeans_init(T, R, L1, L2, theta):
+def kmeans_init(T, R, L1, theta):
     Treal = _complex_to_real(T)
 
-    kmeans = KMeans(n_clusters=R, init="k-means++")
+    kmeans = KMeans(n_clusters=R, random_state=0, n_init="auto")
 
     # Initialize the KMeans model
-    unfolding = unfold(Treal, 2)
+    unfolding = unfold(Treal, 2).T
     kmeans.fit(unfolding)
     # Get the labels for each vectorized pixel
     labels = kmeans.labels_
 
-    initialC = kmeans.cluster_centers_.T
-
     Rterms = np.zeros((R, Treal.shape[0] * Treal.shape[1]))
 
-    features = np.ones((R, Treal.shape[0], Treal.shape[1]))
+    featuresMaps = np.ones((R, Treal.shape[0], Treal.shape[1]))
 
-    for i in range(len(labels)):
-        Rterms[labels[i], i] = 1
+    # for i in range(len(labels)):
+    #     Rterms[labels[i], i] = 1
 
-    for i in range(R):
-        features[i] = Rterms[i].reshape(Treal.shape[0], Treal.shape[1])
+    for idx in range(len(labels)):
+        Rterms[labels[idx], idx] = np.random.rand()
 
-    model = NMF(n_components=L1, init="nndsvda", random_state=0, max_iter=5000)
+    for r in range(R):
+        featuresMaps[r] = Rterms[r].reshape(Treal.shape[0], Treal.shape[1])
 
-    W = np.zeros((R, features.shape[1], L1))
-    H = np.zeros((R, L1, features.shape[2]))
+    model = NMF(n_components=L1, init="nndsvda", random_state=0, max_iter=1000)
 
-    product = np.zeros((R, features.shape[1], features.shape[2]))
+    W = np.zeros((R, featuresMaps.shape[1], L1))
+    H = np.zeros((R, L1, featuresMaps.shape[2]))
 
-    for i in range(R):
-        W[i] = model.fit_transform(features[i])
-        H[i] = model.components_
-        product[i] = W[i] @ H[i]
+    product = np.zeros((R, featuresMaps.shape[1], featuresMaps.shape[2]))
+
+    for r in range(R):
+        Wr = model.fit_transform(featuresMaps[r])
+        Hr = model.components_
+        W[r] = Wr
+        H[r] = Hr
+        product[r] = Wr @ Hr
 
     initA = W[0]
     initB = H[0].T
@@ -370,35 +373,36 @@ def kmeans_init(T, R, L1, L2, theta):
 
     K = int(np.sqrt(T.shape[2]))
     initC = np.zeros((K**2, R), dtype=np.complex128)
-
+    initialC = kmeans.cluster_centers_.T
     for r in range(R):
         col_C = initialC[:, r]
 
         reconstructed_matrix = np.zeros((K, K), dtype=complex)
-
-        # Fill the matrix using the vector
         k = 0
         for i in range(K):
             for j in range(K):
                 if i == j:
-                    # Diagonal element: only the real part
-                    reconstructed_matrix[i, j] = col_C[k]
+                    # Diagonal: real values only
+                    reconstructed_matrix[i, j] = col_C[k].real
                 elif i < j:
-                    # Upper triangular: real part
+                    # Upper triangle: real part stored directly
                     reconstructed_matrix[i, j] = col_C[k]
                 else:  # i > j
-                    # Lower triangular: imaginary part of conjugate
-                    reconstructed_matrix[i, j] = reconstructed_matrix[j, i].conjugate()
+                    # Lower triangle: imaginary part was stored (as col_C[k])
+                    # So reconstruct as purely imaginary conjugate
+                    reconstructed_matrix[i, j] = 1j * col_C[k]
+                    # Fill upper triangle’s conjugate accordingly
+                    reconstructed_matrix[j, i] = reconstructed_matrix[i, j].conjugate()
                 k += 1
 
-        _, cov_matrix_psd = project_to_psd(reconstructed_matrix)
-
-        initC[:, r] = cov_matrix_psd.reshape(K**2)
+                vec_cov_matrix_psd, _ = project_to_psd(reconstructed_matrix)
+                initC[:, r] = vec_cov_matrix_psd.reshape(K**2)
 
     initT = btd.factors_to_tensor(initA, initB, initC, theta)
     lamb = linalg.norm(T) / linalg.norm(initT)
     initA = initA * lamb ** (1 / 2)
     initB = initB * lamb ** (1 / 2)
+
     return initA, initB, initC
 
 

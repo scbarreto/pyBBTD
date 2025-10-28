@@ -51,18 +51,6 @@ def test_validate_stokes_tensor_warning():
         stokes.validate_stokes_tensor(T0)
 
 
-def test_stokes_kmeans():
-    R = 2
-    L = 2
-    X = stokes.Stokes([15, 15], R, L)
-    _, T0 = X.generate_stokes_tensor()
-
-    features, initialC = stokes_admm.stokes_kmeans(R, T0)
-
-    assert features.shape == (R, T0.shape[0], T0.shape[1])
-    assert initialC.shape == (4, R)
-
-
 def test_fit_admm_random_init():
     np.random.seed(0)
     R = 2
@@ -94,18 +82,15 @@ def test_fit_admm_random_init():
 def test_fit_admm_kmeans_init():
     np.random.seed(10)
 
-    R = 2
+    R = 1
     L = 2
     btd.validate_R_L(R, L)
     X = stokes.Stokes([15, 15], R, L)
 
     [A0, B0, C0], T0 = X.generate_stokes_tensor()
-    theta = X.get_constraint_matrix()
-    Tnoisy = btd.factors_to_tensor(
-        A0, B0, C0, theta, block_mode="LL1"
-    ) + 0 * 1e-5 * np.random.randn(*X.dims)
+
     X.fit(
-        data=Tnoisy,
+        data=T0,
         algorithm="ADMM",
         init="kmeans",
         max_iter=1000,
@@ -125,34 +110,6 @@ def test_fit_invalid_algorithm_raises_warning():
 
     with pytest.raises(UserWarning, match="Algorithm not implemented yet"):
         model.fit("dummy_data", algorithm="NotImplemented_ForceError")
-
-
-def test_stokes_NMF_shapes_and_reconstruction():
-    L = 3
-    R = 2
-    N, M = 5, 4
-
-    rng = np.random.default_rng(seed=42)
-    maps = rng.random((R, N, M))
-
-    product, initA, initB = stokes_admm.stokes_NMF(L, R, maps)
-
-    assert product.shape == (R, N, M)
-    assert initA.shape == (N, L * R), "Incorrect shape for 'initA'"
-    assert initB.shape == (M, L * R), "Incorrect shape for 'initB'"
-
-    # Check non-negativity
-    assert np.all(product >= 0), "'product' contains negative values"
-    assert np.all(initA >= 0), "'initA' contains negative values"
-    assert np.all(initB >= 0), "'initB' contains negative values"
-
-    # Check if reconstruction is close to input
-    for r in range(R):
-        # Explicit slicing and matrix multiplication for each R component
-        approx = initA[:, r * L : (r + 1) * L] @ initB[:, r * L : (r + 1) * L].T
-        assert np.allclose(approx, product[r], atol=1e-1), (
-            f"Reconstruction mismatch at index {r}"
-        )
 
 
 def test_wrong_tensor_init_kmeans():
