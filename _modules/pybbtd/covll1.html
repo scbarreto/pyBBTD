@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pybbtd.covll1 &mdash; pyBBTD  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pyBBTD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference manual</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyBBTD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pybbtd.covll1</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pybbtd.covll1</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="kn">import</span> <span class="n">BTD</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.uniqueness</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_uniqueness_LL1</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+
+<div class="viewcode-block" id="CovLL1">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CovLL1</span><span class="p">(</span><span class="n">BTD</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each</span>
+<span class="sd">    vector of size :math:`K^2` in the rank-one mode represents a valid covariance</span>
+<span class="sd">    matrix of size :math:`K \\times K`, once reshaped.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dims : tuple[int, int, int]</span>
+<span class="sd">        Dimensions :math:`(I, J, K^2)` of the tensor.</span>
+<span class="sd">    R : int</span>
+<span class="sd">        The rank of the decomposition (number of components).</span>
+<span class="sd">    L1 : int</span>
+<span class="sd">        Rank of the spatial maps.</span>
+<span class="sd">    L2 : int</span>
+<span class="sd">        Rank of the covariance matrices.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : np.ndarray</span>
+<span class="sd">        Factor matrix of shape ``(dims[0], L * R)``.</span>
+<span class="sd">    B : np.ndarray</span>
+<span class="sd">        Factor matrix of shape ``(dims[1], L * R)``.</span>
+<span class="sd">    C : np.ndarray</span>
+<span class="sd">        Factor matrix of shape ``(K**2, R)``, where each column is a vectorized</span>
+<span class="sd">        covariance matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize Cov-LL1 model.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            spatial_dims: Tuple[int, int]</span>
+<span class="sd">                Spatial dimensions of the tensor (first two modes).</span>
+<span class="sd">            R: int</span>
+<span class="sd">                Rank of the decomposition (number of components).</span>
+<span class="sd">            L: int</span>
+<span class="sd">                Rank of the spatial maps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L1</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="n">block_mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L1</span> <span class="o">=</span> <span class="n">L1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L2</span> <span class="o">=</span> <span class="n">L2</span>
+
+        <span class="c1"># Validate mode</span>
+        <span class="n">valid_block_modes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;LL1&quot;</span><span class="p">,</span> <span class="s2">&quot;L1L&quot;</span><span class="p">,</span> <span class="s2">&quot;1LL&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">block_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_block_modes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid mode &#39;</span><span class="si">{</span><span class="n">block_mode</span><span class="si">}</span><span class="s2">&#39;. Block mode must be one of </span><span class="si">{</span><span class="n">valid_block_modes</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">=</span> <span class="n">block_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span> <span class="o">=</span> <span class="n">validate_dimensions</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Cov-LL1 tensor initialized with dimensions </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span><span class="si">}</span><span class="s2"> mode.&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CovLL1.generate_covll1_tensor">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1.generate_covll1_tensor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_covll1_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a random covariance tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">generate_covll1_factors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">)</span>
+        <span class="c1"># Generate the tensor using the factors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span>
+            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">(),</span> <span class="n">block_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span></div>
+
+
+<div class="viewcode-block" id="CovLL1.fit">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes Covll1-BTD factor matrices for provided data</span>
+<span class="sd">        using the specified algorithm.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            data: np.ndarray</span>
+<span class="sd">                Input tensor data to be approximated.</span>
+<span class="sd">            algorithm: str</span>
+<span class="sd">                Algorithm to use for fitting. Currently, only &quot;ADMM&quot; is implemented.</span>
+<span class="sd">            **kwargs: Additional keyword arguments for the fitting algorithm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.covll1_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">CovLL1_ADMM</span>
+
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;ADMM&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">CovLL1_ADMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span>
+                <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">(),</span> <span class="n">block_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Algorithm not implemented yet&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CovLL1.get_constraint_matrix">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1.get_constraint_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns constraint matrix for CovLL1 model (useful to CP-equivalent model)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">btd</span><span class="o">.</span><span class="n">constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="generate_covll1_factors">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.generate_covll1_factors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_covll1_factors</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate random factors that follow Cov-LL1 decomposition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dims (Tuple[int, int, int]):</span>
+<span class="sd">            Dimensions :math:`(I, J, K^2)` of the tensor.</span>
+<span class="sd">        R (int):</span>
+<span class="sd">            The rank of the decomposition (number of components).</span>
+<span class="sd">        L (int):</span>
+<span class="sd">            Rank of the spatial maps.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">            A tuple containing the three factor matrices `(A, B, C)`:</span>
+
+<span class="sd">            - A (np.ndarray): Shape `(dims[0], L * R)`.</span>
+<span class="sd">            - B (np.ndarray): Shape `(dims[1], L * R)`.</span>
+<span class="sd">            - C (np.ndarray): Shape `(dims[2]^2, R)`, where each column is a vectorized covariance matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of dimensions should be equal to 3.&quot;</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">L1</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">L1</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span>
+
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="n">cov_factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">L2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">L2</span><span class="p">)</span>
+    <span class="n">sigmas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">R</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="n">sigmas</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov_factors</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">@</span> <span class="n">cov_factors</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">sigmas</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">K</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span></div>
+
+
+
+<div class="viewcode-block" id="validate_dimensions">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.validate_dimensions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_dimensions</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate dimensions for Cov-LL1 model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dims (Tuple[int, int, int]):</span>
+<span class="sd">            Dimensions :math:`(I, J, K^2)` of the tensor.</span>
+<span class="sd">        R (int):</span>
+<span class="sd">            The rank of the decomposition (number of components).</span>
+<span class="sd">        L1 (int):</span>
+<span class="sd">            Rank of the spatial maps.</span>
+<span class="sd">        L2 (int):</span>
+<span class="sd">            Rank of the covariance matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dims must be a tuple of three integers (I, J, K^2).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">!=</span> <span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The third dimension must be a perfect square (K^2).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">R</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;R must be a positive integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">L1</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;L1 must be a positive integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">L2</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;L2 must be a positive integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">L1</span> <span class="o">&gt;</span> <span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">L1</span> <span class="o">&gt;</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;L1 must be less than the first and second dimensions (I and J).&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">L2</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">])):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;L2 must be less than the square root of the third dimension (K).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span></div>
+
+
+
+<div class="viewcode-block" id="check_uniqueness">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.check_uniqueness">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_uniqueness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if, for given parameters, uniqueness can be guaranteed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;LL1&quot;</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">check_uniqueness_LL1</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;L1L&quot;</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">check_uniqueness_LL1</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;1LL&quot;</span><span class="p">:</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">check_uniqueness_LL1</span><span class="p">(</span><span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">unique</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sufficient condition for uniqueness satisfied&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cannot guarantee uniqueness. Proceed at your own risk.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="validate_cov_matrices">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.validate_cov_matrices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_cov_matrices</span><span class="p">(</span><span class="n">T0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if all covariance matrices satisfy the positive semidefinite constraint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">invalid_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">cov_matrix</span> <span class="o">=</span> <span class="n">T0</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_valid_covariance</span><span class="p">(</span><span class="n">cov_matrix</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">invalid_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">invalid_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">invalid_count</span> <span class="o">/</span> <span class="n">total_pixels</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percentage</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">% of pixels do not satisfy the covariance matrix constraints. (must be square, Hermitian, and positive semidefinite)&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All pixels carry valid covariance matrices.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_valid_covariance">
+<a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.is_valid_covariance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_valid_covariance</span><span class="p">(</span><span class="n">Sigma</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a matrix is a valid covariance matrix.</span>
+
+<span class="sd">    Conditions:</span>
+<span class="sd">    1. Square</span>
+<span class="sd">    2. Hermitian / symmetric</span>
+<span class="sd">    3. Positive semidefinite (all eigenvalues &gt;= -tol)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Sigma : np.ndarray</span>
+<span class="sd">        Matrix to test.</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Numerical tolerance for eigenvalues and symmetry (default 1e-10).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if Sigma is a valid covariance matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Sigma</span><span class="p">)</span>
+
+    <span class="c1"># 1. Must be square</span>
+    <span class="k">if</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># 2. Must be Hermitian (Sigma == Sigmaᴴ within tolerance)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">Sigma</span><span class="p">,</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># 3. Must be positive semidefinite</span>
+    <span class="n">eigvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">Sigma</span><span class="p">)</span>  <span class="c1"># for Hermitian matrices</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">eigvals</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">tol</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Saulo Barreto.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

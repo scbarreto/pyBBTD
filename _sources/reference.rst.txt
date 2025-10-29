@@ -9,8 +9,9 @@ Reference manual
 .. toctree::
    :maxdepth: 2
 
+   reference_covll1
    reference_btd
    reference_stokes
    reference_solvers
-   reference_draw
+   reference_visualization
    reference_uniqueness

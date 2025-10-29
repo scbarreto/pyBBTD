@@ -13,7 +13,6 @@ Load required libraries
     import numpy as np
     import pybbtd.stokes as stokes
     import pybbtd.btd as btd
-    import matplotlib.pyplot as plt
     import pybbtd as 
     
 Define Stokes-BTD parameters and spatial map dimensions 
@@ -40,8 +39,12 @@ Then we get the constraint matrix for the equivalent CPD representation of the B
 
 .. code:: python3
 
+    # theta is the constraint matrix to represent a BTD-LL1 model as a CPD model
     theta = X.get_constraint_matrix()
-    Tnoisy = btd.factors_to_tensor(A0, B0, C0, theta, block_mode="LL1") + 1e-10 * np.random.randn(*X.dims)
+    Tnoisy = btd.factors_to_tensor(A0, B0, C0, theta, block_mode="LL1") + 1e-6 * np.random.randn(*X.dims)
+
+    # or simply use
+    # Tnoisy = T0 +  1e-6 * np.random.randn(*X.dims)
 
     # We check iff all pixels satisfy the Stokes constraints
     stokes.validate_stokes_tensor(Tnoisy)
@@ -52,17 +55,30 @@ We now fit a Stokes-BTD model to the observed tensor.
 
     X.fit(data=Tnoisy,algorithm="ADMM",init="random",max_iter=5000,rho=1,max_admm=1,rel_tol=10**-8,abs_tol=10**-14,admm_tol=10**-10)
 
-    fig, ax = plt.subplots()
-    ax.semilogy(X.fit_error)
-    ax.set_ylabel("fit error")
-    _ = ax.set_xlabel("iteration number")
+    draw_metrics.plot_error(X.fit_error)
 
 .. image:: stokes_files/fit_error_rand.png
 
-Example 2: Separating canonical polarization states with Stokes-BTD and pybbtd
+Example 2: Stokes-BTD with Canonical Polarization States
 ===============================================================================
 
-In this tutorial, we demonstrate how to use the pyBBTD library to perform Stokes-BTD with canonical polarization states. We will use a numpy array representing the acronym BBTD, where each letter is defined to have a canonical polarization state. Then we will fit a Stokes-BTD model, and visualize the results.
+In this tutorial, we demonstrate how to use the **pyBBTD** library to perform a
+**Stokes Block Tensor Decomposition (Stokes-BTD)** with *canonical
+polarization states*.
+
+We will load a :class:`numpy.ndarray` representing the acronym **"BBTD"**,
+where each letter corresponds to a region with a distinct, canonical
+polarization state:
+
+* **Background** — right-handed circularly polarized
+* **First B** — fully horizontally polarized
+* **Second B** — fully linearly polarized at **+45°**
+* **T** — fully right-handed circularly polarized
+* **D** — fully linearly polarized at **–45°**
+
+After defining this synthetic dataset, we will fit a **Stokes-BTD model**
+to recover the polarization components, and then visualize the reconstructed
+Stokes parameters and corresponding polarization ellipses.
 
 Load required libraries
 ------------------------
@@ -93,8 +109,8 @@ Fit the Stokes-BTD model to the data tensor
 
 .. code:: python3
 
-    X.fit(data=tensor,algorithm="ADMM",init="random",max_iter=5000,rho=1,max_admm=1,rel_tol=10**-8, abs_tol=10**-7, admm_tol=10**-5)
+    X.fit(data=tensor,algorithm="ADMM",init="kmeans",max_iter=5000,rho=1,max_admm=2,rel_tol=10**-5, abs_tol=10**-7, admm_tol=10**-5)
 
 Visualize the results, module pybbtd.draw will be soon have a method to plot the Stokes vectors as ellipses.
 
-.. image:: stokes_files/BBTD_board.png
+.. image:: stokes_files/bbtd_board_results.png
