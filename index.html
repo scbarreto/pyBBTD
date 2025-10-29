@@ -74,6 +74,7 @@
   <section id="pybbtd-docs">
 <h1>pyBBTD docs<a class="headerlink" href="#pybbtd-docs" title="Link to this heading"></a></h1>
 <p><strong>pyBBTD</strong> is a Python library that implements two tensor decomposition models: <strong>Cov-LL1</strong> and <strong>BBTD</strong>.</p>
+<p>For details on the mathematical formulation of Cov-LL1 applied to Stokes polarimetric data, please refer to <a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/10446019">this conference paper</a>, and for BBTD applied to covariance imaging data, refer to <a class="reference external" href="https://hal.science/hal-05059862/">this journal paper</a>.</p>
 <p>The <strong>Cov-LL1</strong> model is a third-order tensor decomposition method designed for <em>covariance imaging tensors</em> — that is, tensors in which each pixel carries a covariance matrix. The rank-1 term (vector) in each block corresponds to a vectorized covariance matrix.</p>
 <p>In mathematical form, Cov-LL1 decomposes a third-order tensor <span class="math notranslate nohighlight">\(\mathcal{X}\)</span> as:</p>
 <div class="math notranslate nohighlight">
@@ -99,18 +100,24 @@ In mathematical form, <strong>BBTD</strong> decomposes a fourth-order tensor <sp
 </ul>
 <p>The figure below illustrates the structure of the <strong>BBTD</strong> model.</p>
 <img alt="_images/model_bbtd.png" src="_images/model_bbtd.png" />
+</section>
+<section id="planned-releases">
+<h1>Planned releases<a class="headerlink" href="#planned-releases" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><strong>4th-order model (BBTD)</strong>: planned for early-November 2025</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD-LL1 tutorial with pyBBTD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">BTD-LL1 tutorial with pyBBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial with pyBBTD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Example 1: Stokes Tutorial with pyBBTD and noisy data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html#example-2-stokes-btd-with-canonical-polarization-states">Example 2: Stokes-BTD with Canonical Polarization States</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">pybbtd.covll1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">pybbtd.covll1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">pybbtd.visualization</a></li>
@@ -119,12 +126,6 @@ In mathematical form, <strong>BBTD</strong> decomposes a fourth-order tensor <sp
 </li>
 </ul>
 </div>
-</section>
-<section id="planned-releases">
-<h1>Planned releases<a class="headerlink" href="#planned-releases" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p><strong>4th-order model (BBTD)</strong>: planned for early-November 2025</p></li>
-</ul>
 </section>
 
 
