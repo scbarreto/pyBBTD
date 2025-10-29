@@ -79,6 +79,7 @@ class CovLL1(BTD):
         """
         Computes Covll1-BTD factor matrices for provided data
         using the specified algorithm.
+        
         Parameters:
             data: np.ndarray
                 Input tensor data to be approximated.

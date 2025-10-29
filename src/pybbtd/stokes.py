@@ -60,6 +60,7 @@ class Stokes(BTD):
         """
         Computes Stokes-BTD factor matrices for provided data
         using the specified algorithm.
+        
         Parameters:
             data: np.ndarray
                 Input tensor data to be approximated.
