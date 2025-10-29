@@ -1,6 +1,7 @@
 # pyBBTD
 
 A python package for computing Block-block terms tensor decompositions.
+Check the [documentation and examples](https://scbarreto.github.io/pyBBTD/)
 
 ## basic instructions
 
