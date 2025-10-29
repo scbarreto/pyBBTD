@@ -1,4 +1,4 @@
-BTD-LL1 tutorial with pyBBTD
+Cov-LL1 tutorial with pyBBTD
 ===================================
 
 This tutorial provides an introduction on how to use Cov-LL1 for covariance imaging applications using the pyBBTD library.

@@ -7,6 +7,9 @@ pyBBTD docs
 ====================
 **pyBBTD** is a Python library that implements two tensor decomposition models: **Cov-LL1** and **BBTD**.
 
+For details on the mathematical formulation of Cov-LL1 applied to Stokes polarimetric data, please refer to `this conference paper <https://ieeexplore.ieee.org/abstract/document/10446019>`_, and for BBTD applied to covariance imaging data, refer to `this journal paper <https://hal.science/hal-05059862/>`_.
+
+
 The **Cov-LL1** model is a third-order tensor decomposition method designed for *covariance imaging tensors* — that is, tensors in which each pixel carries a covariance matrix. The rank-1 term (vector) in each block corresponds to a vectorized covariance matrix.
 
 In mathematical form, Cov-LL1 decomposes a third-order tensor :math:`\mathcal{X}` as:
@@ -51,13 +54,14 @@ The figure below illustrates the structure of the **BBTD** model.
 
 
 .. image:: index_files/model_bbtd.png
-.. toctree::
-   :maxdepth: 2
-
-   tutorials/index
-   reference
 
 Planned releases
 ====================
 
 - **4th-order model (BBTD)**: planned for early-November 2025
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorials/index
+   reference
