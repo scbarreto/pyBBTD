@@ -7,122 +7,8 @@ from tensorly.tenalg import khatri_rao
 import pybbtd.btd as btd
 from sklearn.decomposition import NMF
 from sklearn.cluster import KMeans
+import pybbtd.solvers.covll1_admm as covll1_admm
 import warnings
-
-
-def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
-    # init variables
-    Al = Ainit.copy()
-    Atl = Atinit.copy()
-    Ul = np.zeros_like(Ainit)
-
-    M1 = khatri_rao([Bk, Ck]).T
-
-    # Build system
-    M1M1T = M1 @ M1.T  # K x K
-    RHS = Y1 @ M1.T  # I x K
-
-    epsPri = np.size(Al) ** (1 / 2) * tol
-    epsDual = np.size(Atl) ** (1 / 2) * tol
-
-    n = 0
-    primalResidue = epsPri + 1
-    dualResidue = epsDual + 1
-
-    exitCriterion = True
-    while (n < nitermax) & exitCriterion:
-        # update A_{l+1}
-        # Solve A @ X = B  ⇒  A = B @ inv(X)
-        A_T = solve(
-            (M1M1T + rho * np.eye(Ainit.shape[1])).T, (RHS + rho * (Atl - Ul)).T
-        )
-        Al1 = A_T.T
-
-        # update \tilde{A}_{l+1}
-        Atl1 = np.maximum(0, Al1 + Ul)
-
-        # update dual
-        Ul1 = Ul + Al1 - Atl1
-
-        # compute convergence metrics residuals
-        primalResidue = np.linalg.norm(Al1 - Atl1)
-        dualResidue = rho * np.linalg.norm(Atl1 - Atl)
-
-        if (primalResidue < epsPri) and (dualResidue < epsDual):
-            exitCriterion = False
-        if primalResidue > 10 * dualResidue:
-            rho *= 2
-            Ul1 /= 2
-        elif dualResidue > 10 * primalResidue:
-            rho /= 2
-            Ul1 *= 2
-        # update all variables
-        Al = Al1.copy()
-        Atl = Atl1.copy()
-        Ul = Ul1.copy()
-
-        n += +1
-
-    return Atl, Al, primalResidue
-
-
-def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
-    # init variables
-    Bl = Binit.copy()
-    Btl = Btinit.copy()
-    Ul = np.zeros_like(Bl)
-
-    # iteration
-    M2 = khatri_rao([Ak, Ck]).T
-
-    # Build system
-    M2M2T = M2 @ M2.T  # K x K
-    RHS = Y2 @ M2.T  # I x K
-
-    epsPri = np.size(Bl) ** (1 / 2) * tol
-    epsDual = np.size(Btl) ** (1 / 2) * tol
-
-    n = 0
-    primalResidue = epsPri + 1
-    dualResidue = epsDual + 1
-
-    exitCriterion = True
-    while (n < nitermax) & exitCriterion:
-        # update B_(l+1)
-        B_T = solve(
-            (M2M2T + rho * np.eye(Binit.shape[1])).T, (RHS + rho * (Btl - Ul)).T
-        )
-        Bl1 = B_T.T
-
-        # update \tilde{B}_{l+1}
-        Btl1 = np.maximum(0, Bl1 + Ul)
-
-        # update dual
-        Ul1 = Ul + Bl1 - Btl1
-
-        # compute convergence metrics residuals
-
-        primalResidue = np.linalg.norm(Bl1 - Btl1)
-        dualResidue = rho * np.linalg.norm(Btl1 - Btl)
-
-        if (primalResidue < epsPri) and (dualResidue < epsDual):
-            exitCriterion = False
-        if (primalResidue < epsPri) and (dualResidue < epsDual):
-            exitCriterion = False
-        if primalResidue > 10 * dualResidue:
-            rho *= 2
-            Ul1 /= 2
-        elif dualResidue > 10 * primalResidue:
-            rho /= 2
-            Ul1 *= 2
-        # update all variables
-        Bl = Bl1.copy()
-        Btl = Btl1.copy()
-        Ul = Ul1.copy()
-
-        n += +1
-
-    return Btl, Bl, primalResidue
 
 
 def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14):
@@ -185,72 +71,101 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     return Ctl, Cl, primalResidue
 
 
-def stokes_kmeans(R, T):
+def kmeans_init(T, R, Lr, theta):
+    """
+    Full initializer that:
+    1. Runs KMeans on unfolded T to get cluster maps and cluster spectra.
+    2. Runs NMF on those maps to get nonnegative spatial factors A, B.
+    3. Builds C from the projected cluster centers (Stokes vectors).
+
+    Inputs:
+    - T: data tensor
+    - R: number of clusters / block terms
+    - Lr: list/array where Lr[0] is the NMF rank per block matching the rank of the spatial maps
+    - theta: model parameter passed to btd.factors_to_tensor
+
+    Outputs:
+    - kmeansA (initA): nonnegative factor A
+    - kmeansB (initB): nonnegative factor B
+    - kmeansC (initC): Each column is a Stokes vector (after projection)
+    """
+
+    # -------------------------
+    # 1. KMEANS-BASED INITIALIZATION OF C AND FEATURE MAPS
+    # -------------------------
+
     unfolding = unfold(T, 2).T
 
-    clustered = KMeans(n_clusters=R, random_state=0, n_init="auto").fit(unfolding)
+    # KMeans clustering
+    kmeans = KMeans(n_clusters=R, random_state=0, n_init="auto")
+    kmeans.fit(unfolding)
 
-    initialC = clustered.cluster_centers_.T
+    labels = kmeans.labels_
 
-    for i in range(R):
-        initialC[:, i] = stokes.stokesProjection(initialC[:, i])
+    # Initial cluster centers (shape ~ [features, R])
+    kmeansC = kmeans.cluster_centers_.T
 
-    for i in range(R):
-        if initialC[0, i] > 0:
-            initialC[:, i] = initialC[:, i] / initialC[0, i]
+    # Project each cluster center using Stokes projection
+    for r in range(R):
+        kmeansC[:, r] = stokes.stokesProjection(kmeansC[:, r])
 
+    # Normalize each cluster center so that its first component is 1
+    for r in range(R):
+        if kmeansC[0, r] > 0:
+            kmeansC[:, r] = kmeansC[:, r] / kmeansC[0, r]
+
+    # Rterms is (R, I*J) if T is (I, J, ...)
     Rterms = np.zeros((R, T.shape[0] * T.shape[1]))
+    featureMaps = np.ones((R, T.shape[0], T.shape[1]))
 
-    features = np.ones((R, T.shape[0], T.shape[1]))
+    for idx in range(len(labels)):
+        Rterms[labels[idx], idx] = np.random.rand()
 
-    for i in range(len(clustered.labels_)):
-        # Rterms[clustered.labels_[i], i] = np.random.rand(
-        #     np.size(clustered.labels_[i]))
-        Rterms[clustered.labels_[i], i] = np.random.rand()
+    # Reshape each cluster's assignment map into spatial maps
+    for r in range(R):
+        featureMaps[r] = Rterms[r].reshape(T.shape[0], T.shape[1])
 
-    for i in range(R):
-        features[i] = Rterms[i].reshape(T.shape[0], T.shape[1])
+    # -------------------------
+    # 2. NMF ON FEATURE MAPS TO BUILD A AND B
+    # -------------------------
 
-    return features, initialC
-
-
-def stokes_NMF(Lr, R, maps):
-    model = NMF(n_components=Lr, init="random", max_iter=1000)
-
-    W = np.zeros((R, maps.shape[1], Lr))
-    H = np.zeros((R, Lr, maps.shape[2]))
-
-    product = np.zeros((R, maps.shape[1], maps.shape[2]))
-
-    for i in range(R):
-        W[i] = model.fit_transform(maps[i])
-
-        H[i] = model.components_
-        product[i] = W[i] @ H[i]
-
-    initA = W[0]
-    initB = H[0].T
-
-    if R > 1:
-        for i in range(1, R):
-            initA = np.concatenate((initA, W[i]), axis=1)
-            initB = np.concatenate((initB, H[i].T), axis=1)
-
-    return product, initA, initB
-
-
-def kmeans_init(Lr, R, T, theta):
+    # NMF rank per block
     L = Lr[0]
 
-    featureMaps, kmeansC = stokes_kmeans(R, T)
+    model = NMF(n_components=L, init="random", max_iter=1000)
 
-    outputNMF, kmeansA, kmeansB = stokes_NMF(L, R, featureMaps)
+    # We'll factor each feature map with its own NMF,
+    # then concatenate all the W/H across clusters.
+    W = np.zeros((R, featureMaps.shape[1], L))
+    H = np.zeros((R, L, featureMaps.shape[2]))
+
+    product = np.zeros((R, featureMaps.shape[1], featureMaps.shape[2]))
+
+    for r in range(R):
+        W[r] = model.fit_transform(featureMaps[r])  # shape (I, L)
+        H[r] = model.components_  # shape (L, J)
+        product[r] = W[r] @ H[r]
+
+    # Concatenate per-cluster factors across columns
+    kmeansA = W[0]  # shape (I, L)
+    kmeansB = H[0].T  # shape (J, L)
+
+    if R > 1:
+        for r in range(1, R):
+            kmeansA = np.concatenate((kmeansA, W[r]), axis=1)  # (I, R*L)
+            kmeansB = np.concatenate((kmeansB, H[r].T), axis=1)  # (J, R*L)
+
+    # -------------------------
+    # 3. SCALE A AND B USING GLOBAL NORM MATCHING
+    # -------------------------
 
     Tkmeans = btd.factors_to_tensor(kmeansA, kmeansB, kmeansC, theta)
-    lamb = linalg.norm(T) / linalg.norm(Tkmeans)
 
-    kmeansA = kmeansA * lamb ** (1 / 2)
-    kmeansB = kmeansB * lamb ** (1 / 2)
+    lamb = linalg.norm(T) / linalg.norm(Tkmeans)
+    scale = lamb**0.5
+
+    kmeansA = kmeansA * scale
+    kmeansB = kmeansB * scale
 
     return kmeansA, kmeansB, kmeansC
 
@@ -269,7 +184,7 @@ def init_Stokes_factors(Stokes_model, init="random", T=None):
         A, B, C = stokes.generate_stokes_factors(dims, R, L)
 
     elif init == "kmeans":
-        A, B, C = kmeans_init(L, R, T, theta)
+        A, B, C = kmeans_init(T, R, L, theta)
 
     return A, B, C
 
@@ -327,12 +242,12 @@ def Stokes_ADMM(
         if (k != 0) and (k % int(max_iter / 5)) == 0:
             print("Progress:", (k / max_iter * 100), "%")
         # update A
-        Atk1, Ak1, _ = ADMM_A(
+        Atk1, Ak1, _ = covll1_admm.ADMM_A(
             T1, Btk, (Ctk @ theta), Ak, Atk, rho, L, nitermax=max_admm, tol=admm_tol
         )
 
         # update B
-        Btk1, Bk1, _ = ADMM_B(
+        Btk1, Bk1, _ = covll1_admm.ADMM_B(
             T2, Atk1, (Ctk @ theta), Bk, Btk, rho, L, nitermax=max_admm, tol=admm_tol
         )
 

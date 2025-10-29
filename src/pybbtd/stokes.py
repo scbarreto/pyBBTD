@@ -192,20 +192,3 @@ def stokesProjection(S):
     proj = projPSD(coh)
     newS = coh2stokes(proj)
     return newS
-
-
-# def elip_2_stokes(psi, chi, p=1):
-#     S1 = p * np.cos(2 * psi) * np.cos(2 * chi)
-#     S2 = p * np.sin(2 * psi) * np.cos(2 * chi)
-#     S3 = p * np.sin(2 * chi)
-#     return np.array([1, S1, S2, S3])
-
-
-# def stokes_2_elip(S):
-#     S0 = S[0]
-#     p = np.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]
-#     psi = 1 / 2 * np.arctan2(S[2], S[1])
-#     chi = 1 / 2 * np.arctan2(S[3], np.sqrt(S[1] ** 2 + S[2] ** 2))
-#     # chi = 1/2 * np.arcsin(S[3] / S[0])
-
-#     return (psi, chi, p, S0)
