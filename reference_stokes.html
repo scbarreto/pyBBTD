@@ -124,14 +124,12 @@
 <dt class="sig sig-object py" id="pybbtd.stokes.Stokes.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ADMM'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#Stokes.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.Stokes.fit" title="Link to this definition"></a></dt>
 <dd><p>Computes Stokes-BTD factor matrices for provided data
-using the specified algorithm.
-:param data: np.ndarray</p>
-<blockquote>
-<div><p>Input tensor data to be approximated.</p>
-</div></blockquote>
+using the specified algorithm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – np.ndarray
+Input tensor data to be approximated.</p></li>
 <li><p><strong>algorithm</strong> – str
 Algorithm to use for fitting. Currently, only “ADMM” is implemented.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments for the fitting algorithm.</p></li>
