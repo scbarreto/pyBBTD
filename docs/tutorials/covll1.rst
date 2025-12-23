@@ -17,6 +17,7 @@ Generate Cov-LL1 data
 -------------------------------------------------------------------------------------
 
 We first define the dimensions of the tensor and create a Cov-LL1 model instance.
+
 .. code:: python3
 
     R = 2

@@ -5,12 +5,11 @@
 
 pyBBTD docs
 ====================
-**pyBBTD** is a Python library that implements two tensor decomposition models: **Cov-LL1** and **BBTD**.
-
-For details on the mathematical formulation of Cov-LL1 applied to Stokes polarimetric data, please refer to `this conference paper <https://ieeexplore.ieee.org/abstract/document/10446019>`_, and for BBTD applied to covariance imaging data, refer to `this journal paper <https://hal.science/hal-05059862/>`_.
+**pyBBTD** implements two tensor decomposition models: `Cov-LL1 <https://ieeexplore.ieee.org/abstract/document/10446019>`_ and `BBTD <https://hal.science/hal-05059862/>`_.
 
 
-The **Cov-LL1** model is a third-order tensor decomposition method designed for *covariance imaging tensors* — that is, tensors in which each pixel carries a covariance matrix. The rank-1 term (vector) in each block corresponds to a vectorized covariance matrix.
+**Cov-LL1** is a third-order tensor decomposition model specifically tailored for *covariance-valued imaging tensors*, i.e., data in which each pixel is associated with a covariance matrix. It can be seen as a constrained `LL1 model <https://epubs.siam.org/doi/abs/10.1137/070690729>`_.
+
 
 In mathematical form, Cov-LL1 decomposes a third-order tensor :math:`\mathcal{X}` as:
 
@@ -22,18 +21,18 @@ where:
 
 - :math:`R` is the number of components.
 
-- :math:`\mathbf{A}_r \in \mathbb{R}^{I \times L_1}` and :math:`\mathbf{B}_r \in \mathbb{R}^{J \times L_1}` represent spatial factor matrices of rank :math:`L_1`, and  
+- :math:`\mathbf{A}_r \in \mathbb{R}^{I \times L_1}` and :math:`\mathbf{B}_r \in \mathbb{R}^{J \times L_1}` represent spatial (non-negative) factor matrices of rank :math:`L_1`, and  
 
 - :math:`\mathbf{c}_r \in \mathbb{R}^{K^2}` is a vectorized :math:`K \times K` covariance matrix associated with the :math:`r`-th component.
 
-The parameters :math:`R` (number of components) and :math:`L_1` (spatial rank) can be adjusted by the user, as illustrated in the figure below.
-
+One can choose the :math:`R` (number of components) and :math:`L_1` (spatial rank) up to certain identifiability conditions (checked by pyBBTD). Here is an illustration of the Cov-LL1 model:
 
 .. image:: index_files/model_covll1.png
 
 
-**BBTD** is a fourth-order tensor decomposition model that represents a tensor as a sum of two blocks.  
-Unlike **Cov-LL1**, the **BBTD** model allows the user to set not only the number of blocks :math:`R` and the spatial rank :math:`L_1`, but also the covariance rank :math:`L_2` for the covariance matrices in each block.
+**BBTD** is a fourth-order tensor decomposition model that represents data as a sum of two blocks: a spatial component with rank :math:`L_1` and a covariance component with rank :math:`L_2`. The user can choose :math:`R` (number of components), :math:`L_1` (spatial rank), and :math:`L_2` (covariance rank), up to certain identifiability conditions (checked by pyBBTD).
+
+
 In mathematical form, **BBTD** decomposes a fourth-order tensor :math:`\mathcal{T}` as:
 
 .. math::
@@ -55,13 +54,14 @@ The figure below illustrates the structure of the **BBTD** model.
 
 .. image:: index_files/model_bbtd.png
 
-Planned releases
-====================
+For more details about Cov-LL1 and BBTD models, please refer to the chapters 3 and 4, respectively, of the following `thesis <https://theses.fr/s348607>`_.
 
-- **4th-order model (BBTD)**: planned for early-November 2025
+################
+Guide & Reference
+################
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    tutorials/index
-   reference
+   reference_api

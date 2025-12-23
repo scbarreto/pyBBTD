@@ -3,6 +3,10 @@
 A python package for computing Block-block terms tensor decompositions.
 Check the [documentation and examples](https://scbarreto.github.io/pyBBTD/).
 
+# Getting Started
+
+Soon available from PyPi
+
 ## basic instructions
 
 Packaging uses `uv` : [see here for detailed installation instructions](https://docs.astral.sh/uv/#installation)
