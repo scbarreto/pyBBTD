@@ -1,9 +1,17 @@
 .. _reference_api:
 
 ################
-Reference API
+**Reference API**
 ################
 
+| Current Release: 0.1.0
+| Last Updated: December 2025
+
+This section contains the complete API documentation for pyBBTD. For tutorials and guided explanations, see :ref:`tutorials` page.
+
+
+API Overview
+=============
 .. automodule:: pybbtd
 
 .. toctree::

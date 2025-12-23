@@ -7,7 +7,7 @@ import warnings
 
 class Stokes(BTD):
     """
-     Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.
+    Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.
 
     :param dims: Dimensions `(I, J, 4)` of the tensor.
     :type dims: Tuple[int, int, int]
@@ -78,7 +78,7 @@ class Stokes(BTD):
         else:
             raise UserWarning("Algorithm not implemented yet")
 
-    def get_constraint_matrix(self):
+    def _get_constraint_matrix(self):
         """
         Returns constraint matrix for BTD-LL1 model (useful to CP-equivalent model)
         """
@@ -144,6 +144,9 @@ def validate_stokes_tensor(T0):
 
 
 def check_stokes_constraints(S):
+    """
+    Check if a 4-D tensor satisfies the Stokes constraints.
+    """
     return (
         0
         if (
@@ -165,7 +168,7 @@ def stokes2coh(S):
 
 
 def coh2stokes(coh):
-    "return Stokes parameters from coherence matrix"
+    "Returns Stokes parameters from polarization (coherency) matrix"
     S0 = np.real(coh[0, 0] + coh[1, 1])
     S1 = np.real(coh[0, 0] - coh[1, 1])
     S2 = 2 * coh[0, 1].real
@@ -189,6 +192,7 @@ def projPSD(M):
 
 
 def stokesProjection(S):
+    """Projection of Stokes parameters onto the set of valid Stokes vectors."""
     coh = stokes2coh(S)
     proj = projPSD(coh)
     newS = coh2stokes(proj)

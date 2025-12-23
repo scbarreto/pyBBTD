@@ -1,36 +1,30 @@
 from pybbtd.btd import BTD
 import numpy as np
 import pybbtd.btd as btd
-from pybbtd.uniqueness import check_uniqueness_LL1
 import warnings
 
 
 class CovLL1(BTD):
     """
-    Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each
-    vector of size :math:`K^2` in the rank-one mode represents a valid covariance
-    matrix of size :math:`K \\times K`, once reshaped.
+    Class for tensors admitting a Cov-LL1 (constrained LL1) decomposition, where each vector of size :math:`K^2` in the rank-one mode corresponds to a :math:`K \\times K` covariance matrix.
 
-    Parameters
-    ----------
-    dims : tuple[int, int, int]
-        Dimensions :math:`(I, J, K^2)` of the tensor.
-    R : int
-        The rank of the decomposition (number of components).
-    L1 : int
-        Rank of the spatial maps.
-    L2 : int
-        Rank of the covariance matrices.
+    :param dims: Dimensions of the tensor.
+    :type dims: Tuple[int, int, int]
+    :param R: The rank of the decomposition (number of components).
+    :type R: int
+    :param L1: Rank of the spatial maps.
+    :type L1: int
+    :param L2: Rank of the covariance matrices.
+    :type L2: int
 
-    Attributes
-    ----------
-    A : np.ndarray
-        Factor matrix of shape ``(dims[0], L * R)``.
-    B : np.ndarray
-        Factor matrix of shape ``(dims[1], L * R)``.
-    C : np.ndarray
-        Factor matrix of shape ``(K**2, R)``, where each column is a vectorized
-        covariance matrix.
+    :ivar A: Factor matrix of shape `(dims[0], L1* R)`.
+    :vartype A: np.ndarray
+    :ivar B: Factor matrix of shape `(dims[1], L1 * R)`.
+    :vartype B: np.ndarray
+    :ivar C: Factor matrix of shape `(dims[2], R)`, each column is a vectorized covariance matrix.
+    :vartype C: np.ndarray
+
+
     """
 
     def __init__(self, dims, R: int, L1: int, L2: int, block_mode="LL1"):
@@ -56,7 +50,7 @@ class CovLL1(BTD):
                 f"Invalid mode '{block_mode}'. Block mode must be one of {valid_block_modes}."
             )
         self.block_mode = block_mode
-        self.rank, self.L1, self.L2 = validate_dimensions(dims, R, L1, L2)
+        self.rank, self.L1, self.L2 = _validate_dimensions(dims, R, L1, L2)
 
         print(
             f"Cov-LL1 tensor initialized with dimensions {self.dims} on {self.block_mode} mode."
@@ -64,7 +58,7 @@ class CovLL1(BTD):
 
     def generate_covll1_tensor(self):
         """
-        Generate a random covariance tensor.
+        Generate a random covariance imaging tensor.
         """
 
         A, B, C = generate_covll1_factors(self.dims, self.rank, self.L1, self.L2)
@@ -143,7 +137,7 @@ def generate_covll1_factors(dims, R, L1, L2):
     return A, B, C
 
 
-def validate_dimensions(dims, R, L1, L2):
+def _validate_dimensions(dims, R, L1, L2):
     """
     Validate dimensions for Cov-LL1 model.
 
@@ -175,32 +169,12 @@ def validate_dimensions(dims, R, L1, L2):
         raise ValueError(
             "L2 must be less than the square root of the third dimension (K)."
         )
-
     return R, L1, L2
-
-
-def check_uniqueness(self):
-    """
-    Check if, for given parameters, uniqueness can be guaranteed.
-    """
-
-    N1, N2, N3 = self.dims
-
-    if self.block_mode == "LL1":
-        unique = check_uniqueness_LL1(N1, N2, N3, self.R, self.L1)
-    elif self.block_mode == "L1L":
-        unique = check_uniqueness_LL1(N1, N3, N2, self.R, self.L1)
-    elif self.block_mode == "1LL":
-        unique = check_uniqueness_LL1(N2, N3, N1, self.R, self.L1)
-    if unique is True:
-        print("Sufficient condition for uniqueness satisfied")
-    else:
-        print("Cannot guarantee uniqueness. Proceed at your own risk.")
 
 
 def validate_cov_matrices(T0):
     """
-    Check if all covariance matrices satisfy the positive semidefinite constraint.
+    Check if all covariance matrices in a tensor are valid.
     """
     invalid_count = 0
     total_pixels = T0.shape[0] * T0.shape[1]
@@ -225,12 +199,7 @@ def validate_cov_matrices(T0):
 
 def is_valid_covariance(Sigma, tol=1e-10):
     """
-    Check if a matrix is a valid covariance matrix.
-
-    Conditions:
-    1. Square
-    2. Hermitian / symmetric
-    3. Positive semidefinite (all eigenvalues >= -tol)
+    Check if a matrix is a valid covariance matrix (Square, Hermitian, Positive Semidefinite).
 
     Parameters
     ----------

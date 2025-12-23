@@ -55,7 +55,7 @@ def test_fit_admm_random_init():
     np.random.seed(0)
     R = 2
     L = 1
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
     X = stokes.Stokes([7, 8], R, L)
 
     [A0, B0, C0], T0 = X.generate_stokes_tensor()
@@ -84,7 +84,7 @@ def test_fit_admm_kmeans_init():
 
     R = 1
     L = 2
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
     X = stokes.Stokes([15, 15], R, L)
 
     [A0, B0, C0], T0 = X.generate_stokes_tensor()
@@ -116,7 +116,7 @@ def test_wrong_tensor_init_kmeans():
     # Create Stokes model
     R = 2
     L = 2
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
     X = stokes.Stokes([2, 3], R, L)
     Twrong = np.random.rand(3, 2, 5)
     Tright = np.random.rand(2, 3, 4)
@@ -133,7 +133,7 @@ def test_admm_convergence():
 
     R = 3
     L = 1
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
     X = stokes.Stokes([15, 15], R, L)
 
     [A0, B0, C0], T0 = X.generate_stokes_tensor()
@@ -168,7 +168,7 @@ def test_stokes_instance():
 def test_max_iter_criteria():
     R = 1
     L = 1
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
     X = stokes.Stokes([10, 10], R, L)
 
     [A0, B0, C0], T0 = X.generate_stokes_tensor()

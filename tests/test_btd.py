@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import tensorly as tly
 from tensorly.tenalg import outer, khatri_rao
-from pybbtd.btd import BTD, validate_R_L, constraint_matrix, factors_to_tensor
+from pybbtd.btd import BTD, _validate_R_L, _constraint_matrix, factors_to_tensor
 from pybbtd.solvers.btd_als import init_BTD_factors
 import numpy.testing as npt
 
@@ -53,10 +53,10 @@ def test_invalid_block_mode():
 
 
 def test_unfoldings():
-    R, L = validate_R_L(3, 2)
+    R, L = _validate_R_L(3, 2)
     Lsum = np.array(L).sum()
     dims = (13, 12, 11)
-    theta = constraint_matrix(R, L)
+    theta = _constraint_matrix(R, L)
     # random factors for LL1
     A = np.random.rand(dims[0], Lsum)
     B = np.random.rand(dims[1], Lsum)
@@ -66,8 +66,8 @@ def test_unfoldings():
     T = np.zeros(dims)
     ind = 0
     for r in range(R):
-        Ar = A[:, ind : ind + L[r]]
-        Br = B[:, ind : ind + L[r]]
+        Ar = A[:, ind: ind + L[r]]
+        Br = B[:, ind: ind + L[r]]
         ind += L[r]
         T += outer([Ar @ Br.T, C[:, r]])
 
@@ -113,7 +113,8 @@ def test_fit_1LL():
     B0 = np.random.randn(dims[1], Lsum)
     C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
-    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
+    Trec = factors_to_tensor(
+        A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)
@@ -135,7 +136,8 @@ def test_fit_L1L():
     B0 = np.random.randn(dims[1], R)
     C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
-    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
+    Trec = factors_to_tensor(
+        A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)

@@ -38,7 +38,7 @@ class BTD:
         self.dims = tuple(dims)
 
         # validate R, L values
-        self.rank, self.L = validate_R_L(R, L)
+        self.rank, self.L = _validate_R_L(R, L)
 
         # Validate mode
         valid_block_modes = {"LL1", "L1L", "1LL"}
@@ -104,9 +104,9 @@ class BTD:
 
     def get_constraint_matrix(self):
         """
-        Get the constraint matrix for the CP equivalent of the BTD model.
+        Get the constraint matrix for the CP equivalent of the BTD model, correctly repeating columns.
         """
-        return constraint_matrix(self.rank, self.L)
+        return _constraint_matrix(self.rank, self.L)
 
     def to_cpd_format():
         """
@@ -115,7 +115,7 @@ class BTD:
         pass
 
 
-def validate_R_L(R, L):
+def _validate_R_L(R, L):
     """Check if R and L are non-negative integers."""
     # check R
     if not isinstance(R, int) or R <= 0:
@@ -136,7 +136,7 @@ def validate_R_L(R, L):
     return R, Larray
 
 
-def constraint_matrix(R, L):
+def _constraint_matrix(R, L):
     """Compute the constraint matrix repeating columns
     for the BTD model
 
@@ -147,7 +147,7 @@ def constraint_matrix(R, L):
     Returns:
         theta: BTD constraint matrix
     """
-    _, Larray = validate_R_L(R, L)
+    _, Larray = _validate_R_L(R, L)
     theta = block_diag(*[np.ones(Lr) for Lr in Larray])
 
     return theta

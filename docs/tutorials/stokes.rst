@@ -1,11 +1,14 @@
+Stokes Tutorials
+===================================
+
 Stokes Tutorial I with Cov-LL1
-==================================
+----------------------------------
 
 
 This tutorial provides an introduction to the Stokes Block Tensor Decomposition (Stokes-BTD) using the pyBBTD library.
 
-Load required libraries
-------------------------
+Load required libraries.
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python3
 
@@ -25,8 +28,8 @@ Define Stokes-BTD parameters and spatial map dimensions
     # Define spatial maps of size 25x25.
     X = stokes.Stokes([25, 25], R, L)
 
-Generate BTD-LL1 data that respect Stokes constraints 
------------------------------------------------------
+Generate Stokes BTD-LL1 data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. code:: python3
@@ -49,7 +52,8 @@ Then we get the constraint matrix for the equivalent CPD representation of the B
     stokes.validate_stokes_tensor(Tnoisy)
 
 Fit a Stokes-BTD model 
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
+
 We now fit a Stokes-BTD model to the observed tensor.
 
 .. code:: python3
@@ -61,7 +65,7 @@ We now fit a Stokes-BTD model to the observed tensor.
 .. image:: stokes_files/fit_error_rand.png
 
 Stokes Tutorial II with Cov-LL1
-===================================
+----------------------------------
 
 In this tutorial, we demonstrate how to use the **pyBBTD** library to perform a
 **Stokes Block Tensor Decomposition (Stokes-BTD)** with *canonical
@@ -82,8 +86,7 @@ to recover the polarization components, and then visualize the reconstructed
 Stokes parameters and corresponding polarization ellipses.
 
 Load required libraries
-------------------------
-
+^^^^^^^^^^^^^^^^^^^^^^^
 .. code:: python3
 
     import numpy as np
@@ -92,8 +95,8 @@ Load required libraries
     import matplotlib.pyplot as plt
     import pybbtd as pybbtd
 
-Load the data tensor and define the Stokes-BTD model parameters
------------------------------------------------------------------
+Load the data tensor and define parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python3
 
@@ -106,7 +109,7 @@ Load the data tensor and define the Stokes-BTD model parameters
     X = stokes.Stokes([tensor.shape[0], tensor.shape[1]], R, L)
 
 Fit the Stokes-BTD model to the data tensor
-------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python3
 
