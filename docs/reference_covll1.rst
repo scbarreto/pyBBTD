@@ -2,7 +2,7 @@
 
  .. currentmodule:: pybbtd.covll1
 
-pybbtd.covll1
+Cov-LL1 Class
 =============
 
 .. automodule:: pybbtd.covll1

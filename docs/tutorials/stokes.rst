@@ -1,6 +1,5 @@
-Example 1: Stokes Tutorial with pyBBTD and noisy data
-===========================================================
-
+Stokes Tutorial I with Cov-LL1
+==================================
 
 
 This tutorial provides an introduction to the Stokes Block Tensor Decomposition (Stokes-BTD) using the pyBBTD library.
@@ -49,6 +48,8 @@ Then we get the constraint matrix for the equivalent CPD representation of the B
     # We check iff all pixels satisfy the Stokes constraints
     stokes.validate_stokes_tensor(Tnoisy)
 
+Fit a Stokes-BTD model 
+------------------------
 We now fit a Stokes-BTD model to the observed tensor.
 
 .. code:: python3
@@ -59,8 +60,8 @@ We now fit a Stokes-BTD model to the observed tensor.
 
 .. image:: stokes_files/fit_error_rand.png
 
-Example 2: Stokes-BTD with Canonical Polarization States
-===============================================================================
+Stokes Tutorial II with Cov-LL1
+===================================
 
 In this tutorial, we demonstrate how to use the **pyBBTD** library to perform a
 **Stokes Block Tensor Decomposition (Stokes-BTD)** with *canonical

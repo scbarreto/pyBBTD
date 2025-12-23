@@ -2,7 +2,7 @@
 
  .. currentmodule:: pybbtd.stokes
 
-pybbtd.stokes
+Stokes Class
 =============
 
 .. automodule:: pybbtd.stokes

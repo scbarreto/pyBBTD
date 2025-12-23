@@ -2,7 +2,7 @@
 
  .. currentmodule:: pybbtd.visualization
 
-pybbtd.visualization
+Visualization
 ==============
 
 .. automodule:: pybbtd.visualization

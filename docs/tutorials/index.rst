@@ -9,4 +9,4 @@ Tutorials
 
    btd
    covll1
-   stokes
+   Stokes tutorials <stokes>

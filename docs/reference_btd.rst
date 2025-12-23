@@ -2,7 +2,7 @@
 
  .. currentmodule:: pybbtd.btd
 
-pybbtd.btd
+BTD Class
 =============
 
 .. automodule:: pybbtd.btd

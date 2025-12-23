@@ -2,7 +2,7 @@
 
  .. currentmodule:: pybbtd.uniqueness
 
-pybbtd.uniqueness
+Uniqueness
 =================
 
 .. automodule:: pybbtd.uniqueness

@@ -1,7 +1,7 @@
-BTD-LL1 tutorial with pyBBTD
+BTD tutorial
 ===================================
 
-This tutorial provides an introduction to Block Tensor Decomposition (BTD) using the pyBBTD library.
+This tutorial provides an introduction to Block Tensor Decomposition (BTD) into rank-(L, L, 1) terms using the pyBBTD library.
 
 Load required libraries
 ------------------------
@@ -12,8 +12,8 @@ Load required libraries
     from pybbtd.solvers import btd_als
     import numpy as np
     
-Generate noisy data with known BTD structure and fit a BTD model
--------------------------------------------------------------------------------------
+Generate noisy BTD data
+-----------------------------------------------------
 
 We first define the dimensions of the tensor and the BTD parameters.
 
@@ -21,7 +21,7 @@ We first define the dimensions of the tensor and the BTD parameters.
 
     # Define tensor size and BTD parameters
     N1, N2, N3 = 80, 100, 4  # dimensions of the tensor
-    R = 3  # number of BTD terms
+    R = 3  # number of LL1 terms
     L = 5  # rank of each term
 
     # Generate BTD model
@@ -33,13 +33,14 @@ Then we create the true BTD components and generate the observed tensor with add
 
     # Create ground truth tensor
     A0, B0, C0 = btd_als.init_BTD_factors(X, strat="random")
-    # This is the constraint matrix to represent BTD-LL1 as a CPD model
+    # This is the constraint matrix to represent BTD as a CPD model
     theta = X.get_constraint_matrix()
 
-    T_observed = btd.factors_to_tensor(
-        A0, B0, C0, theta, block_mode="LL1"
-    ) + 1 * 1e-6 * np.random.randn(*X.dims)
+    T_observed = btd.factors_to_tensor(A0, B0, C0, theta, block_mode="LL1") + 1 * 1e-6 * np.random.randn(*X.dims)
 
+
+Fit a BTD model
+-------------------
 We now fit a BTD model to the observed tensor with random initialization
 
 .. code:: python3

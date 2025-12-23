@@ -2,7 +2,7 @@
 
  .. currentmodule:: pybbtd.solvers
 
-pybbtd.solvers
+Solvers
 ==============
 
 .. automodule:: pybbtd.solvers.stokes_admm

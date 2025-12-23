@@ -1,4 +1,4 @@
-Cov-LL1 tutorial with pyBBTD
+Cov-LL1 tutorial
 ===================================
 
 This tutorial provides an introduction on how to use Cov-LL1 for covariance imaging applications using the pyBBTD library.
@@ -13,8 +13,8 @@ Load required libraries
     import pybbtd as pybbtd
     from pybbtd.visualization import draw_metrics
     
-Generate Cov-LL1 data
--------------------------------------------------------------------------------------
+Generate noisy Cov-LL1 data
+-----------------------------------
 
 We first define the dimensions of the tensor and create a Cov-LL1 model instance.
 
@@ -41,13 +41,22 @@ Then we create the true Cov-LL1 components and generate the observed tensor with
     # We check if all pixels carry valid covariance matrices
     covll1.validate_cov_matrices(Tnoisy)
 
+Fit a Cov-LL1 model
+-------------------------
+
 We now fit a Cov-LL1 model to the observed tensor with k-means initialization
 
 .. code:: python3
 
     X.fit(data=Tnoisy, algorithm="ADMM", init="kmeans", max_iter=10000, rho=1, max_admm=50, rel_tol=10**-6, abs_tol=10**-12, admm_tol=10**-8)
 
-    # Plot the fit error curve
+
+
+Plot the fit error curve
+-------------------------
+
+.. code:: python3
+
     draw_metrics.plot_error(X.fit_error)
  
 .. image:: covll1_files/kmeans_covll1.png
