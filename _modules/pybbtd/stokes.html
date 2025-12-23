@@ -148,14 +148,13 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html"><strong>Tutorials</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorial I with Cov-LL1</a></li>
-
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html">Reference API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_stokes.html">Stokes Class</a></li>
@@ -278,7 +277,7 @@ document.write(`
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Stokes</span><span class="p">(</span><span class="n">BTD</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">     Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.</span>
+<span class="sd">    Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.</span>
 
 <span class="sd">    :param dims: Dimensions `(I, J, 4)` of the tensor.</span>
 <span class="sd">    :type dims: Tuple[int, int, int]</span>
@@ -355,14 +354,11 @@ document.write(`
             <span class="k">raise</span> <span class="ne">UserWarning</span><span class="p">(</span><span class="s2">&quot;Algorithm not implemented yet&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Stokes.get_constraint_matrix">
-<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes.get_constraint_matrix">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns constraint matrix for BTD-LL1 model (useful to CP-equivalent model)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">btd</span><span class="o">.</span><span class="n">constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
-</div>
 
 
 
@@ -433,6 +429,9 @@ document.write(`
 <div class="viewcode-block" id="check_stokes_constraints">
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.check_stokes_constraints">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_stokes_constraints</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a 4-D tensor satisfies the Stokes constraints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="mi">0</span>
         <span class="k">if</span> <span class="p">(</span>
@@ -460,7 +459,7 @@ document.write(`
 <div class="viewcode-block" id="coh2stokes">
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.coh2stokes">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">coh2stokes</span><span class="p">(</span><span class="n">coh</span><span class="p">):</span>
-    <span class="s2">&quot;return Stokes parameters from coherence matrix&quot;</span>
+    <span class="s2">&quot;Returns Stokes parameters from polarization (coherency) matrix&quot;</span>
     <span class="n">S0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">coh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">S1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">coh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">S2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
@@ -490,6 +489,7 @@ document.write(`
 <div class="viewcode-block" id="stokesProjection">
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.stokesProjection">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">stokesProjection</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Projection of Stokes parameters onto the set of valid Stokes vectors.&quot;&quot;&quot;</span>
     <span class="n">coh</span> <span class="o">=</span> <span class="n">stokes2coh</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
     <span class="n">proj</span> <span class="o">=</span> <span class="n">projPSD</span><span class="p">(</span><span class="n">coh</span><span class="p">)</span>
     <span class="n">newS</span> <span class="o">=</span> <span class="n">coh2stokes</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Stokes Tutorial I with Cov-LL1 &#8212; pyBBTD  documentation</title>
+    <title>Stokes Tutorials &#8212; pyBBTD  documentation</title>
   
   
   
@@ -149,14 +149,13 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html"><strong>Tutorials</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covll1.html">Cov-LL1 tutorial</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Stokes Tutorial I with Cov-LL1</a></li>
-
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Stokes Tutorials</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../reference_api.html">Reference API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_stokes.html">Stokes Class</a></li>
@@ -303,7 +302,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Stokes Tutorial I with Cov-LL1</h1>
+    <h1>Stokes Tutorials</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -313,20 +312,19 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Stokes Tutorial I with Cov-LL1</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-required-libraries">Load required libraries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-btd-ll1-data-that-respect-stokes-constraints">Generate BTD-LL1 data that respect Stokes constraints</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-a-stokes-btd-model">Fit a Stokes-BTD model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-tutorial-i-with-cov-ll1">Stokes Tutorial I with Cov-LL1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-required-libraries">Load required libraries.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-stokes-btd-ll1-data">Generate Stokes BTD-LL1 data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-a-stokes-btd-model">Fit a Stokes-BTD model</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-tutorial-ii-with-cov-ll1">Stokes Tutorial II with Cov-LL1</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Load required libraries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-tensor-and-define-the-stokes-btd-model-parameters">Load the data tensor and define the Stokes-BTD model parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-tutorial-ii-with-cov-ll1">Stokes Tutorial II with Cov-LL1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Load required libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-tensor-and-define-parameters">Load the data tensor and define parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
 </ul>
 </li>
 </ul>
-
             </nav>
         </div>
     </div>
@@ -337,11 +335,13 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="stokes-tutorial-i-with-cov-ll1">
-<h1>Stokes Tutorial I with Cov-LL1<a class="headerlink" href="#stokes-tutorial-i-with-cov-ll1" title="Link to this heading">#</a></h1>
+  <section id="stokes-tutorials">
+<h1>Stokes Tutorials<a class="headerlink" href="#stokes-tutorials" title="Link to this heading">#</a></h1>
+<section id="stokes-tutorial-i-with-cov-ll1">
+<h2>Stokes Tutorial I with Cov-LL1<a class="headerlink" href="#stokes-tutorial-i-with-cov-ll1" title="Link to this heading">#</a></h2>
 <p>This tutorial provides an introduction to the Stokes Block Tensor Decomposition (Stokes-BTD) using the pyBBTD library.</p>
 <section id="load-required-libraries">
-<h2>Load required libraries<a class="headerlink" href="#load-required-libraries" title="Link to this heading">#</a></h2>
+<h3>Load required libraries.<a class="headerlink" href="#load-required-libraries" title="Link to this heading">#</a></h3>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
@@ -358,8 +358,8 @@ document.write(`
 </pre></div>
 </div>
 </section>
-<section id="generate-btd-ll1-data-that-respect-stokes-constraints">
-<h2>Generate BTD-LL1 data that respect Stokes constraints<a class="headerlink" href="#generate-btd-ll1-data-that-respect-stokes-constraints" title="Link to this heading">#</a></h2>
+<section id="generate-stokes-btd-ll1-data">
+<h3>Generate Stokes BTD-LL1 data<a class="headerlink" href="#generate-stokes-btd-ll1-data" title="Link to this heading">#</a></h3>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create ground truth tensor</span>
 <span class="p">[</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">,</span> <span class="n">C0</span><span class="p">],</span> <span class="n">T0</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">generate_stokes_tensor</span><span class="p">()</span>
 </pre></div>
@@ -378,7 +378,7 @@ document.write(`
 </div>
 </section>
 <section id="fit-a-stokes-btd-model">
-<h2>Fit a Stokes-BTD model<a class="headerlink" href="#fit-a-stokes-btd-model" title="Link to this heading">#</a></h2>
+<h3>Fit a Stokes-BTD model<a class="headerlink" href="#fit-a-stokes-btd-model" title="Link to this heading">#</a></h3>
 <p>We now fit a Stokes-BTD model to the observed tensor.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">Tnoisy</span><span class="p">,</span><span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">max_admm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">8</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">14</span><span class="p">,</span><span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">10</span><span class="p">)</span>
 
@@ -389,7 +389,7 @@ document.write(`
 </section>
 </section>
 <section id="stokes-tutorial-ii-with-cov-ll1">
-<h1>Stokes Tutorial II with Cov-LL1<a class="headerlink" href="#stokes-tutorial-ii-with-cov-ll1" title="Link to this heading">#</a></h1>
+<h2>Stokes Tutorial II with Cov-LL1<a class="headerlink" href="#stokes-tutorial-ii-with-cov-ll1" title="Link to this heading">#</a></h2>
 <p>In this tutorial, we demonstrate how to use the <strong>pyBBTD</strong> library to perform a
 <strong>Stokes Block Tensor Decomposition (Stokes-BTD)</strong> with <em>canonical
 polarization states</em>.</p>
@@ -407,7 +407,7 @@ polarization state:</p>
 to recover the polarization components, and then visualize the reconstructed
 Stokes parameters and corresponding polarization ellipses.</p>
 <section id="id1">
-<h2>Load required libraries<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h3>Load required libraries<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
@@ -416,8 +416,8 @@ Stokes parameters and corresponding polarization ellipses.</p>
 </pre></div>
 </div>
 </section>
-<section id="load-the-data-tensor-and-define-the-stokes-btd-model-parameters">
-<h2>Load the data tensor and define the Stokes-BTD model parameters<a class="headerlink" href="#load-the-data-tensor-and-define-the-stokes-btd-model-parameters" title="Link to this heading">#</a></h2>
+<section id="load-the-data-tensor-and-define-parameters">
+<h3>Load the data tensor and define parameters<a class="headerlink" href="#load-the-data-tensor-and-define-parameters" title="Link to this heading">#</a></h3>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/BBTD_Stokes.npy&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create Stokes model</span>
@@ -429,12 +429,13 @@ Stokes parameters and corresponding polarization ellipses.</p>
 </div>
 </section>
 <section id="fit-the-stokes-btd-model-to-the-data-tensor">
-<h2>Fit the Stokes-BTD model to the data tensor<a class="headerlink" href="#fit-the-stokes-btd-model-to-the-data-tensor" title="Link to this heading">#</a></h2>
+<h3>Fit the Stokes-BTD model to the data tensor<a class="headerlink" href="#fit-the-stokes-btd-model-to-the-data-tensor" title="Link to this heading">#</a></h3>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tensor</span><span class="p">,</span><span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;kmeans&quot;</span><span class="p">,</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">max_admm</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">5</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">7</span><span class="p">,</span> <span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Visualize the results, module pybbtd.draw will be soon have a method to plot the Stokes vectors as ellipses.</p>
 <img alt="../_images/bbtd_board_results.png" src="../_images/bbtd_board_results.png" />
+</section>
 </section>
 </section>
 
@@ -463,7 +464,7 @@ Stokes parameters and corresponding polarization ellipses.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Reference API</p>
+        <p class="prev-next-title"><strong>Reference API</strong></p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -483,20 +484,19 @@ Stokes parameters and corresponding polarization ellipses.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Stokes Tutorial I with Cov-LL1</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-required-libraries">Load required libraries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-btd-ll1-data-that-respect-stokes-constraints">Generate BTD-LL1 data that respect Stokes constraints</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-a-stokes-btd-model">Fit a Stokes-BTD model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-tutorial-i-with-cov-ll1">Stokes Tutorial I with Cov-LL1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-required-libraries">Load required libraries.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-stokes-btd-ll1-data">Generate Stokes BTD-LL1 data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-a-stokes-btd-model">Fit a Stokes-BTD model</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-tutorial-ii-with-cov-ll1">Stokes Tutorial II with Cov-LL1</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Load required libraries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-tensor-and-define-the-stokes-btd-model-parameters">Load the data tensor and define the Stokes-BTD model parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-tutorial-ii-with-cov-ll1">Stokes Tutorial II with Cov-LL1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Load required libraries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-tensor-and-define-parameters">Load the data tensor and define parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
 </ul>
 </li>
 </ul>
-
   </nav></div>
 
 </div></div>

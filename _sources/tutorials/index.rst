@@ -1,7 +1,7 @@
 .. _tutorials:
 
 #########
-Tutorials
+**Tutorials**
 #########
 
 .. toctree::
@@ -9,4 +9,4 @@ Tutorials
 
    btd
    covll1
-   Stokes tutorials <stokes>
+   Stokes Tutorials <stokes>

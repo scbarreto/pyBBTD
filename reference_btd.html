@@ -149,14 +149,13 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html"><strong>Tutorials</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorial I with Cov-LL1</a></li>
-
+<li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html">Reference API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
@@ -313,16 +312,17 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.fit"><code class="docutils literal notranslate"><span class="pre">BTD.fit()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.get_constraint_matrix"><code class="docutils literal notranslate"><span class="pre">BTD.get_constraint_matrix()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.to_cpd_format"><code class="docutils literal notranslate"><span class="pre">BTD.to_cpd_format()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-methods">Core Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.fit"><code class="docutils literal notranslate"><span class="pre">BTD.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.get_constraint_matrix"><code class="docutils literal notranslate"><span class="pre">BTD.get_constraint_matrix()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.to_cpd_format"><code class="docutils literal notranslate"><span class="pre">BTD.to_cpd_format()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.constraint_matrix"><code class="docutils literal notranslate"><span class="pre">constraint_matrix()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.validate_R_L"><code class="docutils literal notranslate"><span class="pre">validate_R_L()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -334,9 +334,31 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-pybbtd.btd">
-<span id="btd-class"></span><span id="reference-btd"></span><h1>BTD Class<a class="headerlink" href="#module-pybbtd.btd" title="Link to this heading">#</a></h1>
-<dl class="py class">
+  <section id="btd-class">
+<span id="reference-btd"></span><h1>BTD Class<a class="headerlink" href="#btd-class" title="Link to this heading">#</a></h1>
+<section id="core-methods">
+<h2>Core Methods<a class="headerlink" href="#core-methods" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.fit" title="pybbtd.btd.BTD.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a></p></td>
+<td><p>Fits a BTD model to an input tensor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.check_uniqueness" title="pybbtd.btd.BTD.check_uniqueness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_uniqueness()</span></code></a></p></td>
+<td><p>Checks generic uniqueness conditions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.get_constraint_matrix" title="pybbtd.btd.BTD.get_constraint_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_constraint_matrix()</span></code></a></p></td>
+<td><p>Returns the constraint matrix for the CP-equivalent BTD model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.to_cpd_format" title="pybbtd.btd.BTD.to_cpd_format"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_cpd_format()</span></code></a></p></td>
+<td><p>Converts the BTD to CPD format.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.factors_to_tensor" title="pybbtd.btd.factors_to_tensor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></p></td>
+<td><p>Converts BTD factor matrices to a full tensor.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class" id="module-pybbtd.btd">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">BTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -382,7 +404,7 @@ The algorithm to use for fitting.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.get_constraint_matrix">
 <span class="sig-name descname"><span class="pre">get_constraint_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.get_constraint_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.get_constraint_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Get the constraint matrix for the CP equivalent of the BTD model.</p>
+<dd><p>Get the constraint matrix for the CP equivalent of the BTD model, correctly repeating columns.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -394,38 +416,12 @@ The algorithm to use for fitting.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.btd.constraint_matrix">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">constraint_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#constraint_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.constraint_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Compute the constraint matrix repeating columns
-for the BTD model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>R</strong> – rank of the decomposition (number of terms)</p></li>
-<li><p><strong>L</strong> – int or sequence of rank-L values for the spatial map of each block</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>BTD constraint matrix</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>theta</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.btd.factors_to_tensor">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">factors_to_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#factors_to_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.factors_to_tensor" title="Link to this definition">#</a></dt>
 <dd><p>Convert BTD factor matrices to full tensor.</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.btd.validate_R_L">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">validate_R_L</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#validate_R_L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.validate_R_L" title="Link to this definition">#</a></dt>
-<dd><p>Check if R and L are non-negative integers.</p>
-</dd></dl>
-
+</section>
 </section>
 
 
@@ -445,7 +441,7 @@ for the BTD model</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Reference API</p>
+        <p class="prev-next-title"><strong>Reference API</strong></p>
       </div>
     </a>
     <a class="right-next"
@@ -473,16 +469,17 @@ for the BTD model</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.fit"><code class="docutils literal notranslate"><span class="pre">BTD.fit()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.get_constraint_matrix"><code class="docutils literal notranslate"><span class="pre">BTD.get_constraint_matrix()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.to_cpd_format"><code class="docutils literal notranslate"><span class="pre">BTD.to_cpd_format()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-methods">Core Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.fit"><code class="docutils literal notranslate"><span class="pre">BTD.fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.get_constraint_matrix"><code class="docutils literal notranslate"><span class="pre">BTD.get_constraint_matrix()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.to_cpd_format"><code class="docutils literal notranslate"><span class="pre">BTD.to_cpd_format()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.constraint_matrix"><code class="docutils literal notranslate"><span class="pre">constraint_matrix()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.validate_R_L"><code class="docutils literal notranslate"><span class="pre">validate_R_L()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.factors_to_tensor"><code class="docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

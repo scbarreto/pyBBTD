@@ -148,14 +148,13 @@
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html"><strong>Tutorials</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorial I with Cov-LL1</a></li>
-
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html">Reference API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_stokes.html">Stokes Class</a></li>
@@ -309,7 +308,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
 
         <span class="c1"># validate R, L values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
         <span class="c1"># Validate mode</span>
         <span class="n">valid_block_modes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;LL1&quot;</span><span class="p">,</span> <span class="s2">&quot;L1L&quot;</span><span class="p">,</span> <span class="s2">&quot;1LL&quot;</span><span class="p">}</span>
@@ -383,9 +382,9 @@ document.write(`
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.BTD.get_constraint_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the constraint matrix for the CP equivalent of the BTD model.</span>
+<span class="sd">        Get the constraint matrix for the CP equivalent of the BTD model, correctly repeating columns.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BTD.to_cpd_format">
@@ -399,9 +398,7 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="validate_R_L">
-<a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.validate_R_L">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if R and L are non-negative integers.&quot;&quot;&quot;</span>
     <span class="c1"># check R</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">R</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -419,13 +416,10 @@ document.write(`
             <span class="s2">&quot;L should be either a single integer or a list/array of length R.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">Larray</span></div>
+    <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">Larray</span>
 
 
-
-<div class="viewcode-block" id="constraint_matrix">
-<a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.constraint_matrix">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">constraint_matrix</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_constraint_matrix</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the constraint matrix repeating columns</span>
 <span class="sd">    for the BTD model</span>
 
@@ -436,11 +430,10 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        theta: BTD constraint matrix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">Larray</span> <span class="o">=</span> <span class="n">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">Larray</span> <span class="o">=</span> <span class="n">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Lr</span><span class="p">)</span> <span class="k">for</span> <span class="n">Lr</span> <span class="ow">in</span> <span class="n">Larray</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">theta</span></div>
-
+    <span class="k">return</span> <span class="n">theta</span>
 
 
 <div class="viewcode-block" id="factors_to_tensor">
