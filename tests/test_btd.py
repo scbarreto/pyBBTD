@@ -66,8 +66,8 @@ def test_unfoldings():
     T = np.zeros(dims)
     ind = 0
     for r in range(R):
-        Ar = A[:, ind: ind + L[r]]
-        Br = B[:, ind: ind + L[r]]
+        Ar = A[:, ind : ind + L[r]]
+        Br = B[:, ind : ind + L[r]]
         ind += L[r]
         T += outer([Ar @ Br.T, C[:, r]])
 
@@ -113,8 +113,7 @@ def test_fit_1LL():
     B0 = np.random.randn(dims[1], Lsum)
     C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
-    Trec = factors_to_tensor(
-        A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
+    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="1LL")  # GT 1LL tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)
@@ -136,8 +135,7 @@ def test_fit_L1L():
     B0 = np.random.randn(dims[1], R)
     C0 = np.random.randn(dims[2], Lsum)
     theta = X.get_constraint_matrix()
-    Trec = factors_to_tensor(
-        A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
+    Trec = factors_to_tensor(A0, B0, C0, theta, block_mode="L1L")  # GT L1L tensor
 
     # perfom the fit with usual parameters
     X.fit(Trec, abs_tol=1e-14)
