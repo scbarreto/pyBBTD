@@ -44,7 +44,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference_api.html">Reference API</a></li>
 </ul>
 
         </div>
@@ -73,23 +73,21 @@
              
   <section id="pybbtd-docs">
 <h1>pyBBTD docs<a class="headerlink" href="#pybbtd-docs" title="Link to this heading"></a></h1>
-<p><strong>pyBBTD</strong> is a Python library that implements two tensor decomposition models: <strong>Cov-LL1</strong> and <strong>BBTD</strong>.</p>
-<p>For details on the mathematical formulation of Cov-LL1 applied to Stokes polarimetric data, please refer to <a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/10446019">this conference paper</a>, and for BBTD applied to covariance imaging data, refer to <a class="reference external" href="https://hal.science/hal-05059862/">this journal paper</a>.</p>
-<p>The <strong>Cov-LL1</strong> model is a third-order tensor decomposition method designed for <em>covariance imaging tensors</em> — that is, tensors in which each pixel carries a covariance matrix. The rank-1 term (vector) in each block corresponds to a vectorized covariance matrix.</p>
+<p><strong>pyBBTD</strong> implements two tensor decomposition models: <a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/10446019">Cov-LL1</a> and <a class="reference external" href="https://hal.science/hal-05059862/">BBTD</a>.</p>
+<p><strong>Cov-LL1</strong> is a third-order tensor decomposition model specifically tailored for <em>covariance-valued imaging tensors</em>, i.e., data in which each pixel is associated with a covariance matrix. It can be seen as a constrained <a class="reference external" href="https://epubs.siam.org/doi/abs/10.1137/070690729">LL1 model</a>.</p>
 <p>In mathematical form, Cov-LL1 decomposes a third-order tensor <span class="math notranslate nohighlight">\(\mathcal{X}\)</span> as:</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{X} \approx \sum_{r=1}^{R} \mathbf{A}_r \mathbf{B}_r^{\top} \circ \mathbf{c}_r\]</div>
 <p>where:</p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(R\)</span> is the number of components.</p></li>
-<li><p><span class="math notranslate nohighlight">\(\mathbf{A}_r \in \mathbb{R}^{I \times L_1}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{B}_r \in \mathbb{R}^{J \times L_1}\)</span> represent spatial factor matrices of rank <span class="math notranslate nohighlight">\(L_1\)</span>, and</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbf{A}_r \in \mathbb{R}^{I \times L_1}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{B}_r \in \mathbb{R}^{J \times L_1}\)</span> represent spatial (non-negative) factor matrices of rank <span class="math notranslate nohighlight">\(L_1\)</span>, and</p></li>
 <li><p><span class="math notranslate nohighlight">\(\mathbf{c}_r \in \mathbb{R}^{K^2}\)</span> is a vectorized <span class="math notranslate nohighlight">\(K \times K\)</span> covariance matrix associated with the <span class="math notranslate nohighlight">\(r\)</span>-th component.</p></li>
 </ul>
-<p>The parameters <span class="math notranslate nohighlight">\(R\)</span> (number of components) and <span class="math notranslate nohighlight">\(L_1\)</span> (spatial rank) can be adjusted by the user, as illustrated in the figure below.</p>
+<p>One can choose the <span class="math notranslate nohighlight">\(R\)</span> (number of components) and <span class="math notranslate nohighlight">\(L_1\)</span> (spatial rank) up to certain identifiability conditions (checked by pyBBTD). Here is an illustration of the Cov-LL1 model:</p>
 <img alt="_images/model_covll1.png" src="_images/model_covll1.png" />
-<p><strong>BBTD</strong> is a fourth-order tensor decomposition model that represents a tensor as a sum of two blocks.
-Unlike <strong>Cov-LL1</strong>, the <strong>BBTD</strong> model allows the user to set not only the number of blocks <span class="math notranslate nohighlight">\(R\)</span> and the spatial rank <span class="math notranslate nohighlight">\(L_1\)</span>, but also the covariance rank <span class="math notranslate nohighlight">\(L_2\)</span> for the covariance matrices in each block.
-In mathematical form, <strong>BBTD</strong> decomposes a fourth-order tensor <span class="math notranslate nohighlight">\(\mathcal{T}\)</span> as:</p>
+<p><strong>BBTD</strong> is a fourth-order tensor decomposition model that represents data as a sum of two blocks: a spatial component with rank <span class="math notranslate nohighlight">\(L_1\)</span> and a covariance component with rank <span class="math notranslate nohighlight">\(L_2\)</span>. The user can choose <span class="math notranslate nohighlight">\(R\)</span> (number of components), <span class="math notranslate nohighlight">\(L_1\)</span> (spatial rank), and <span class="math notranslate nohighlight">\(L_2\)</span> (covariance rank), up to certain identifiability conditions (checked by pyBBTD).</p>
+<p>In mathematical form, <strong>BBTD</strong> decomposes a fourth-order tensor <span class="math notranslate nohighlight">\(\mathcal{T}\)</span> as:</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{T} \approx \sum_{r=1}^{R} \mathbf{A}_r \mathbf{B}_r^{\top} \circ \mathbf{C}_r\mathbf{C}_r^{H}\]</div>
 <p>where:</p>
@@ -100,32 +98,16 @@ In mathematical form, <strong>BBTD</strong> decomposes a fourth-order tensor <sp
 </ul>
 <p>The figure below illustrates the structure of the <strong>BBTD</strong> model.</p>
 <img alt="_images/model_bbtd.png" src="_images/model_bbtd.png" />
-</section>
-<section id="planned-releases">
-<h1>Planned releases<a class="headerlink" href="#planned-releases" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p><strong>4th-order model (BBTD)</strong>: planned for early-November 2025</p></li>
-</ul>
+<p>For more details about Cov-LL1 and BBTD models, please refer to the chapters 3 and 4, respectively, of the following <a class="reference external" href="https://theses.fr/s348607">thesis</a>.</p>
+<section id="guide-reference">
+<h2>Guide &amp; Reference<a class="headerlink" href="#guide-reference" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD-LL1 tutorial with pyBBTD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial with pyBBTD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Example 1: Stokes Tutorial with pyBBTD and noisy data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html#example-2-stokes-btd-with-canonical-polarization-states">Example 2: Stokes-BTD with Canonical Polarization States</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html">pybbtd.btd</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">pybbtd.covll1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">pybbtd.stokes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">pybbtd.solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">pybbtd.visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">pybbtd.uniqueness</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference_api.html">Reference API</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 

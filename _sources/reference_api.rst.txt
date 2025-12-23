@@ -1,13 +1,13 @@
-.. _reference:
+.. _reference_api:
 
 ################
-Reference manual
+Reference API
 ################
 
-.. module:: pybbtd
+.. automodule:: pybbtd
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    reference_btd
    reference_covll1

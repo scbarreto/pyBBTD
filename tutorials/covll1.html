@@ -54,7 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="stokes.html#example-2-stokes-btd-with-canonical-polarization-states">Example 2: Stokes-BTD with Canonical Polarization States</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../reference.html">Reference manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference_api.html">Reference API</a></li>
 </ul>
 
         </div>
@@ -96,17 +96,18 @@
 </section>
 <section id="generate-cov-ll1-data">
 <h2>Generate Cov-LL1 data<a class="headerlink" href="#generate-cov-ll1-data" title="Link to this heading"></a></h2>
-<p>We first define the dimensions of the tensor and create a Cov-LL1 model instance.
-.. code:: python3</p>
-<blockquote>
-<div><p>R = 2
-L1 = 5
-L2 = 2 # Note here that Cov-LL1 cannot handle rank-constraints for the covariance data, so in this example, this is a parameter used only to generate data.</p>
-<p># Define spatial dimensions N1 and N2, and covariance dimension (N3 x N3), which gives N3^2 for Cov-LL1
-N1, N2, N3 = 20, 20, 2
-dims = (N1, N2, N3**2)</p>
-<p>X = covll1.CovLL1(dims, R=R, L1=L1, L2=L2, block_mode=”LL1”)</p>
-</div></blockquote>
+<p>We first define the dimensions of the tensor and create a Cov-LL1 model instance.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">L1</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">L2</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># Note here that Cov-LL1 cannot handle rank-constraints for the covariance data, so in this example, this is a parameter used only to generate data.</span>
+
+<span class="c1"># Define spatial dimensions N1 and N2, and covariance dimension (N3 x N3), which gives N3^2 for Cov-LL1</span>
+<span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">covll1</span><span class="o">.</span><span class="n">CovLL1</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="o">=</span><span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="o">=</span><span class="n">L2</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Then we create the true Cov-LL1 components and generate the observed tensor with added noise.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create ground truth tensor</span>
 <span class="p">[</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">,</span> <span class="n">C0</span><span class="p">],</span> <span class="n">T0</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">generate_covll1_tensor</span><span class="p">()</span>
