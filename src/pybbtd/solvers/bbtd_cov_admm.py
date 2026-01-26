@@ -492,5 +492,5 @@ def _project_to_sdp(A):
     """
     A = (A + A.T.conj()) / 2
     eigenvalues, eigenvectors = np.linalg.eigh(A)
-    eigenvalues[eigenvalues < 0] = 1e-10
+    eigenvalues[eigenvalues < 0] = 0.0
     return eigenvectors @ np.diag(eigenvalues) @ eigenvectors.T.conj()
