@@ -37,8 +37,8 @@
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference_uniqueness';</script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -152,6 +152,8 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -311,6 +313,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.uniqueness.check_uniqueness_BBTD"><code class="docutils literal notranslate"><span class="pre">check_uniqueness_BBTD()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.uniqueness.check_uniqueness_LL1"><code class="docutils literal notranslate"><span class="pre">check_uniqueness_LL1()</span></code></a></li>
 </ul>
             </nav>
@@ -326,9 +329,77 @@ document.write(`
   <section id="module-pybbtd.uniqueness">
 <span id="uniqueness"></span><span id="reference-uniqueness"></span><h1>Uniqueness<a class="headerlink" href="#module-pybbtd.uniqueness" title="Link to this heading">#</a></h1>
 <dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.uniqueness.check_uniqueness_BBTD">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.uniqueness.</span></span><span class="sig-name descname"><span class="pre">check_uniqueness_BBTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/uniqueness.html#check_uniqueness_BBTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.uniqueness.check_uniqueness_BBTD" title="Link to this definition">#</a></dt>
+<dd><p>Check if a fourth-order BBTD model with rank-(L1, L2, 1, 1) terms is unique
+for the given dimensions by examining two equivalent third-order models.</p>
+<p>The fourth-order tensor is unfolded into two third-order BTD models:</p>
+<ul class="simple">
+<li><p><strong>Vectorize first block</strong> (modes 1 and 2): third-order BTD with
+dimensions <code class="docutils literal notranslate"><span class="pre">(N3,</span> <span class="pre">N4,</span> <span class="pre">N1*N2)</span></code> and block rank <code class="docutils literal notranslate"><span class="pre">L2</span></code>.</p></li>
+<li><p><strong>Vectorize second block</strong> (modes 3 and 4): third-order BTD with
+dimensions <code class="docutils literal notranslate"><span class="pre">(N1,</span> <span class="pre">N2,</span> <span class="pre">N3*N4)</span></code> and block rank <code class="docutils literal notranslate"><span class="pre">L1</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N1</strong> – int
+First dimension of the 4D tensor.</p></li>
+<li><p><strong>N2</strong> – int
+Second dimension of the 4D tensor.</p></li>
+<li><p><strong>N3</strong> – int
+Third dimension of the 4D tensor.</p></li>
+<li><p><strong>N4</strong> – int
+Fourth dimension of the 4D tensor.</p></li>
+<li><p><strong>R</strong> – int
+Rank of the decomposition (number of components).</p></li>
+<li><p><strong>L1</strong> – int
+Rank of the first block (modes 1 and 2).</p></li>
+<li><p><strong>L2</strong> – int
+Rank of the second block (modes 3 and 4).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if a sufficient condition for uniqueness is satisfied,
+<code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.uniqueness.check_uniqueness_LL1">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.uniqueness.</span></span><span class="sig-name descname"><span class="pre">check_uniqueness_LL1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/uniqueness.html#check_uniqueness_LL1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.uniqueness.check_uniqueness_LL1" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Check if a third-order BTD model with rank-(L, L, 1) terms is unique
+for the given dimensions.</p>
+<p>Five sufficient conditions from the BTD uniqueness theory are evaluated. If any one of them is satisfied, uniqueness of the
+decomposition is guaranteed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N1</strong> – int
+First dimension of the 3D tensor.</p></li>
+<li><p><strong>N2</strong> – int
+Second dimension of the 3D tensor.</p></li>
+<li><p><strong>N3</strong> – int
+Third dimension of the 3D tensor.</p></li>
+<li><p><strong>R</strong> – int
+Rank of the decomposition (number of components).</p></li>
+<li><p><strong>L</strong> – int
+Rank of the spatial maps (block rank).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if a sufficient condition for uniqueness is satisfied,
+<code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -368,6 +439,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.uniqueness.check_uniqueness_BBTD"><code class="docutils literal notranslate"><span class="pre">check_uniqueness_BBTD()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.uniqueness.check_uniqueness_LL1"><code class="docutils literal notranslate"><span class="pre">check_uniqueness_LL1()</span></code></a></li>
 </ul>
   </nav></div>

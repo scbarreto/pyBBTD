@@ -37,9 +37,10 @@
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference_btd';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -153,6 +154,8 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -312,7 +315,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-methods">Core Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-methods">Class Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-functions">Module Functions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.fit"><code class="docutils literal notranslate"><span class="pre">BTD.fit()</span></code></a></li>
@@ -336,66 +340,97 @@ document.write(`
                   
   <section id="btd-class">
 <span id="reference-btd"></span><h1>BTD Class<a class="headerlink" href="#btd-class" title="Link to this heading">#</a></h1>
-<section id="core-methods">
-<h2>Core Methods<a class="headerlink" href="#core-methods" title="Link to this heading">#</a></h2>
+<section id="class-methods">
+<h2>Class Methods<a class="headerlink" href="#class-methods" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.fit" title="pybbtd.btd.BTD.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a></p></td>
-<td><p>Fits a BTD model to an input tensor.</p></td>
+<td><p>Fit a BTD model to the given data using the specified algorithm (default: ALS).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.check_uniqueness" title="pybbtd.btd.BTD.check_uniqueness"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_uniqueness()</span></code></a></p></td>
-<td><p>Checks generic uniqueness conditions.</p></td>
+<td><p>Check if sufficient conditions for essential uniqueness are satisfied.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.get_constraint_matrix" title="pybbtd.btd.BTD.get_constraint_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_constraint_matrix()</span></code></a></p></td>
-<td><p>Returns the constraint matrix for the CP-equivalent BTD model.</p></td>
+<td><p>Return the constraint matrix for the CP-equivalent BTD model.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.btd.BTD.to_cpd_format" title="pybbtd.btd.BTD.to_cpd_format"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_cpd_format()</span></code></a></p></td>
-<td><p>Converts the BTD to CPD format.</p></td>
+<td><p>Convert the BTD to CPD format (not implemented yet).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.factors_to_tensor" title="pybbtd.btd.factors_to_tensor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></p></td>
-<td><p>Converts BTD factor matrices to a full tensor.</p></td>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-functions">
+<h2>Module Functions<a class="headerlink" href="#module-functions" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.btd.factors_to_tensor" title="pybbtd.btd.factors_to_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">factors_to_tensor()</span></code></a></p></td>
+<td><p>Convert BTD factor matrices to a full tensor for a given block mode.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">_constraint_matrix()</span></code></p></td>
+<td><p>Compute the block-diagonal constraint matrix that maps BTD factors to CP-equivalent factors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">_validate_R_L()</span></code></p></td>
+<td><p>Validate that R and L are positive integers (or a list of positive integers for L).</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py class" id="module-pybbtd.btd">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">BTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">BTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.</p>
+<p>Class for tensors admitting a Block Term Decomposition (BTD) into
+rank-(L, L, 1) terms.</p>
+<p>The decomposition writes a third-order tensor as a sum of R block terms,
+each formed by the outer product of a rank-L matrix and a vector. Three
+block modes are supported: <code class="docutils literal notranslate"><span class="pre">&quot;LL1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;L1L&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;1LL&quot;</span></code>, indicating
+which mode carries the rank-one structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <cite>(I, J, K)</cite> of the tensor.</p></li>
-<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
-<li><p><strong>L</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code> of the tensor.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – Number of block terms (rank of the decomposition).</p></li>
+<li><p><strong>L</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Rank of the block in each term. Can be a single integer
+(same rank for all terms) or a list of R integers.</p></li>
+<li><p><strong>block_mode</strong> (<em>str</em>) – Block mode of the decomposition.
+One of <code class="docutils literal notranslate"><span class="pre">&quot;LL1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;L1L&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;1LL&quot;</span></code> (default: <code class="docutils literal notranslate"><span class="pre">&quot;LL1&quot;</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>A</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[0], L * R)</cite>.</p></li>
-<li><p><strong>B</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[1], L * R)</cite>.</p></li>
-<li><p><strong>C</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[2], R)</cite>.</p></li>
+<li><p><strong>factors</strong> (<em>list</em><em>[</em><em>np.ndarray</em><em>] or </em><em>None</em>) – List of factor matrices <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> after fitting,
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> before fitting.</p></li>
+<li><p><strong>tensor</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Reconstructed tensor after fitting, or <code class="docutils literal notranslate"><span class="pre">None</span></code> before fitting.</p></li>
+<li><p><strong>fit_error</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Array of fitting errors at each iteration, or <code class="docutils literal notranslate"><span class="pre">None</span></code>
+before fitting.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.check_uniqueness">
 <span class="sig-name descname"><span class="pre">check_uniqueness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.check_uniqueness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.check_uniqueness" title="Link to this definition">#</a></dt>
-<dd><p>Check if, for given parameters, uniqueness can be guaranteed.</p>
+<dd><p>Check if sufficient conditions for essential uniqueness are satisfied.</p>
+<p>Uses the algebraic conditions from the literature (constant-L case only).
+Prints whether uniqueness can be guaranteed or not. When L varies across
+terms, the check is skipped with a message.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ALS'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.fit" title="Link to this definition">#</a></dt>
-<dd><p>Fit a BTD to the given data using the specified algorithm.</p>
+<dd><p>Fit a BTD model to the given data using the specified algorithm.</p>
+<p>After fitting, <code class="docutils literal notranslate"><span class="pre">self.factors</span></code>, <code class="docutils literal notranslate"><span class="pre">self.tensor</span></code>, and <code class="docutils literal notranslate"><span class="pre">self.fit_error</span></code>
+are updated in place.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> – ndarray
-The input tensor data to be decomposed.</p></li>
+<li><p><strong>data</strong> – np.ndarray
+Input tensor of shape <code class="docutils literal notranslate"><span class="pre">dims</span></code> to be decomposed.</p></li>
 <li><p><strong>algorithm</strong> – str
-The algorithm to use for fitting.</p></li>
+Algorithm to use for fitting (default: <code class="docutils literal notranslate"><span class="pre">&quot;ALS&quot;</span></code>).</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments passed to the solver
+(e.g. <code class="docutils literal notranslate"><span class="pre">init</span></code>, <code class="docutils literal notranslate"><span class="pre">max_iter</span></code>, <code class="docutils literal notranslate"><span class="pre">rel_tol</span></code>, <code class="docutils literal notranslate"><span class="pre">abs_tol</span></code>).</p></li>
 </ul>
 </dd>
 </dl>
@@ -404,13 +439,28 @@ The algorithm to use for fitting.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.get_constraint_matrix">
 <span class="sig-name descname"><span class="pre">get_constraint_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.get_constraint_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.get_constraint_matrix" title="Link to this definition">#</a></dt>
-<dd><p>Get the constraint matrix for the CP equivalent of the BTD model, correctly repeating columns.</p>
+<dd><p>Return the constraint matrix for the CP-equivalent BTD model.</p>
+<p>The constraint matrix <span class="math notranslate nohighlight">\(\Theta\)</span> maps the R columns of the
+rank-one factor to the <code class="docutils literal notranslate"><span class="pre">sum(L)</span></code> columns of the block factors,
+enabling a CP-like representation of the BTD.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Constraint matrix of shape <code class="docutils literal notranslate"><span class="pre">(R,</span> <span class="pre">sum(L))</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.btd.BTD.to_cpd_format">
 <span class="sig-name descname"><span class="pre">to_cpd_format</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#BTD.to_cpd_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.BTD.to_cpd_format" title="Link to this definition">#</a></dt>
 <dd><p>Convert the BTD to CPD format.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not implemented yet.</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -418,7 +468,33 @@ The algorithm to use for fitting.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.btd.factors_to_tensor">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.btd.</span></span><span class="sig-name descname"><span class="pre">factors_to_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LL1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/btd.html#factors_to_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.btd.factors_to_tensor" title="Link to this definition">#</a></dt>
-<dd><p>Convert BTD factor matrices to full tensor.</p>
+<dd><p>Convert BTD factor matrices to a full tensor.</p>
+<p>Reconstructs the tensor from factors A, B, C and the constraint matrix
+<span class="math notranslate nohighlight">\(\Theta\)</span>, using the CP-equivalent representation for the given
+block mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – np.ndarray
+First factor matrix.</p></li>
+<li><p><strong>B</strong> – np.ndarray
+Second factor matrix.</p></li>
+<li><p><strong>C</strong> – np.ndarray
+Third factor matrix.</p></li>
+<li><p><strong>theta</strong> – np.ndarray
+Constraint matrix from <code class="xref py py-func docutils literal notranslate"><span class="pre">_constraint_matrix()</span></code>.</p></li>
+<li><p><strong>block_mode</strong> – str
+Block mode of the decomposition. One of <code class="docutils literal notranslate"><span class="pre">&quot;LL1&quot;</span></code> (default),
+<code class="docutils literal notranslate"><span class="pre">&quot;L1L&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;1LL&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reconstructed tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -469,7 +545,8 @@ The algorithm to use for fitting.</p></li>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-methods">Core Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-methods">Class Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-functions">Module Functions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD"><code class="docutils literal notranslate"><span class="pre">BTD</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.check_uniqueness"><code class="docutils literal notranslate"><span class="pre">BTD.check_uniqueness()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.btd.BTD.fit"><code class="docutils literal notranslate"><span class="pre">BTD.fit()</span></code></a></li>

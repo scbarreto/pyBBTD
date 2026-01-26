@@ -36,8 +36,8 @@
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pybbtd/uniqueness';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -152,6 +152,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -267,40 +269,100 @@ document.write(`
                   
   <h1>Source code for pybbtd.uniqueness</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">floor</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="check_uniqueness_BBTD">
+<a class="viewcode-back" href="../../reference_uniqueness.html#pybbtd.uniqueness.check_uniqueness_BBTD">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_uniqueness_BBTD</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N4</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a fourth-order BBTD model with rank-(L1, L2, 1, 1) terms is unique</span>
+<span class="sd">    for the given dimensions by examining two equivalent third-order models.</span>
+
+<span class="sd">    The fourth-order tensor is unfolded into two third-order BTD models:</span>
+
+<span class="sd">    - **Vectorize first block** (modes 1 and 2): third-order BTD with</span>
+<span class="sd">      dimensions ``(N3, N4, N1*N2)`` and block rank ``L2``.</span>
+<span class="sd">    - **Vectorize second block** (modes 3 and 4): third-order BTD with</span>
+<span class="sd">      dimensions ``(N1, N2, N3*N4)`` and block rank ``L1``.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        N1: int</span>
+<span class="sd">            First dimension of the 4D tensor.</span>
+<span class="sd">        N2: int</span>
+<span class="sd">            Second dimension of the 4D tensor.</span>
+<span class="sd">        N3: int</span>
+<span class="sd">            Third dimension of the 4D tensor.</span>
+<span class="sd">        N4: int</span>
+<span class="sd">            Fourth dimension of the 4D tensor.</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Rank of the decomposition (number of components).</span>
+<span class="sd">        L1: int</span>
+<span class="sd">            Rank of the first block (modes 1 and 2).</span>
+<span class="sd">        L2: int</span>
+<span class="sd">            Rank of the second block (modes 3 and 4).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool:</span>
+<span class="sd">            ``True`` if a sufficient condition for uniqueness is satisfied,</span>
+<span class="sd">            ``False`` otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L1</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;L1 should be an integer&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L2</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;L2 should be an integer&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Model 1: vectorize first block (modes 1,2) -&gt; BTD(N3, N4, N1*N2, L2, R)</span>
+    <span class="n">model1_unique</span> <span class="o">=</span> <span class="n">check_uniqueness_LL1</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">N4</span><span class="p">,</span> <span class="n">N1</span> <span class="o">*</span> <span class="n">N2</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L2</span><span class="p">)</span>
+
+    <span class="c1"># Model 2: vectorize second block (modes 3,4) -&gt; BTD(N1, N2, N3*N4, L1, R)</span>
+    <span class="n">model2_unique</span> <span class="o">=</span> <span class="n">check_uniqueness_LL1</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span> <span class="o">*</span> <span class="n">N4</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model1_unique</span> <span class="ow">or</span> <span class="n">model2_unique</span></div>
+
 
 
 <div class="viewcode-block" id="check_uniqueness_LL1">
 <a class="viewcode-back" href="../../reference_uniqueness.html#pybbtd.uniqueness.check_uniqueness_LL1">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_uniqueness_LL1</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a third-order BTD model with rank-(L, L, 1) terms is unique</span>
+<span class="sd">    for the given dimensions.</span>
+
+<span class="sd">    Five sufficient conditions from the BTD uniqueness theory are evaluated. If any one of them is satisfied, uniqueness of the</span>
+<span class="sd">    decomposition is guaranteed.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        N1: int</span>
+<span class="sd">            First dimension of the 3D tensor.</span>
+<span class="sd">        N2: int</span>
+<span class="sd">            Second dimension of the 3D tensor.</span>
+<span class="sd">        N3: int</span>
+<span class="sd">            Third dimension of the 3D tensor.</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Rank of the decomposition (number of components).</span>
+<span class="sd">        L: int</span>
+<span class="sd">            Rank of the spatial maps (block rank).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool:</span>
+<span class="sd">            ``True`` if a sufficient condition for uniqueness is satisfied,</span>
+<span class="sd">            ``False`` otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;L should be an integer&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">cond_BTD_41</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">R</span> <span class="o">&lt;=</span> <span class="n">N3</span><span class="p">)</span>
+    <span class="n">conditions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">R</span> <span class="o">&lt;=</span> <span class="n">N3</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">N3</span> <span class="o">&gt;=</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">N1</span> <span class="o">&gt;=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">N2</span> <span class="o">&gt;=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">*</span> <span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">cond_BTD_42</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">N3</span> <span class="o">&gt;=</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">cond_BTD_43</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">N1</span> <span class="o">&gt;=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">cond_BTD_44</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">N2</span> <span class="o">&gt;=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">cond_BTD_45</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">*</span> <span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">R</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N1</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">N2</span> <span class="o">/</span> <span class="n">L</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">N3</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">R</span> <span class="o">+</span> <span class="mi">2</span>
-        <span class="p">)</span>
-
-    <span class="c1"># Check if any condition is true</span>
-    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
-        <span class="n">cond</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">cond</span> <span class="ow">in</span> <span class="p">[</span><span class="n">cond_BTD_41</span><span class="p">,</span> <span class="n">cond_BTD_42</span><span class="p">,</span> <span class="n">cond_BTD_43</span><span class="p">,</span> <span class="n">cond_BTD_44</span><span class="p">,</span> <span class="n">cond_BTD_45</span><span class="p">]</span>
-    <span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span>
-    <span class="c1"># otherwise return False</span>
-    <span class="k">return</span> <span class="kc">False</span></div>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">conditions</span><span class="p">)</span></div>
 
 </pre></div>
 

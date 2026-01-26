@@ -36,8 +36,8 @@
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pybbtd/btd';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -152,6 +152,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -273,26 +275,37 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.btd_als</span><span class="w"> </span><span class="kn">import</span> <span class="n">BTD_ALS</span>
 
 
-<span class="c1"># main class for tensors in BTD format</span>
 <div class="viewcode-block" id="BTD">
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.BTD">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BTD</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.</span>
+<span class="sd">    Class for tensors admitting a Block Term Decomposition (BTD) into</span>
+<span class="sd">    rank-(L, L, 1) terms.</span>
 
-<span class="sd">    :param dims: Dimensions `(I, J, K)` of the tensor.</span>
+<span class="sd">    The decomposition writes a third-order tensor as a sum of R block terms,</span>
+<span class="sd">    each formed by the outer product of a rank-L matrix and a vector. Three</span>
+<span class="sd">    block modes are supported: ``&quot;LL1&quot;``, ``&quot;L1L&quot;``, and ``&quot;1LL&quot;``, indicating</span>
+<span class="sd">    which mode carries the rank-one structure.</span>
+
+<span class="sd">    :param dims: Dimensions ``(I, J, K)`` of the tensor.</span>
 <span class="sd">    :type dims: Tuple[int, int, int]</span>
-<span class="sd">    :param R: The rank of the decomposition (number of components).</span>
+<span class="sd">    :param R: Number of block terms (rank of the decomposition).</span>
 <span class="sd">    :type R: int</span>
-<span class="sd">    :param L: Rank of the spatial maps.</span>
-<span class="sd">    :type L: int</span>
+<span class="sd">    :param L: Rank of the block in each term. Can be a single integer</span>
+<span class="sd">        (same rank for all terms) or a list of R integers.</span>
+<span class="sd">    :type L: int or list[int]</span>
+<span class="sd">    :param block_mode: Block mode of the decomposition.</span>
+<span class="sd">        One of ``&quot;LL1&quot;``, ``&quot;L1L&quot;``, ``&quot;1LL&quot;`` (default: ``&quot;LL1&quot;``).</span>
+<span class="sd">    :type block_mode: str</span>
 
-<span class="sd">    :ivar A: Factor matrix of shape `(dims[0], L * R)`.</span>
-<span class="sd">    :vartype A: np.ndarray</span>
-<span class="sd">    :ivar B: Factor matrix of shape `(dims[1], L * R)`.</span>
-<span class="sd">    :vartype B: np.ndarray</span>
-<span class="sd">    :ivar C: Factor matrix of shape `(dims[2], R)`.</span>
-<span class="sd">    :vartype C: np.ndarray</span>
+<span class="sd">    :ivar factors: List of factor matrices ``[A, B, C]`` after fitting,</span>
+<span class="sd">        or ``None`` before fitting.</span>
+<span class="sd">    :vartype factors: list[np.ndarray] or None</span>
+<span class="sd">    :ivar tensor: Reconstructed tensor after fitting, or ``None`` before fitting.</span>
+<span class="sd">    :vartype tensor: np.ndarray or None</span>
+<span class="sd">    :ivar fit_error: Array of fitting errors at each iteration, or ``None``</span>
+<span class="sd">        before fitting.</span>
+<span class="sd">    :vartype fit_error: np.ndarray or None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">):</span>
@@ -330,7 +343,11 @@ document.write(`
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.BTD.check_uniqueness">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_uniqueness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check if, for given parameters, uniqueness can be guaranteed.</span>
+<span class="sd">        Check if sufficient conditions for essential uniqueness are satisfied.</span>
+
+<span class="sd">        Uses the algebraic conditions from the literature (constant-L case only).</span>
+<span class="sd">        Prints whether uniqueness can be guaranteed or not. When L varies across</span>
+<span class="sd">        terms, the check is skipped with a message.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">return</span> <span class="nb">print</span><span class="p">(</span>
@@ -361,13 +378,19 @@ document.write(`
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.BTD.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ALS&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fit a BTD to the given data using the specified algorithm.</span>
+<span class="sd">        Fit a BTD model to the given data using the specified algorithm.</span>
+
+<span class="sd">        After fitting, ``self.factors``, ``self.tensor``, and ``self.fit_error``</span>
+<span class="sd">        are updated in place.</span>
 
 <span class="sd">        Parameters:</span>
-<span class="sd">            data: ndarray</span>
-<span class="sd">                The input tensor data to be decomposed.</span>
+<span class="sd">            data: np.ndarray</span>
+<span class="sd">                Input tensor of shape ``dims`` to be decomposed.</span>
 <span class="sd">            algorithm: str</span>
-<span class="sd">                The algorithm to use for fitting.</span>
+<span class="sd">                Algorithm to use for fitting (default: ``&quot;ALS&quot;``).</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                Additional keyword arguments passed to the solver</span>
+<span class="sd">                (e.g. ``init``, ``max_iter``, ``rel_tol``, ``abs_tol``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;ALS&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">BTD_ALS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -382,24 +405,51 @@ document.write(`
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.BTD.get_constraint_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the constraint matrix for the CP equivalent of the BTD model, correctly repeating columns.</span>
+<span class="sd">        Return the constraint matrix for the CP-equivalent BTD model.</span>
+
+<span class="sd">        The constraint matrix :math:`\\Theta` maps the R columns of the</span>
+<span class="sd">        rank-one factor to the ``sum(L)`` columns of the block factors,</span>
+<span class="sd">        enabling a CP-like representation of the BTD.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray:</span>
+<span class="sd">                Constraint matrix of shape ``(R, sum(L))``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BTD.to_cpd_format">
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.BTD.to_cpd_format">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_cpd_format</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_cpd_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert the BTD to CPD format.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Not implemented yet.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;to_cpd_format is not implemented yet.&quot;</span><span class="p">)</span></div>
 </div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if R and L are non-negative integers.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate that R and L are positive integers.</span>
+
+<span class="sd">    If L is a single integer it is broadcast to a length-R array.</span>
+<span class="sd">    If L is a list or array it must have length R with all positive entries.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Number of block terms (must be a positive integer).</span>
+<span class="sd">        L: int or list[int] or np.ndarray</span>
+<span class="sd">            Rank of each block term. A single integer is replicated R times.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[int, np.ndarray]:</span>
+<span class="sd">            Validated ``(R, L)`` where L is always a 1-D integer array of</span>
+<span class="sd">            length R.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check R</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">R</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;R should be a positive integer.&quot;</span><span class="p">)</span>
@@ -420,15 +470,22 @@ document.write(`
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_constraint_matrix</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the constraint matrix repeating columns</span>
-<span class="sd">    for the BTD model</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the constraint matrix for the BTD model.</span>
+
+<span class="sd">    Builds a block-diagonal matrix :math:`\\Theta` of shape ``(R, sum(L))``</span>
+<span class="sd">    where each block is a row of ones of length ``L[r]``. This matrix maps</span>
+<span class="sd">    the CP-equivalent factors back to the BTD factors.</span>
 
 <span class="sd">    Parameters:</span>
-<span class="sd">        R: rank of the decomposition (number of terms)</span>
-<span class="sd">        L: int or sequence of rank-L values for the spatial map of each block</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Number of block terms.</span>
+<span class="sd">        L: int or list[int]</span>
+<span class="sd">            Rank of each block term. A single integer is replicated R times.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        theta: BTD constraint matrix</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            Constraint matrix :math:`\\Theta` of shape ``(R, sum(L))``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">Larray</span> <span class="o">=</span> <span class="n">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Lr</span><span class="p">)</span> <span class="k">for</span> <span class="n">Lr</span> <span class="ow">in</span> <span class="n">Larray</span><span class="p">])</span>
@@ -439,7 +496,30 @@ document.write(`
 <div class="viewcode-block" id="factors_to_tensor">
 <a class="viewcode-back" href="../../reference_btd.html#pybbtd.btd.factors_to_tensor">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">factors_to_tensor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert BTD factor matrices to full tensor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert BTD factor matrices to a full tensor.</span>
+
+<span class="sd">    Reconstructs the tensor from factors A, B, C and the constraint matrix</span>
+<span class="sd">    :math:`\\Theta`, using the CP-equivalent representation for the given</span>
+<span class="sd">    block mode.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        A: np.ndarray</span>
+<span class="sd">            First factor matrix.</span>
+<span class="sd">        B: np.ndarray</span>
+<span class="sd">            Second factor matrix.</span>
+<span class="sd">        C: np.ndarray</span>
+<span class="sd">            Third factor matrix.</span>
+<span class="sd">        theta: np.ndarray</span>
+<span class="sd">            Constraint matrix from :func:`_constraint_matrix`.</span>
+<span class="sd">        block_mode: str</span>
+<span class="sd">            Block mode of the decomposition. One of ``&quot;LL1&quot;`` (default),</span>
+<span class="sd">            ``&quot;L1L&quot;``, ``&quot;1LL&quot;``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            Reconstructed tensor of shape ``(I, J, K)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;LL1&quot;</span><span class="p">:</span>
         <span class="n">Trec</span> <span class="o">=</span> <span class="n">cp_to_tensor</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">@</span> <span class="n">theta</span><span class="p">]))</span>
     <span class="k">elif</span> <span class="n">block_mode</span> <span class="o">==</span> <span class="s2">&quot;1LL&quot;</span><span class="p">:</span>

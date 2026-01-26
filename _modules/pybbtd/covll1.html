@@ -36,8 +36,8 @@
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pybbtd/covll1';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -152,6 +152,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -300,13 +302,19 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="s2">&quot;LL1&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize Cov-LL1 model.</span>
+
 <span class="sd">        Parameters:</span>
-<span class="sd">            spatial_dims: Tuple[int, int]</span>
-<span class="sd">                Spatial dimensions of the tensor (first two modes).</span>
+<span class="sd">            dims: Tuple[int, int, int]</span>
+<span class="sd">                Dimensions ``(I, J, K^2)`` of the tensor, where ``K^2`` is the</span>
+<span class="sd">                vectorized covariance dimension.</span>
 <span class="sd">            R: int</span>
 <span class="sd">                Rank of the decomposition (number of components).</span>
-<span class="sd">            L: int</span>
+<span class="sd">            L1: int</span>
 <span class="sd">                Rank of the spatial maps.</span>
+<span class="sd">            L2: int</span>
+<span class="sd">                Rank of the covariance matrices.</span>
+<span class="sd">            block_mode: str</span>
+<span class="sd">                Block mode for the decomposition. One of ``&quot;LL1&quot;``, ``&quot;L1L&quot;``, ``&quot;1LL&quot;``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L1</span><span class="p">,</span> <span class="n">block_mode</span><span class="o">=</span><span class="n">block_mode</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
@@ -330,7 +338,12 @@ document.write(`
 <a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1.generate_covll1_tensor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate_covll1_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a random covariance imaging tensor.</span>
+<span class="sd">        Generate a random covariance imaging tensor and store the factors.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[list, np.ndarray]:</span>
+<span class="sd">                A tuple ``(factors, tensor)`` where ``factors = [A, B, C]``</span>
+<span class="sd">                and ``tensor`` has shape ``dims``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">generate_covll1_factors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">)</span>
@@ -346,15 +359,15 @@ document.write(`
 <a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Computes Covll1-BTD factor matrices for provided data</span>
-<span class="sd">        using the specified algorithm.</span>
+<span class="sd">        Fit a Cov-LL1 model to the given data using the specified algorithm.</span>
 
 <span class="sd">        Parameters:</span>
 <span class="sd">            data: np.ndarray</span>
-<span class="sd">                Input tensor data to be approximated.</span>
+<span class="sd">                Input tensor data to be decomposed.</span>
 <span class="sd">            algorithm: str</span>
-<span class="sd">                Algorithm to use for fitting. Currently, only &quot;ADMM&quot; is implemented.</span>
-<span class="sd">            **kwargs: Additional keyword arguments for the fitting algorithm.</span>
+<span class="sd">                Algorithm to use for fitting (default: ``&quot;ADMM&quot;``).</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                Additional keyword arguments passed to the solver.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.covll1_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">CovLL1_ADMM</span>
 
@@ -371,7 +384,7 @@ document.write(`
 <a class="viewcode-back" href="../../reference_covll1.html#pybbtd.covll1.CovLL1.get_constraint_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns constraint matrix for CovLL1 model (useful to CP-equivalent model)</span>
+<span class="sd">        Return the constraint matrix for the CP-equivalent Cov-LL1 model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">btd</span><span class="o">.</span><span class="n">constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
 </div>
@@ -384,21 +397,27 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate random factors that follow Cov-LL1 decomposition.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Non-negative spatial factors A, B are drawn from a uniform distribution.</span>
+<span class="sd">    Each column of C is a vectorized :math:`K \\times K` positive semidefinite</span>
+<span class="sd">    Hermitian matrix built from rank-L2 factors.</span>
+
+<span class="sd">    Parameters:</span>
 <span class="sd">        dims (Tuple[int, int, int]):</span>
-<span class="sd">            Dimensions :math:`(I, J, K^2)` of the tensor.</span>
+<span class="sd">            Dimensions ``(I, J, K^2)`` of the tensor.</span>
 <span class="sd">        R (int):</span>
 <span class="sd">            The rank of the decomposition (number of components).</span>
-<span class="sd">        L (int):</span>
+<span class="sd">        L1 (int):</span>
 <span class="sd">            Rank of the spatial maps.</span>
+<span class="sd">        L2 (int):</span>
+<span class="sd">            Rank of the covariance matrices.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
-<span class="sd">            A tuple containing the three factor matrices `(A, B, C)`:</span>
+<span class="sd">            A tuple ``(A, B, C)`` where:</span>
 
-<span class="sd">            - A (np.ndarray): Shape `(dims[0], L * R)`.</span>
-<span class="sd">            - B (np.ndarray): Shape `(dims[1], L * R)`.</span>
-<span class="sd">            - C (np.ndarray): Shape `(dims[2]^2, R)`, where each column is a vectorized covariance matrix</span>
+<span class="sd">            - A: Shape ``(dims[0], L1 * R)``, non-negative.</span>
+<span class="sd">            - B: Shape ``(dims[1], L1 * R)``, non-negative.</span>
+<span class="sd">            - C: Shape ``(K^2, R)``, each column is a vectorized covariance matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
@@ -422,17 +441,25 @@ document.write(`
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_validate_dimensions</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Validate dimensions for Cov-LL1 model.</span>
+<span class="sd">    Validate dimensions and parameters for the Cov-LL1 model.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Checks that ``dims`` has three elements, the third dimension is a</span>
+<span class="sd">    perfect square, and that R, L1, L2 are positive integers consistent</span>
+<span class="sd">    with the tensor dimensions.</span>
+
+<span class="sd">    Parameters:</span>
 <span class="sd">        dims (Tuple[int, int, int]):</span>
-<span class="sd">            Dimensions :math:`(I, J, K^2)` of the tensor.</span>
+<span class="sd">            Dimensions ``(I, J, K^2)`` of the tensor.</span>
 <span class="sd">        R (int):</span>
 <span class="sd">            The rank of the decomposition (number of components).</span>
 <span class="sd">        L1 (int):</span>
 <span class="sd">            Rank of the spatial maps.</span>
 <span class="sd">        L2 (int):</span>
 <span class="sd">            Rank of the covariance matrices.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[int, int, int]:</span>
+<span class="sd">            Validated ``(R, L1, L2)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dims must be a tuple of three integers (I, J, K^2).&quot;</span><span class="p">)</span>
@@ -460,6 +487,15 @@ document.write(`
 <span class="k">def</span><span class="w"> </span><span class="nf">validate_cov_matrices</span><span class="p">(</span><span class="n">T0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if all covariance matrices in a tensor are valid.</span>
+
+<span class="sd">    Each spatial pixel ``T0[i, j, :]`` is reshaped into a :math:`K \\times K`</span>
+<span class="sd">    matrix and tested for Hermitian positive semidefiniteness. Emits a</span>
+<span class="sd">    warning with the percentage of invalid pixels if any are found.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        T0: np.ndarray</span>
+<span class="sd">            Tensor of shape ``(I, J, K^2)`` whose third mode contains</span>
+<span class="sd">            vectorized covariance matrices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">invalid_count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

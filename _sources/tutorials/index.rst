@@ -10,3 +10,5 @@
    btd
    covll1
    Stokes Tutorials <stokes>
+   bbtd_vanilla
+   bbtd_cov
