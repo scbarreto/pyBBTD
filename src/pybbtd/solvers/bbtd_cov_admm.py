@@ -3,6 +3,8 @@ import scipy
 from tensorly import unfold
 from tensorly.tenalg import khatri_rao
 from tensorly.cp_tensor import cp_to_tensor
+from sklearn.cluster import KMeans
+from sklearn.decomposition import NMF
 import pybbtd.bbtd as bbtd
 
 
@@ -29,7 +31,7 @@ def BBTD_COV_ADMM(
         T: np.ndarray
             The input 4D tensor to be decomposed, shape (I, J, K, K).
         init: str
-            Initialization strategy. Options: "random".
+            Initialization strategy. Options: "random", "svd", "kmeans".
         max_iter: int
             Maximum number of outer iterations.
         gamma: float
@@ -80,7 +82,7 @@ def BBTD_COV_ADMM(
     T4 = unfold(T3D, 2)
 
     # Initialize factors
-    Aest, Best, Cest = init_BBTD_cov_factors(BBTD_model, strat=init)
+    Aest, Best, Cest = init_BBTD_cov_factors(BBTD_model, strat=init, T=T)
     Dest = Cest.conj()
 
     # Compute initial spatial maps
@@ -297,7 +299,7 @@ def _solve_C(estC, estD, T3, T4, vecS0, psibtd, rho, inner_admm, tol_admm, L2, R
     return estC, estD, primalResidue, dualResidue
 
 
-def init_BBTD_cov_factors(BBTD_model, strat="random"):
+def init_BBTD_cov_factors(BBTD_model, strat="random", T=None):
     """
     Initialize factor matrices for the constrained BBTD decomposition.
 
@@ -307,7 +309,9 @@ def init_BBTD_cov_factors(BBTD_model, strat="random"):
         BBTD_model: BBTD
             An instance of the BBTD class.
         strat: str
-            Initialization strategy. Options: "random".
+            Initialization strategy. Options: "random", "svd", "kmeans".
+        T: np.ndarray
+            Input tensor (required for "svd" and "kmeans" initialization).
 
     Returns:
         A, B, C: tuple of np.ndarray
@@ -322,7 +326,171 @@ def init_BBTD_cov_factors(BBTD_model, strat="random"):
         A = np.random.rand(dims[0], L1 * R)
         B = np.random.rand(dims[1], L1 * R)
         C = np.random.randn(dims[2], L2 * R) + 1j * np.random.randn(dims[2], L2 * R)
+    elif strat == "svd":
+        if T is None:
+            raise ValueError("SVD init requires input data T.")
+        u0, s0, _ = np.linalg.svd(unfold(T, 0), full_matrices=False)
+        u1, s1, _ = np.linalg.svd(unfold(T, 1), full_matrices=False)
+        u2, s2, _ = np.linalg.svd(unfold(T, 2), full_matrices=False)
+
+        n0 = min(len(s0), L1 * R)
+        n1 = min(len(s1), L1 * R)
+        n2 = min(len(s2), L2 * R)
+
+        A = np.abs(u0[:, :n0] @ np.diag(s0[:n0] ** 0.5))
+        B = np.abs(u1[:, :n1] @ np.diag(s1[:n1] ** 0.5))
+        C = u2[:, :n2] @ np.diag(s2[:n2] ** 0.5)
+
+        # Pad with random columns if SVD did not produce enough
+        if n0 < L1 * R:
+            A = np.hstack([A, np.random.rand(dims[0], L1 * R - n0)])
+        if n1 < L1 * R:
+            B = np.hstack([B, np.random.rand(dims[1], L1 * R - n1)])
+        if n2 < L2 * R:
+            pad = np.random.randn(dims[2], L2 * R - n2) + 1j * np.random.randn(
+                dims[2], L2 * R - n2
+            )
+            C = np.hstack([C, pad])
+    elif strat == "kmeans":
+        if T is None:
+            raise ValueError("K-means init requires input data T.")
+        A, B, C = _kmeans_init(T, R, L1, L2)
     else:
         raise ValueError(f"Initialization strategy '{strat}' not implemented.")
 
     return A, B, C
+
+
+def _kmeans_init(T, R, L1, L2):
+    """
+    K-means based initialization for constrained BBTD.
+
+    Clusters the spatial pixels by their covariance vectors using K-means,
+    then applies NMF on each cluster's spatial map to obtain non-negative
+    factors A, B. The covariance factor C is initialized from the cluster
+    centers projected onto the positive semi-definite cone.
+
+    Parameters:
+        T: np.ndarray
+            Input 4D tensor of shape (J, M, K, K).
+        R: int
+            Number of BBTD terms.
+        L1: int
+            Rank of the first block (spatial maps).
+        L2: int
+            Rank of the second block (covariance).
+
+    Returns:
+        A, B, C: tuple of np.ndarray
+            Initialized factor matrices.
+    """
+    J, M, K, _ = T.shape
+
+    # Convert complex 4D tensor (J, M, K, K) to real 3D tensor (J, M, K²)
+    Treal = _complex_to_real(T)
+
+    # K-means clustering on spatial pixels
+    unfolding = unfold(Treal, 2).T  # (J*M, K²)
+    kmeans = KMeans(n_clusters=R, random_state=0, n_init="auto")
+    kmeans.fit(unfolding)
+    labels = kmeans.labels_
+
+    # Build feature maps from cluster assignments
+    Rterms = np.zeros((R, J * M))
+    for idx in range(len(labels)):
+        Rterms[labels[idx], idx] = 1
+
+    featuresMaps = np.zeros((R, J, M))
+    for r in range(R):
+        featuresMaps[r] = Rterms[r].reshape(J, M)
+
+    # NMF on each cluster's feature map to get A_r, B_r
+    model = NMF(n_components=L1, init="nndsvda", random_state=0, max_iter=5000)
+
+    W = np.zeros((R, J, L1))
+    H = np.zeros((R, L1, M))
+    for r in range(R):
+        W[r] = model.fit_transform(featuresMaps[r])
+        H[r] = model.components_
+
+    initA = np.concatenate([W[r] for r in range(R)], axis=1)
+    initB = np.concatenate([H[r].T for r in range(R)], axis=1)
+
+    # Initialize C from cluster centers
+    initC = np.zeros((K, L2 * R), dtype=np.complex128)
+    initialC = kmeans.cluster_centers_.T  # (K², R)
+
+    for r in range(R):
+        col_C = initialC[:, r]
+
+        # Reconstruct Hermitian matrix from vectorized representation
+        reconstructed_matrix = np.zeros((K, K), dtype=complex)
+        k = 0
+        for i in range(K):
+            for j in range(K):
+                if i == j:
+                    reconstructed_matrix[i, j] = col_C[k]
+                elif i < j:
+                    reconstructed_matrix[i, j] = col_C[k]
+                else:
+                    reconstructed_matrix[i, j] = reconstructed_matrix[j, i].conjugate()
+                k += 1
+
+        # Project to SDP and truncate via SVD
+        sdp_matrix = _project_to_sdp(reconstructed_matrix)
+        U, S, _ = np.linalg.svd(sdp_matrix)
+        initC[:, r * L2 : (r + 1) * L2] = U[:, :L2] @ np.diag(np.sqrt(S[:L2]))
+
+    # Scale to match tensor norm
+    phi, psi = bbtd._constraint_matrices(L1, L2, R)
+    initD = initC.conj()
+    initT = bbtd.factors_to_tensor(initA, initB, initC, initD, phi, psi)
+    lamb = np.linalg.norm(T) / np.linalg.norm(initT)
+    initA = initA * lamb ** (1 / 2)
+    initB = initB * lamb ** (1 / 2)
+
+    return initA, initB, initC
+
+
+def _complex_to_real(X):
+    """
+    Convert a complex 4D tensor (J, M, K, K) to a real 3D tensor (J, M, K²).
+
+    Each K x K Hermitian matrix is vectorized into a K² real vector using
+    diagonal (real), upper-triangular (real), and lower-triangular (imaginary)
+    parts.
+    """
+    K = X.shape[2]
+    real_tensor = np.zeros((X.shape[0], X.shape[1], K**2), dtype="float64")
+
+    for x in range(X.shape[0]):
+        for y in range(X.shape[1]):
+            cov_matrix = X[x, y, :, :]
+            vectorized = np.zeros(K * K)
+
+            k = 0
+            for i in range(K):
+                for j in range(K):
+                    if i == j:
+                        vectorized[k] = cov_matrix[i, j].real
+                    elif i < j:
+                        vectorized[k] = cov_matrix[i, j].real
+                    else:
+                        vectorized[k] = cov_matrix[j, i].imag
+                    k += 1
+
+            real_tensor[x, y, :] = vectorized
+
+    return real_tensor
+
+
+def _project_to_sdp(A):
+    """
+    Project a Hermitian matrix onto the positive semi-definite cone.
+
+    Computes the eigenvalue decomposition and clips negative eigenvalues.
+    """
+    A = (A + A.T.conj()) / 2
+    eigenvalues, eigenvectors = np.linalg.eigh(A)
+    eigenvalues[eigenvalues < 0] = 1e-10
+    return eigenvectors @ np.diag(eigenvalues) @ eigenvectors.T.conj()
