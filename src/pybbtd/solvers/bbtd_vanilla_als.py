@@ -3,7 +3,6 @@ from tensorly import unfold
 from tensorly.tenalg import khatri_rao
 from scipy.linalg import solve
 import pybbtd.bbtd as bbtd
-from pybbtd.bbtd import factors_to_tensor
 
 
 def BBTD_ALS(BBTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e-3):
@@ -58,7 +57,7 @@ def BBTD_ALS(BBTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=
 
     k = 0
     exit_criterion = False
-    Tfit_0 = factors_to_tensor(Ak, Bk, Ck, Dk, phi, psi)
+    Tfit_0 = bbtd.factors_to_tensor(Ak, Bk, Ck, Dk, phi, psi)
     fit_error = [np.linalg.norm(Tfit_0 - T) / np.linalg.norm(T)]
 
     while exit_criterion is False:
@@ -99,7 +98,7 @@ def BBTD_ALS(BBTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=
         Dk1 = solve(M3_M3H.T, RHS.T, assume_a="pos").T
 
         # Compute reconstruction error
-        Tfit_k = factors_to_tensor(Ak1, Bk1, Ck1, Dk1, phi, psi)
+        Tfit_k = bbtd.factors_to_tensor(Ak1, Bk1, Ck1, Dk1, phi, psi)
         fit_error.append(np.linalg.norm(Tfit_k - T) / np.linalg.norm(T))
 
         # Exit criterion
