@@ -325,7 +325,3 @@ def test_admm_nonneg_spatial_maps():
         S_r = A_est[:, r * L1 : (r + 1) * L1] @ B_est[:, r * L1 : (r + 1) * L1].T
         # Spatial maps should be approximately non-negative after projection
         assert np.all(S_r >= -1e-6), f"Spatial map S_{r} has negative entries"
-
-
-if __name__ == "__main__":
-    pytest.main()
