@@ -97,7 +97,6 @@ def BBTD_COV_ADMM(
     tensor_init = cp_to_tensor((weights, factors_init))
     scale_factor = np.linalg.norm(T3D) / np.linalg.norm(tensor_init)
     Sout = Sout * scale_factor
-    vecSout = Sout.reshape(R, J * M).T
 
     # Initialize metrics
     cost = np.zeros(max_iter)
