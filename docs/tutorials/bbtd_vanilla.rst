@@ -1,7 +1,7 @@
 BBTD tutorial (Vanilla ALS)
 ===================================
 
-This tutorial provides an introduction to the Block-Block Term Decomposition (BBTD) into rank-(L1, L2, 1, 1) terms using the vanilla ALS solver.
+This tutorial provides an introduction to the Block-Block Term Decomposition (BBTD) into rank-(L1, L1, L2, L2) terms using the vanilla ALS solver.
 
 Load required libraries
 ------------------------

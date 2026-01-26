@@ -1,7 +1,7 @@
 BBTD tutorial (Constrained ADMM)
 ===================================
 
-This tutorial provides an introduction to the constrained Block-Block Term Decomposition (BBTD) for covariance imaging using the AO-ADMM solver. The constraints enforce non-negative spatial maps and conjugate symmetry (D = C*).
+This tutorial provides an introduction to the constrained Block-Block Terms Decomposition (BBTD) for covariance imaging using the AO-ADMM solver. The constraints enforce non-negative spatial maps and conjugate symmetry.
 
 Load required libraries
 ------------------------

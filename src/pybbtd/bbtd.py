@@ -5,28 +5,54 @@ from tensorly.cp_tensor import cp_to_tensor
 
 class BBTD:
     """
-    Class for tensors admitting a Block-Block Term Decomposition (BBTD) into rank-(L1, L2, 1, 1) terms.
+    Class for tensors admitting a Block-Block Term Decomposition (BBTD)
+    into rank-:math:`(L_1, L_1, L_2, L_2)` terms.
 
-    :param dims: Dimensions `(I, J, K, M)` of the 4D tensor.
-    :type dims: Tuple[int, int, int, int]
-    :param R: The rank of the decomposition (number of components).
+    A BBTD decomposes a 4-D tensor :math:`\\mathcal{T} \\in
+    \\mathbb{R}^{I \\times J \\times K \\times M}` as a sum of :math:`R`
+    block terms, each of which is a rank-:math:`(L_1, L_1, L_2, L_2)`
+    term built from four factor matrices A, B, C, D and two constraint
+    matrices :math:`\\Phi` and :math:`\\Psi`.
+
+    :param dims: Dimensions ``(I, J, K, M)`` of the 4-D tensor.
+    :type dims: list[int] or Tuple[int, int, int, int]
+    :param R: Number of block terms (rank of the decomposition).
     :type R: int
-    :param L1: Rank of the first block (first mode).
+    :param L1: Rank of the spatial block (shared by modes A and B).
     :type L1: int
-    :param L2: Rank of the second block (second mode).
+    :param L2: Rank of the spectral block (shared by modes C and D).
     :type L2: int
 
-    :ivar A: Factor matrix of shape `(dims[0], L1 * R)`.
-    :vartype A: np.ndarray
-    :ivar B: Factor matrix of shape `(dims[1], L1 * R)`.
-    :vartype B: np.ndarray
-    :ivar C: Factor matrix of shape `(dims[2], L2 * R)`.
-    :vartype C: np.ndarray
-    :ivar D: Factor matrix of shape `(dims[3], L2 * R)`.
-    :vartype D: np.ndarray
+    :ivar factors: List of factor matrices ``[A, B, C, D]`` after fitting,
+        or ``None`` before fitting.
+    :vartype factors: list[np.ndarray] or None
+    :ivar tensor: Reconstructed tensor after fitting, or ``None`` before
+        fitting.
+    :vartype tensor: np.ndarray or None
+    :ivar fit_error: Array of fitting errors at each iteration, or ``None``
+        before fitting.
+    :vartype fit_error: np.ndarray or None
     """
 
     def __init__(self, dims, R: int, L1: int, L2: int):
+        """
+        Initialize a BBTD model.
+
+        Parameters:
+            dims: list[int] or Tuple[int, int, int, int]
+                Dimensions ``(I, J, K, M)`` of the 4-D tensor.  Must contain
+                exactly four positive integers.
+            R: int
+                Number of block terms (rank of the decomposition).
+            L1: int
+                Rank of the spatial block (shared by modes A and B).
+            L2: int
+                Rank of the spectral block (shared by modes C and D).
+
+        Raises:
+            ValueError: If ``dims`` is not a list/tuple of four positive
+                integers, or if R, L1, L2 are not positive integers.
+        """
         # Validate dims
         if (
             not isinstance(dims, (list, tuple))
@@ -48,28 +74,43 @@ class BBTD:
 
     def get_constraint_matrices(self):
         """
-        Get the constraint matrices phi and psi.
+        Return the constraint matrices :math:`\\Phi` and :math:`\\Psi` for
+        the CP-equivalent BBTD model.
+
+        :math:`\\Phi` maps the spatial factors (A, B) and :math:`\\Psi`
+        maps the spectral factors (C, D) so that the BBTD can be
+        expressed as a CP decomposition.
 
         Returns:
-            phi: Constraint matrix for the first block (A, B), shape (L1 * L2 * R, L1 * R)
-            psi: Constraint matrix for the second block (C, D), shape (L2 * R, L1 * L2 * R)
+            Tuple[np.ndarray, np.ndarray]:
+                ``(phi, psi)`` where ``phi`` has shape
+                ``(L1 * L2 * R, L1 * R)`` and ``psi`` has shape
+                ``(L2 * R, L1 * L2 * R)``.
         """
         return _constraint_matrices(self.L1, self.L2, self.rank)
 
     def fit(self, data, algorithm="ALS", **kwargs):
         """
-        Fit a BBTD to the given data using the specified algorithm.
+        Fit a BBTD model to the given data using the specified algorithm.
+
+        After fitting, ``self.factors``, ``self.tensor``, and
+        ``self.fit_error`` are updated in place.
 
         Parameters:
             data: np.ndarray
-                The input 4D tensor data to be decomposed.
+                Input 4-D tensor of shape matching ``self.dims``.
             algorithm: str
-                The algorithm to use for fitting. Options: "ALS", "ADMM".
+                Algorithm to use for fitting (default: ``"ALS"``).
+                Options: ``"ALS"`` (vanilla Alternating Least Squares),
+                ``"ADMM"`` (constrained AO-ADMM with non-negativity on
+                A, B and conjugate symmetry D = C*).
             **kwargs:
-                Additional keyword arguments passed to the solver.
+                Additional keyword arguments passed to the solver
+                (e.g. ``init``, ``max_iter``, ``rel_tol``, ``abs_tol``).
 
-        Returns:
-            None. Updates self.factors, self.tensor, and self.fit_error.
+        Raises:
+            NotImplementedError: If ``algorithm`` is not ``"ALS"`` or
+                ``"ADMM"``.
         """
         if algorithm == "ALS":
             from pybbtd.solvers.bbtd_vanilla_als import BBTD_ALS
@@ -87,7 +128,24 @@ class BBTD:
 
 
 def _validate_R_L1_L2(R, L1, L2):
-    """Check if R, L1, and L2 are positive integers."""
+    """
+    Validate that R, L1, and L2 are positive integers.
+
+    Parameters:
+        R: int
+            Number of block terms.
+        L1: int
+            Rank of the spatial block.
+        L2: int
+            Rank of the spectral block.
+
+    Returns:
+        Tuple[int, int, int]:
+            Validated ``(R, L1, L2)``.
+
+    Raises:
+        ValueError: If any argument is not a positive integer.
+    """
     if not isinstance(R, int) or R <= 0:
         raise ValueError("R should be a positive integer.")
     if not isinstance(L1, int) or L1 <= 0:
@@ -99,22 +157,44 @@ def _validate_R_L1_L2(R, L1, L2):
 
 
 def _repeat_list_nested(input_list, n):
-    """Repeat a list n times as nested elements."""
+    """
+    Repeat a list *n* times as nested elements.
+
+    Parameters:
+        input_list: list
+            The list to repeat.
+        n: int
+            Number of repetitions.
+
+    Returns:
+        list:
+            A list of *n* references to ``input_list``.
+    """
     return [input_list for _ in range(n)]
 
 
 def _constraint_matrices(L1, L2, R):
     """
-    Compute the constraint matrices phi and psi for the BBTD model.
+    Compute the block-diagonal constraint matrices :math:`\\Phi` and
+    :math:`\\Psi` for the BBTD model.
+
+    :math:`\\Phi` expands the spatial factors (A, B) and :math:`\\Psi`
+    selects the spectral factors (C, D) so that the BBTD can be written
+    as a standard CP decomposition.
 
     Parameters:
-        L1: Rank of the first block (used by A and B)
-        L2: Rank of the second block (used by C and D)
-        R: Rank of the decomposition (number of terms)
+        L1: int
+            Rank of the spatial block (shared by A and B).
+        L2: int
+            Rank of the spectral block (shared by C and D).
+        R: int
+            Number of block terms.
 
     Returns:
-        phi: Constraint matrix for the first block (A, B)
-        psi: Constraint matrix for the second block (C, D)
+        Tuple[np.ndarray, np.ndarray]:
+            ``(phi, psi)`` where ``phi`` has shape
+            ``(L1 * L2 * R, L1 * R)`` and ``psi`` has shape
+            ``(L2 * R, L1 * L2 * R)``.
     """
     # Phi: constraint matrix for the first block (A, B)
     onesL2 = np.ones(L2)
@@ -135,25 +215,29 @@ def _constraint_matrices(L1, L2, R):
 
 def factors_to_tensor(A, B, C, D, phi, psi):
     """
-    Convert BBTD factor matrices to full 4D tensor.
+    Reconstruct a full 4-D tensor from BBTD factor matrices and
+    constraint matrices.
+
+    Computes ``A @ phi``, ``B @ phi``, ``C @ psi``, ``D @ psi`` and
+    assembles the CP-equivalent tensor.
 
     Parameters:
         A: np.ndarray
-            Factor matrix of shape (I, L1 * R).
+            Factor matrix of shape ``(I, L1 * R)``.
         B: np.ndarray
-            Factor matrix of shape (J, L1 * R).
+            Factor matrix of shape ``(J, L1 * R)``.
         C: np.ndarray
-            Factor matrix of shape (K, L2 * R).
+            Factor matrix of shape ``(K, L2 * R)``.
         D: np.ndarray
-            Factor matrix of shape (M, L2 * R).
+            Factor matrix of shape ``(M, L2 * R)``.
         phi: np.ndarray
-            Constraint matrix for the first block (A, B).
+            Constraint matrix for the spatial block (A, B).
         psi: np.ndarray
-            Constraint matrix for the second block (C, D).
+            Constraint matrix for the spectral block (C, D).
 
     Returns:
-        full_tensor: np.ndarray
-            Reconstructed 4D tensor.
+        np.ndarray:
+            Reconstructed 4-D tensor of shape ``(I, J, K, M)``.
     """
     APhi = A @ phi
     BPhi = B @ phi

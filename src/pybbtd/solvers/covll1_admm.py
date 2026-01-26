@@ -10,6 +10,38 @@ from sklearn.decomposition import NMF
 
 
 def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
+    """
+    Inner ADMM update for factor A with non-negativity constraint.
+
+    Solves the augmented Lagrangian subproblem for A using the first
+    mode unfolding, with a proximal non-negativity projection.
+
+    Parameters:
+        Y1: np.ndarray
+            First mode unfolding of the input tensor.
+        Bk: np.ndarray
+            Current estimate of factor B.
+        Ck: np.ndarray
+            Current estimate of factor C (pre-multiplied by theta).
+        Ainit: np.ndarray
+            Initial primal variable for A.
+        Atinit: np.ndarray
+            Initial projected (non-negative) variable for A.
+        rho: float
+            ADMM penalty parameter.
+        L: int
+            Rank of the spatial maps.
+        nitermax: int
+            Maximum number of inner ADMM iterations (default: 100).
+        tol: float
+            Convergence tolerance (default: 1e-14).
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, float]:
+            ``(Atilde, A, primal_residue)`` where ``Atilde`` is the
+            non-negative projected factor, ``A`` is the unconstrained
+            factor, and ``primal_residue`` is the final primal residual.
+    """
     # init variables
     Al = Ainit.copy()
     Atl = Atinit.copy()
@@ -66,6 +98,38 @@ def ADMM_A(Y1, Bk, Ck, Ainit, Atinit, rho, L, nitermax=100, tol=1e-14):
 
 
 def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
+    """
+    Inner ADMM update for factor B with non-negativity constraint.
+
+    Solves the augmented Lagrangian subproblem for B using the second
+    mode unfolding, with a proximal non-negativity projection.
+
+    Parameters:
+        Y2: np.ndarray
+            Second mode unfolding of the input tensor.
+        Ak: np.ndarray
+            Current estimate of factor A.
+        Ck: np.ndarray
+            Current estimate of factor C (pre-multiplied by theta).
+        Binit: np.ndarray
+            Initial primal variable for B.
+        Btinit: np.ndarray
+            Initial projected (non-negative) variable for B.
+        rho: float
+            ADMM penalty parameter.
+        L: int
+            Rank of the spatial maps.
+        nitermax: int
+            Maximum number of inner ADMM iterations (default: 100).
+        tol: float
+            Convergence tolerance (default: 1e-14).
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, float]:
+            ``(Btilde, B, primal_residue)`` where ``Btilde`` is the
+            non-negative projected factor, ``B`` is the unconstrained
+            factor, and ``primal_residue`` is the final primal residual.
+    """
     # init variables
     Bl = Binit.copy()
     Btl = Btinit.copy()
@@ -123,6 +187,43 @@ def ADMM_B(Y2, Ak, Ck, Binit, Btinit, rho, L, nitermax=100, tol=1e-14):
 
 
 def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14):
+    """
+    Inner ADMM update for factor C with PSD covariance constraint.
+
+    Solves the augmented Lagrangian subproblem for C using the third
+    mode unfolding, projecting each column onto the positive
+    semidefinite cone via :func:`project_to_psd`.
+
+    Parameters:
+        Y3: np.ndarray
+            Third mode unfolding of the input tensor.
+        Ak: np.ndarray
+            Current estimate of factor A.
+        Bk: np.ndarray
+            Current estimate of factor B.
+        Cinit: np.ndarray
+            Initial primal variable for C.
+        Ctinit: np.ndarray
+            Initial projected (PSD) variable for C.
+        theta: np.ndarray
+            Constraint matrix from the BTD model.
+        rho: float
+            ADMM penalty parameter.
+        L: int
+            Rank of the spatial maps.
+        R: int
+            Number of block terms.
+        nitermax: int
+            Maximum number of inner ADMM iterations (default: 100).
+        tol: float
+            Convergence tolerance (default: 1e-14).
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, float]:
+            ``(Ctilde, C, primal_residue)`` where ``Ctilde`` is the
+            PSD-projected factor, ``C`` is the unconstrained factor,
+            and ``primal_residue`` is the final primal residual.
+    """
     # init variables
 
     Cl = Cinit.copy()
@@ -189,19 +290,20 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 
 def project_to_psd(cov_matrix):
     """
-    Project a vectorized covariance matrix onto the PSD (positive semidefinite) cone.
+    Project a covariance matrix onto the PSD (positive semidefinite) cone.
 
-    Parameters
-    ----------
-    cov_matrix : np.ndarray
-        Covariance matrix of shape (K, K)
+    Computes the SVD and clips negative singular values to zero, then
+    reconstructs the matrix.
 
-    Returns
-    -------
-    vec_cov_psd : np.ndarray
-        Vectorized PSD-projected covariance matrix of shape (K^2,).
-    cov_matrix_psd : np.ndarray
-        The reconstructed PSD K x K covariance matrix.
+    Parameters:
+        cov_matrix: np.ndarray
+            Covariance matrix of shape ``(K, K)``.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]:
+            ``(vec_cov_psd, cov_matrix_psd)`` where ``vec_cov_psd`` is
+            the vectorized PSD-projected matrix of shape ``(K^2,)`` and
+            ``cov_matrix_psd`` is the ``(K, K)`` PSD matrix.
     """
     # SVD decomposition
     U, s, Vh = linalg.svd(cov_matrix)
@@ -228,6 +330,41 @@ def CovLL1_ADMM(
     abs_tol=10**-10,
     admm_tol=10**-8,
 ):
+    """
+    AO-ADMM solver for the Cov-LL1 decomposition.
+
+    Enforces non-negativity on spatial factors A, B and positive
+    semidefiniteness on the covariance columns of C via alternating
+    ADMM updates.
+
+    Parameters:
+        CovLL1_model: CovLL1
+            An instance of the :class:`~pybbtd.covll1.CovLL1` class.
+        T: np.ndarray
+            Input tensor of shape ``(I, J, K^2)`` to be decomposed.
+        init: str
+            Initialization strategy (default: ``"random"``).
+            Options: ``"random"``, ``"kmeans"``.
+        max_iter: int
+            Maximum number of outer iterations (default: 1000).
+        rho: float
+            ADMM penalty parameter (default: 1).
+        max_admm: int
+            Maximum number of inner ADMM iterations per factor update
+            (default: 1).
+        rel_tol: float
+            Relative tolerance for outer convergence (default: 1e-10).
+        abs_tol: float
+            Absolute tolerance for outer convergence (default: 1e-10).
+        admm_tol: float
+            Tolerance for inner ADMM convergence (default: 1e-8).
+
+    Returns:
+        Tuple[list, list]:
+            ``(factors, fit_error)`` where ``factors = [A, B, C]`` and
+            ``fit_error`` is a list of normalized squared reconstruction
+            errors.
+    """
     if init == "random":
         Ak, Bk, Ck = init_covll1_factors(CovLL1_model, init="random")
         Atk, Btk, Ctk = init_covll1_factors(CovLL1_model, init="random")
@@ -303,7 +440,23 @@ def CovLL1_ADMM(
 
 
 def init_covll1_factors(CovLL1_model, init="random", T=None):
-    # Add check to see if T has coherent dimensions
+    """
+    Initialize factor matrices for the Cov-LL1 decomposition.
+
+    Parameters:
+        CovLL1_model: CovLL1
+            An instance of the :class:`~pybbtd.covll1.CovLL1` class.
+        init: str
+            Initialization strategy (default: ``"random"``).
+            Options: ``"random"``, ``"kmeans"``.
+        T: np.ndarray or None
+            Input tensor (required for ``"kmeans"`` initialization).
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray]:
+            Initialized factor matrices ``(A, B, C)`` where A, B are
+            non-negative and C contains vectorized covariance columns.
+    """
     import pybbtd.covll1 as covll1
 
     # get BTD model params
@@ -324,6 +477,29 @@ def init_covll1_factors(CovLL1_model, init="random", T=None):
 
 
 def kmeans_init(T, R, L1, theta):
+    """
+    K-means based initialization for the Cov-LL1 decomposition.
+
+    Clusters the spatial pixels by their covariance vectors using K-means,
+    then applies NMF on each cluster's spatial map to obtain non-negative
+    factors A, B. The covariance factor C is initialized from the cluster
+    centers projected onto the PSD cone.
+
+    Parameters:
+        T: np.ndarray
+            Input tensor of shape ``(I, J, K^2)`` to be decomposed.
+        R: int
+            Number of block terms.
+        L1: int
+            Rank of the spatial maps (NMF rank per cluster).
+        theta: np.ndarray
+            Constraint matrix from the BTD model.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray]:
+            Initialized factor matrices ``(A, B, C)`` where A, B are
+            non-negative and C contains vectorized PSD covariance columns.
+    """
     Treal = _complex_to_real(T)
 
     kmeans = KMeans(n_clusters=R, random_state=0, n_init="auto")

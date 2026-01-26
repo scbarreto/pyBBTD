@@ -137,15 +137,6 @@ class BTD:
         """
         return _constraint_matrix(self.rank, self.L)
 
-    def to_cpd_format(self):
-        """
-        Convert the BTD to CPD format.
-
-        .. note::
-            Not implemented yet.
-        """
-        raise NotImplementedError("to_cpd_format is not implemented yet.")
-
 
 def _validate_R_L(R, L):
     """
