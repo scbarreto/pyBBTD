@@ -5,24 +5,35 @@ from tensorly.cp_tensor import cp_to_tensor
 from pybbtd.solvers.btd_als import BTD_ALS
 
 
-# main class for tensors in BTD format
 class BTD:
     """
-    Class for tensors admitting a Block Terms Decomposition (BTD) into rank-(L, L, 1) terms.
+    Class for tensors admitting a Block Term Decomposition (BTD) into
+    rank-(L, L, 1) terms.
 
-    :param dims: Dimensions `(I, J, K)` of the tensor.
+    The decomposition writes a third-order tensor as a sum of R block terms,
+    each formed by the outer product of a rank-L matrix and a vector. Three
+    block modes are supported: ``"LL1"``, ``"L1L"``, and ``"1LL"``, indicating
+    which mode carries the rank-one structure.
+
+    :param dims: Dimensions ``(I, J, K)`` of the tensor.
     :type dims: Tuple[int, int, int]
-    :param R: The rank of the decomposition (number of components).
+    :param R: Number of block terms (rank of the decomposition).
     :type R: int
-    :param L: Rank of the spatial maps.
-    :type L: int
+    :param L: Rank of the block in each term. Can be a single integer
+        (same rank for all terms) or a list of R integers.
+    :type L: int or list[int]
+    :param block_mode: Block mode of the decomposition.
+        One of ``"LL1"``, ``"L1L"``, ``"1LL"`` (default: ``"LL1"``).
+    :type block_mode: str
 
-    :ivar A: Factor matrix of shape `(dims[0], L * R)`.
-    :vartype A: np.ndarray
-    :ivar B: Factor matrix of shape `(dims[1], L * R)`.
-    :vartype B: np.ndarray
-    :ivar C: Factor matrix of shape `(dims[2], R)`.
-    :vartype C: np.ndarray
+    :ivar factors: List of factor matrices ``[A, B, C]`` after fitting,
+        or ``None`` before fitting.
+    :vartype factors: list[np.ndarray] or None
+    :ivar tensor: Reconstructed tensor after fitting, or ``None`` before fitting.
+    :vartype tensor: np.ndarray or None
+    :ivar fit_error: Array of fitting errors at each iteration, or ``None``
+        before fitting.
+    :vartype fit_error: np.ndarray or None
     """
 
     def __init__(self, dims, R: int, L: int, block_mode="LL1"):
@@ -58,7 +69,11 @@ class BTD:
 
     def check_uniqueness(self):
         """
-        Check if, for given parameters, uniqueness can be guaranteed.
+        Check if sufficient conditions for essential uniqueness are satisfied.
+
+        Uses the algebraic conditions from the literature (constant-L case only).
+        Prints whether uniqueness can be guaranteed or not. When L varies across
+        terms, the check is skipped with a message.
         """
         if not np.all(self.L == self.L[0]):
             return print(
@@ -86,13 +101,19 @@ class BTD:
 
     def fit(self, data, algorithm="ALS", **kwargs):
         """
-        Fit a BTD to the given data using the specified algorithm.
+        Fit a BTD model to the given data using the specified algorithm.
+
+        After fitting, ``self.factors``, ``self.tensor``, and ``self.fit_error``
+        are updated in place.
 
         Parameters:
-            data: ndarray
-                The input tensor data to be decomposed.
+            data: np.ndarray
+                Input tensor of shape ``dims`` to be decomposed.
             algorithm: str
-                The algorithm to use for fitting.
+                Algorithm to use for fitting (default: ``"ALS"``).
+            **kwargs:
+                Additional keyword arguments passed to the solver
+                (e.g. ``init``, ``max_iter``, ``rel_tol``, ``abs_tol``).
         """
         if algorithm == "ALS":
             self.factors, self.fit_error = BTD_ALS(self, data, **kwargs)
@@ -104,19 +125,46 @@ class BTD:
 
     def get_constraint_matrix(self):
         """
-        Get the constraint matrix for the CP equivalent of the BTD model, correctly repeating columns.
+        Return the constraint matrix for the CP-equivalent BTD model.
+
+        The constraint matrix :math:`\\Theta` maps the R columns of the
+        rank-one factor to the ``sum(L)`` columns of the block factors,
+        enabling a CP-like representation of the BTD.
+
+        Returns:
+            np.ndarray:
+                Constraint matrix of shape ``(R, sum(L))``.
         """
         return _constraint_matrix(self.rank, self.L)
 
-    def to_cpd_format():
+    def to_cpd_format(self):
         """
         Convert the BTD to CPD format.
+
+        .. note::
+            Not implemented yet.
         """
-        pass
+        raise NotImplementedError("to_cpd_format is not implemented yet.")
 
 
 def _validate_R_L(R, L):
-    """Check if R and L are non-negative integers."""
+    """
+    Validate that R and L are positive integers.
+
+    If L is a single integer it is broadcast to a length-R array.
+    If L is a list or array it must have length R with all positive entries.
+
+    Parameters:
+        R: int
+            Number of block terms (must be a positive integer).
+        L: int or list[int] or np.ndarray
+            Rank of each block term. A single integer is replicated R times.
+
+    Returns:
+        Tuple[int, np.ndarray]:
+            Validated ``(R, L)`` where L is always a 1-D integer array of
+            length R.
+    """
     # check R
     if not isinstance(R, int) or R <= 0:
         raise ValueError("R should be a positive integer.")
@@ -137,15 +185,22 @@ def _validate_R_L(R, L):
 
 
 def _constraint_matrix(R, L):
-    """Compute the constraint matrix repeating columns
-    for the BTD model
+    """
+    Compute the constraint matrix for the BTD model.
+
+    Builds a block-diagonal matrix :math:`\\Theta` of shape ``(R, sum(L))``
+    where each block is a row of ones of length ``L[r]``. This matrix maps
+    the CP-equivalent factors back to the BTD factors.
 
     Parameters:
-        R: rank of the decomposition (number of terms)
-        L: int or sequence of rank-L values for the spatial map of each block
+        R: int
+            Number of block terms.
+        L: int or list[int]
+            Rank of each block term. A single integer is replicated R times.
 
     Returns:
-        theta: BTD constraint matrix
+        np.ndarray:
+            Constraint matrix :math:`\\Theta` of shape ``(R, sum(L))``.
     """
     _, Larray = _validate_R_L(R, L)
     theta = block_diag(*[np.ones(Lr) for Lr in Larray])
@@ -154,7 +209,30 @@ def _constraint_matrix(R, L):
 
 
 def factors_to_tensor(A, B, C, theta, block_mode="LL1"):
-    """Convert BTD factor matrices to full tensor."""
+    """
+    Convert BTD factor matrices to a full tensor.
+
+    Reconstructs the tensor from factors A, B, C and the constraint matrix
+    :math:`\\Theta`, using the CP-equivalent representation for the given
+    block mode.
+
+    Parameters:
+        A: np.ndarray
+            First factor matrix.
+        B: np.ndarray
+            Second factor matrix.
+        C: np.ndarray
+            Third factor matrix.
+        theta: np.ndarray
+            Constraint matrix from :func:`_constraint_matrix`.
+        block_mode: str
+            Block mode of the decomposition. One of ``"LL1"`` (default),
+            ``"L1L"``, ``"1LL"``.
+
+    Returns:
+        np.ndarray:
+            Reconstructed tensor of shape ``(I, J, K)``.
+    """
     if block_mode == "LL1":
         Trec = cp_to_tensor((np.ones(theta.shape[1]), [A, B, C @ theta]))
     elif block_mode == "1LL":

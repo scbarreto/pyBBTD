@@ -30,13 +30,19 @@ class CovLL1(BTD):
     def __init__(self, dims, R: int, L1: int, L2: int, block_mode="LL1"):
         """
         Initialize Cov-LL1 model.
+
         Parameters:
-            spatial_dims: Tuple[int, int]
-                Spatial dimensions of the tensor (first two modes).
+            dims: Tuple[int, int, int]
+                Dimensions ``(I, J, K^2)`` of the tensor, where ``K^2`` is the
+                vectorized covariance dimension.
             R: int
                 Rank of the decomposition (number of components).
-            L: int
+            L1: int
                 Rank of the spatial maps.
+            L2: int
+                Rank of the covariance matrices.
+            block_mode: str
+                Block mode for the decomposition. One of ``"LL1"``, ``"L1L"``, ``"1LL"``.
         """
         super().__init__(dims, R=R, L=L1, block_mode=block_mode)
         self.dims = tuple(dims)
@@ -58,7 +64,12 @@ class CovLL1(BTD):
 
     def generate_covll1_tensor(self):
         """
-        Generate a random covariance imaging tensor.
+        Generate a random covariance imaging tensor and store the factors.
+
+        Returns:
+            Tuple[list, np.ndarray]:
+                A tuple ``(factors, tensor)`` where ``factors = [A, B, C]``
+                and ``tensor`` has shape ``dims``.
         """
 
         A, B, C = generate_covll1_factors(self.dims, self.rank, self.L1, self.L2)
@@ -71,15 +82,15 @@ class CovLL1(BTD):
 
     def fit(self, data, algorithm="ADMM", **kwargs):
         """
-        Computes Covll1-BTD factor matrices for provided data
-        using the specified algorithm.
+        Fit a Cov-LL1 model to the given data using the specified algorithm.
 
         Parameters:
             data: np.ndarray
-                Input tensor data to be approximated.
+                Input tensor data to be decomposed.
             algorithm: str
-                Algorithm to use for fitting. Currently, only "ADMM" is implemented.
-            **kwargs: Additional keyword arguments for the fitting algorithm.
+                Algorithm to use for fitting (default: ``"ADMM"``).
+            **kwargs:
+                Additional keyword arguments passed to the solver.
         """
         from pybbtd.solvers.covll1_admm import CovLL1_ADMM
 
@@ -93,7 +104,7 @@ class CovLL1(BTD):
 
     def get_constraint_matrix(self):
         """
-        Returns constraint matrix for CovLL1 model (useful to CP-equivalent model)
+        Return the constraint matrix for the CP-equivalent Cov-LL1 model.
         """
         return btd.constraint_matrix(self.rank, self.L)
 
@@ -102,21 +113,27 @@ def generate_covll1_factors(dims, R, L1, L2):
     """
     Generate random factors that follow Cov-LL1 decomposition.
 
-    Args:
+    Non-negative spatial factors A, B are drawn from a uniform distribution.
+    Each column of C is a vectorized :math:`K \\times K` positive semidefinite
+    Hermitian matrix built from rank-L2 factors.
+
+    Parameters:
         dims (Tuple[int, int, int]):
-            Dimensions :math:`(I, J, K^2)` of the tensor.
+            Dimensions ``(I, J, K^2)`` of the tensor.
         R (int):
             The rank of the decomposition (number of components).
-        L (int):
+        L1 (int):
             Rank of the spatial maps.
+        L2 (int):
+            Rank of the covariance matrices.
 
     Returns:
         Tuple[np.ndarray, np.ndarray, np.ndarray]:
-            A tuple containing the three factor matrices `(A, B, C)`:
+            A tuple ``(A, B, C)`` where:
 
-            - A (np.ndarray): Shape `(dims[0], L * R)`.
-            - B (np.ndarray): Shape `(dims[1], L * R)`.
-            - C (np.ndarray): Shape `(dims[2]^2, R)`, where each column is a vectorized covariance matrix
+            - A: Shape ``(dims[0], L1 * R)``, non-negative.
+            - B: Shape ``(dims[1], L1 * R)``, non-negative.
+            - C: Shape ``(K^2, R)``, each column is a vectorized covariance matrix.
     """
 
     if len(dims) != 3:
@@ -139,17 +156,25 @@ def generate_covll1_factors(dims, R, L1, L2):
 
 def _validate_dimensions(dims, R, L1, L2):
     """
-    Validate dimensions for Cov-LL1 model.
+    Validate dimensions and parameters for the Cov-LL1 model.
 
-    Args:
+    Checks that ``dims`` has three elements, the third dimension is a
+    perfect square, and that R, L1, L2 are positive integers consistent
+    with the tensor dimensions.
+
+    Parameters:
         dims (Tuple[int, int, int]):
-            Dimensions :math:`(I, J, K^2)` of the tensor.
+            Dimensions ``(I, J, K^2)`` of the tensor.
         R (int):
             The rank of the decomposition (number of components).
         L1 (int):
             Rank of the spatial maps.
         L2 (int):
             Rank of the covariance matrices.
+
+    Returns:
+        Tuple[int, int, int]:
+            Validated ``(R, L1, L2)``.
     """
     if len(dims) != 3:
         raise ValueError("dims must be a tuple of three integers (I, J, K^2).")
@@ -175,6 +200,15 @@ def _validate_dimensions(dims, R, L1, L2):
 def validate_cov_matrices(T0):
     """
     Check if all covariance matrices in a tensor are valid.
+
+    Each spatial pixel ``T0[i, j, :]`` is reshaped into a :math:`K \\times K`
+    matrix and tested for Hermitian positive semidefiniteness. Emits a
+    warning with the percentage of invalid pixels if any are found.
+
+    Parameters:
+        T0: np.ndarray
+            Tensor of shape ``(I, J, K^2)`` whose third mode contains
+            vectorized covariance matrices.
     """
     invalid_count = 0
     total_pixels = T0.shape[0] * T0.shape[1]
