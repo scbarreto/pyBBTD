@@ -260,7 +260,7 @@ def test_admm_invalid_model_type():
 def test_admm_fit_random_init():
     dims = (10, 12, 6, 6)
     R, L1, L2 = 2, 2, 2
-    model, T_gt, (A0, B0, C0, D0) = _make_cov_ground_truth(dims, R, L1, L2, seed=202505)
+    model, T_gt, _ = _make_cov_ground_truth(dims, R, L1, L2, seed=202505)
 
     factors, fit_error = BBTD_COV_ADMM(
         model,
