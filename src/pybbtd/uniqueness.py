@@ -80,19 +80,11 @@ def check_uniqueness_LL1(N1, N2, N3, R, L):
 
     conditions = [
         (min(N1, N2) >= L * R) and (R <= N3),
-        (N3 >= R)
-        and (min(floor(N1 / L), R) + min(floor(N2 / L), R) >= R + 2),
-        (N1 >= L * R)
-        and (min(floor(N2 / L), R) + min(N3, R) >= R + 2),
-        (N2 >= L * R)
-        and (min(floor(N1 / L), R) + min(N3, R) >= R + 2),
+        (N3 >= R) and (min(floor(N1 / L), R) + min(floor(N2 / L), R) >= R + 2),
+        (N1 >= L * R) and (min(floor(N2 / L), R) + min(N3, R) >= R + 2),
+        (N2 >= L * R) and (min(floor(N1 / L), R) + min(N3, R) >= R + 2),
         (floor(N1 * N2 / L**2) >= R)
-        and (
-            min(floor(N1 / L), R)
-            + min(floor(N2 / L), R)
-            + min(N3, R)
-            >= 2 * R + 2
-        ),
+        and (min(floor(N1 / L), R) + min(floor(N2 / L), R) + min(N3, R) >= 2 * R + 2),
     ]
 
     return any(conditions)
