@@ -11,7 +11,7 @@ from pybbtd.stokes import (
     stokesProjection,
 )
 from pybbtd.btd import BTD, factors_to_tensor
-from pybbtd.solvers.stokes_admm import Stokes_ADMM, init_Stokes_factors
+from pybbtd.solvers.stokes_admm import Stokes_ADMM
 
 
 # ──────────────────────────────────────────────────────────────────────────────

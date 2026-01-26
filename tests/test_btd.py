@@ -76,7 +76,9 @@ def test_invalid_L_type():
 
 
 def test_invalid_L_non_positive_in_list():
-    with pytest.raises(ValueError, match="Each element in L should be greater than zero"):
+    with pytest.raises(
+        ValueError, match="Each element in L should be greater than zero"
+    ):
         BTD(dims=(10, 10, 10), R=3, L=[2, 0, 1], block_mode="LL1")
 
 
@@ -129,8 +131,8 @@ def test_unfoldings():
     T = np.zeros(dims)
     ind = 0
     for r in range(R):
-        Ar = A[:, ind: ind + L[r]]
-        Br = B[:, ind: ind + L[r]]
+        Ar = A[:, ind : ind + L[r]]
+        Br = B[:, ind : ind + L[r]]
         ind += L[r]
         T += outer([Ar @ Br.T, C[:, r]])
 
