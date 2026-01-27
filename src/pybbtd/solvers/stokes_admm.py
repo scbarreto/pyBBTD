@@ -18,7 +18,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
     Solves the augmented Lagrangian subproblem for C using the third
     mode unfolding, projecting each column onto the set of physically
     valid Stokes vectors via
-    :func:`~pybbtd.stokes.stokesProjection`.
+    :func:`~pybbtd.stokes.stokes_projection`.
 
     Parameters:
         Y3: np.ndarray
@@ -79,7 +79,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
         # update \tilde{C}_{l+1}
         Ctl1 = np.zeros_like(Ctl)
         for r in range(R):
-            Ctl1[:, r] = stokes.stokesProjection((Cl1 + Ul)[:, r])
+            Ctl1[:, r] = stokes.stokes_projection((Cl1 + Ul)[:, r])
 
         # update dual
         Ul1 = Ul + Cl1 - Ctl1
@@ -150,7 +150,7 @@ def kmeans_init(T, R, Lr, theta):
 
     # Project each cluster center using Stokes projection
     for r in range(R):
-        kmeansC[:, r] = stokes.stokesProjection(kmeansC[:, r])
+        kmeansC[:, r] = stokes.stokes_projection(kmeansC[:, r])
 
     # Normalize each cluster center so that its first component is 1
     for r in range(R):
@@ -213,7 +213,7 @@ def kmeans_init(T, R, Lr, theta):
     return kmeansA, kmeansB, kmeansC
 
 
-def init_Stokes_factors(Stokes_model, init="random", T=None):
+def init_STOKES_factors(Stokes_model, init="random", T=None):
     """
     Initialize factor matrices for the Stokes-BTD decomposition.
 
@@ -248,7 +248,7 @@ def init_Stokes_factors(Stokes_model, init="random", T=None):
     return A, B, C
 
 
-def Stokes_ADMM(
+def STOKES_ADMM(
     Stokes_model,
     T,
     init="random",
@@ -308,11 +308,11 @@ def Stokes_ADMM(
             f"T's dimensions ({T.shape}) do not match Stokes_model.dims ({Stokes_model.dims})."
         )
     if init == "random":
-        Ak, Bk, Ck = init_Stokes_factors(Stokes_model, init="random")
-        Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, init="random")
+        Ak, Bk, Ck = init_STOKES_factors(Stokes_model, init="random")
+        Atk, Btk, Ctk = init_STOKES_factors(Stokes_model, init="random")
     elif init == "kmeans":
-        Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, "kmeans", T)
-        Ak, Bk, Ck = init_Stokes_factors(Stokes_model, "random")
+        Atk, Btk, Ctk = init_STOKES_factors(Stokes_model, "kmeans", T)
+        Ak, Bk, Ck = init_STOKES_factors(Stokes_model, "random")
     else:
         raise ValueError("not implemented")
 

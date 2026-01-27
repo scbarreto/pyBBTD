@@ -1,4 +1,4 @@
-BBTD tutorial (Vanilla ALS)
+ALS for Unconstrained BBTD
 ===================================
 
 This tutorial provides an introduction to the Block-Block Term Decomposition (BBTD) into rank-(L1, L1, L2, L2) terms using the vanilla ALS solver.

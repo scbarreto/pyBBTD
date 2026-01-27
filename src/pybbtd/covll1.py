@@ -92,10 +92,10 @@ class CovLL1(BTD):
             **kwargs:
                 Additional keyword arguments passed to the solver.
         """
-        from pybbtd.solvers.covll1_admm import CovLL1_ADMM
+        from pybbtd.solvers.covll1_admm import COVLL1_ADMM
 
         if algorithm == "ADMM":
-            self.factors, self.fit_error = CovLL1_ADMM(self, data, **kwargs)
+            self.factors, self.fit_error = COVLL1_ADMM(self, data, **kwargs)
             self.tensor = btd.factors_to_tensor(
                 *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
             )

@@ -32,9 +32,9 @@ Module Functions
      - Construct the 2x2 coherency matrix from a Stokes vector.
    * - :func:`~pybbtd.stokes.coh2stokes`
      - Compute the Stokes vector from a 2x2 coherency matrix.
-   * - :func:`~pybbtd.stokes.projPSD`
+   * - :func:`~pybbtd.stokes.proj_psd`
      - Project a matrix onto the set of positive semidefinite Hermitian matrices.
-   * - :func:`~pybbtd.stokes.stokesProjection`
+   * - :func:`~pybbtd.stokes.stokes_projection`
      - Project a Stokes vector onto the set of physically valid Stokes vectors.
 
 .. automodule:: pybbtd.stokes

@@ -8,10 +8,10 @@ from pybbtd.stokes import (
     check_stokes_constraints,
     stokes2coh,
     coh2stokes,
-    stokesProjection,
+    stokes_projection,
 )
 from pybbtd.btd import BTD, factors_to_tensor
-from pybbtd.solvers.stokes_admm import Stokes_ADMM
+from pybbtd.solvers.stokes_admm import STOKES_ADMM
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -125,13 +125,13 @@ def test_coh2stokes_stokes2coh_roundtrip():
 
 def test_stokes_projection_valid_vector_unchanged():
     S = np.array([1.0, 0.5, 0.5, 0.5])
-    S_proj = stokesProjection(S)
+    S_proj = stokes_projection(S)
     npt.assert_allclose(S_proj, S, atol=1e-10)
 
 
 def test_stokes_projection_produces_valid_vector():
     S_invalid = np.array([0.1, 0.5, 0.5, 0.5])
-    S_proj = stokesProjection(S_invalid)
+    S_proj = stokes_projection(S_invalid)
     assert check_stokes_constraints(S_proj) == 1
 
 
@@ -143,27 +143,27 @@ def test_stokes_projection_produces_valid_vector():
 def test_admm_invalid_model_type():
     T = np.random.rand(10, 10, 4)
     with pytest.raises(TypeError, match="must be an instance of the Stokes class"):
-        Stokes_ADMM(Stokes_model=0, T=T)
+        STOKES_ADMM(Stokes_model=0, T=T)
 
 
 def test_admm_invalid_tensor_type():
     model = Stokes([10, 10], R=2, L=2)
     with pytest.raises(TypeError, match="must be a numpy"):
-        Stokes_ADMM(model, T=None)
+        STOKES_ADMM(model, T=None)
 
 
 def test_admm_mismatched_dims():
     model = Stokes([2, 3], R=2, L=2)
     T_wrong = np.random.rand(3, 2, 5)
     with pytest.raises(ValueError, match="do not match"):
-        Stokes_ADMM(model, T=T_wrong)
+        STOKES_ADMM(model, T=T_wrong)
 
 
 def test_admm_invalid_init_strategy():
     model = Stokes([2, 3], R=2, L=2)
     T = np.random.rand(2, 3, 4)
     with pytest.raises(ValueError, match="not implemented"):
-        Stokes_ADMM(model, T=T, init="wrong_one")
+        STOKES_ADMM(model, T=T, init="wrong_one")
 
 
 def test_admm_fit_random_init():

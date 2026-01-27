@@ -28,7 +28,7 @@ Cov-LL1 -- ADMM
 .. list-table::
    :header-rows: 0
 
-   * - :func:`~pybbtd.solvers.covll1_admm.CovLL1_ADMM`
+   * - :func:`~pybbtd.solvers.covll1_admm.COVLL1_ADMM`
      - AO-ADMM solver for the Cov-LL1 decomposition.
    * - :func:`~pybbtd.solvers.covll1_admm.ADMM_A`
      - Inner ADMM update for factor A with non-negativity constraint.
@@ -36,7 +36,7 @@ Cov-LL1 -- ADMM
      - Inner ADMM update for factor B with non-negativity constraint.
    * - :func:`~pybbtd.solvers.covll1_admm.ADMM_C`
      - Inner ADMM update for factor C with PSD covariance constraint.
-   * - :func:`~pybbtd.solvers.covll1_admm.init_covll1_factors`
+   * - :func:`~pybbtd.solvers.covll1_admm.init_COVLL1_factors`
      - Initialize factor matrices for the Cov-LL1 decomposition.
    * - :func:`~pybbtd.solvers.covll1_admm.kmeans_init`
      - K-means based initialization for the Cov-LL1 decomposition.
@@ -55,11 +55,11 @@ Stokes -- ADMM
 .. list-table::
    :header-rows: 0
 
-   * - :func:`~pybbtd.solvers.stokes_admm.Stokes_ADMM`
+   * - :func:`~pybbtd.solvers.stokes_admm.STOKES_ADMM`
      - AO-ADMM solver for the Stokes-constrained BTD-LL1 decomposition.
    * - :func:`~pybbtd.solvers.stokes_admm.ADMM_C`
      - Inner ADMM update for factor C with Stokes constraint.
-   * - :func:`~pybbtd.solvers.stokes_admm.init_Stokes_factors`
+   * - :func:`~pybbtd.solvers.stokes_admm.init_STOKES_factors`
      - Initialize factor matrices for the Stokes-BTD decomposition.
    * - :func:`~pybbtd.solvers.stokes_admm.kmeans_init`
      - K-means based initialization for the Stokes-BTD decomposition.

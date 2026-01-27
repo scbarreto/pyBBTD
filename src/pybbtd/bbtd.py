@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.linalg import block_diag
 from tensorly.cp_tensor import cp_to_tensor
+from pybbtd.uniqueness import check_uniqueness_BBTD
 
 
 class BBTD:
@@ -67,10 +68,27 @@ class BBTD:
         # Validate R, L1, L2
         self.rank, self.L1, self.L2 = _validate_R_L1_L2(R, L1, L2)
 
+        # check uniqueness, raise warning if parameters cannot be guaranteed to lead to unique solution
+        self.check_uniqueness()
+
         # Initialize additional variables
         self.factors = None
         self.tensor = None
         self.fit_error = None
+
+    def check_uniqueness(self):
+        """
+        Check if sufficient conditions for essential uniqueness are satisfied.
+
+        Uses the algebraic conditions from the literature for the BBTD model.
+        Prints whether uniqueness can be guaranteed or not.
+        """
+        N1, N2, N3, N4 = self.dims
+        unique = check_uniqueness_BBTD(N1, N2, N3, N4, self.rank, self.L1, self.L2)
+        if unique:
+            print("Sufficient condition for uniqueness satisfied")
+        else:
+            print("Cannot guarantee uniqueness. Proceed at your own risk.")
 
     def get_constraint_matrices(self):
         """

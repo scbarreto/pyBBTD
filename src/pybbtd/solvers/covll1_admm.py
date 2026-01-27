@@ -319,7 +319,7 @@ def project_to_psd(cov_matrix):
     return vec_cov_psd, cov_matrix_psd
 
 
-def CovLL1_ADMM(
+def COVLL1_ADMM(
     CovLL1_model,
     T,
     init="random",
@@ -366,11 +366,11 @@ def CovLL1_ADMM(
             errors.
     """
     if init == "random":
-        Ak, Bk, Ck = init_covll1_factors(CovLL1_model, init="random")
-        Atk, Btk, Ctk = init_covll1_factors(CovLL1_model, init="random")
+        Ak, Bk, Ck = init_COVLL1_factors(CovLL1_model, init="random")
+        Atk, Btk, Ctk = init_COVLL1_factors(CovLL1_model, init="random")
     elif init == "kmeans":
-        Atk, Btk, Ctk = init_covll1_factors(CovLL1_model, "kmeans", T)
-        Ak, Bk, Ck = init_covll1_factors(CovLL1_model, "random")
+        Atk, Btk, Ctk = init_COVLL1_factors(CovLL1_model, "kmeans", T)
+        Ak, Bk, Ck = init_COVLL1_factors(CovLL1_model, "random")
     else:
         raise ValueError("not implemented")
 
@@ -439,7 +439,7 @@ def CovLL1_ADMM(
     return estimated_factors, fit_error
 
 
-def init_covll1_factors(CovLL1_model, init="random", T=None):
+def init_COVLL1_factors(CovLL1_model, init="random", T=None):
     """
     Initialize factor matrices for the Cov-LL1 decomposition.
 

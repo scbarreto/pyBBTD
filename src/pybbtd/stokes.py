@@ -94,10 +94,10 @@ class Stokes(BTD):
                 (e.g. ``init``, ``max_iter``, ``rho``, ``max_admm``,
                 ``rel_tol``, ``abs_tol``, ``admm_tol``).
         """
-        from pybbtd.solvers.stokes_admm import Stokes_ADMM
+        from pybbtd.solvers.stokes_admm import STOKES_ADMM
 
         if algorithm == "ADMM":
-            self.factors, self.fit_error = Stokes_ADMM(self, data, **kwargs)
+            self.factors, self.fit_error = STOKES_ADMM(self, data, **kwargs)
             self.tensor = btd.factors_to_tensor(
                 *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
             )
@@ -251,7 +251,7 @@ def coh2stokes(coh):
     return S
 
 
-def projPSD(M):
+def proj_psd(M):
     """
     Project a matrix onto the set of positive semidefinite Hermitian matrices.
 
@@ -277,12 +277,12 @@ def projPSD(M):
     return proj
 
 
-def stokesProjection(S):
+def stokes_projection(S):
     """
     Project a Stokes vector onto the set of physically valid Stokes vectors.
 
     Converts to a coherency matrix, projects onto the PSD cone via
-    :func:`projPSD`, and converts back to Stokes parameters.
+    :func:`proj_psd`, and converts back to Stokes parameters.
 
     Parameters:
         S: np.ndarray
@@ -293,6 +293,6 @@ def stokesProjection(S):
             Projected 4-element Stokes vector satisfying the physical constraints.
     """
     coh = stokes2coh(S)
-    proj = projPSD(coh)
+    proj = proj_psd(coh)
     newS = coh2stokes(proj)
     return newS
