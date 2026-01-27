@@ -5,10 +5,31 @@ from palettable.cmocean.sequential import Ice_15
 
 def stokes_to_ellipse(S, n_points=200):
     """
-    Convert a single Stokes vector [S0, S1, S2, S3] into a normalized
-    polarization ellipse (x(t), y(t)) in the transverse plane.
+    Convert a Stokes vector to a polarization ellipse in the transverse plane.
 
-    Returns x, y arrays of shape (n_points,)
+    Computes the orientation angle :math:`\\psi` and ellipticity angle
+    :math:`\\chi` from a single Stokes vector, then traces out the
+    corresponding normalised polarization ellipse.
+
+    Parameters
+    ----------
+    S : array-like
+        Stokes vector ``[S0, S1, S2, S3]``.
+    n_points : int, optional
+        Number of points used to sample the ellipse (default: 200).
+
+    Returns
+    -------
+    x : np.ndarray
+        Horizontal coordinates of the ellipse, shape ``(n_points,)``.
+    y : np.ndarray
+        Vertical coordinates of the ellipse, shape ``(n_points,)``.
+    psi : float
+        Orientation angle in radians.
+    chi : float
+        Ellipticity angle in radians.  The sign of ``tan(chi)``
+        encodes the handedness (positive = left-handed,
+        negative = right-handed).
     """
     S0, S1, S2, S3 = S
 
@@ -40,33 +61,46 @@ def stokes_to_ellipse(S, n_points=200):
     return x, y, psi, chi
 
 
-def plot_Stokes_terms(outA, outB, outC, R, L, cmap=None):
+def plot_stokes_terms(outA, outB, outC, R, L, cmap=None):
     """
-    Visualize:
-    1. The rank-L reconstructions A_r B_r^T for each r in [1..R], side by side.
-    2. The polarization ellipse associated with each Stokes vector in outC.
+    Visualise the spatial maps and polarization ellipses of a Stokes-BTD.
+
+    For each component *r* the function displays:
+
+    * **Top row** — the rank-*L* spatial reconstruction
+      :math:`A_r B_r^{\\top}`, min–max normalised, as a heatmap.
+    * **Bottom row** — the polarization ellipse derived from the
+      Stokes vector :math:`c_r`, annotated with orientation
+      :math:`\\psi`, ellipticity :math:`\\chi`, and handedness.
 
     Parameters
     ----------
     outA : np.ndarray
-        Shape (N1, R*L). Columns are grouped in blocks of length L for each component r.
+        Spatial factor matrix of shape ``(N1, R*L)``.
+        Columns are grouped in contiguous blocks of *L* for each
+        component.
     outB : np.ndarray
-        Shape (N2, R*L). Same block structure as outA.
+        Spatial factor matrix of shape ``(N2, R*L)``, with the same
+        block structure as *outA*.
     outC : np.ndarray
-        Shape (4, R). Each column is a Stokes vector [S0, S1, S2, S3]^T.
+        Stokes matrix of shape ``(4, R)``.  Each column is a Stokes
+        vector :math:`[S_0, S_1, S_2, S_3]^{\\top}`.
     R : int
-         Number of components.
+        Number of components (block terms).
     L : int
-        Column-rank) for each component in outA / outB.
-    cmap : matplotlib colormap, optional
-        Colormap for the A_r B_r^T heatmaps. Falls back to `Ice_15.mpl_colormap`
-        if available, otherwise `plt.cm.viridis`.
+        Column rank shared by every component in *outA* / *outB*.
+    cmap : matplotlib.colors.Colormap, optional
+        Colormap for the heatmaps.  Defaults to
+        ``palettable.cmocean.sequential.Ice_15`` when available,
+        otherwise ``plt.cm.viridis``.
 
     Returns
     -------
     fig : matplotlib.figure.Figure
+        The created figure.
     axes : np.ndarray
-        The axes array of shape (2, R+1). Last column holds the colorbar slot.
+        Array of axes with shape ``(2, R+1)``.  The last column
+        holds the shared colorbar (top) and an empty slot (bottom).
     """
 
     # ---------- Safety / sanity checks ----------

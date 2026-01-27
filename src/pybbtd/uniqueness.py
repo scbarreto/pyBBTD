@@ -5,7 +5,7 @@ import numpy as np
 
 def check_uniqueness_BBTD(N1, N2, N3, N4, R, L1, L2):
     """
-    Check if a fourth-order BBTD model with rank-(L1, L2, 1, 1) terms is unique
+    Check if a fourth-order BBTD model with rank-(L1, L1, L2, L2) terms is unique
     for the given dimensions by examining two equivalent third-order models.
 
     The fourth-order tensor is unfolded into two third-order BTD models:

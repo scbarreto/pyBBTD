@@ -12,6 +12,44 @@ import warnings
 
 
 def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14):
+    """
+    Inner ADMM update for factor C with Stokes constraint.
+
+    Solves the augmented Lagrangian subproblem for C using the third
+    mode unfolding, projecting each column onto the set of physically
+    valid Stokes vectors via
+    :func:`~pybbtd.stokes.stokes_projection`.
+
+    Parameters:
+        Y3: np.ndarray
+            Third mode unfolding of the input tensor.
+        Ak: np.ndarray
+            Current estimate of factor A.
+        Bk: np.ndarray
+            Current estimate of factor B.
+        Cinit: np.ndarray
+            Initial primal variable for C.
+        Ctinit: np.ndarray
+            Initial projected (valid Stokes) variable for C.
+        theta: np.ndarray
+            Constraint matrix from the BTD model.
+        rho: float
+            ADMM penalty parameter.
+        L: int
+            Rank of the spatial maps.
+        R: int
+            Number of block terms.
+        nitermax: int
+            Maximum number of inner ADMM iterations (default: 100).
+        tol: float
+            Convergence tolerance (default: 1e-14).
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, float]:
+            ``(Ctilde, C, primal_residue)`` where ``Ctilde`` is the
+            Stokes-projected factor, ``C`` is the unconstrained factor,
+            and ``primal_residue`` is the final primal residual.
+    """
     # init variables
 
     Cl = Cinit.copy()
@@ -41,7 +79,7 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
         # update \tilde{C}_{l+1}
         Ctl1 = np.zeros_like(Ctl)
         for r in range(R):
-            Ctl1[:, r] = stokes.stokesProjection((Cl1 + Ul)[:, r])
+            Ctl1[:, r] = stokes.stokes_projection((Cl1 + Ul)[:, r])
 
         # update dual
         Ul1 = Ul + Cl1 - Ctl1
@@ -73,21 +111,26 @@ def ADMM_C(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, L, R, nitermax=100, tol=1e-14)
 
 def kmeans_init(T, R, Lr, theta):
     """
-    Full initializer that:
-    1. Runs KMeans on unfolded T to get cluster maps and cluster spectra.
-    2. Runs NMF on those maps to get nonnegative spatial factors A, B.
-    3. Builds C from the projected cluster centers (Stokes vectors).
+    K-means based initialization for the Stokes-BTD decomposition.
 
-    Inputs:
-    - T: data tensor
-    - R: number of clusters / block terms
-    - Lr: list/array where Lr[0] is the NMF rank per block matching the rank of the spatial maps
-    - theta: model parameter passed to btd.factors_to_tensor
+    Clusters spatial pixels via K-means, applies NMF on each cluster's
+    spatial map to obtain non-negative factors A, B, and builds C from
+    the projected cluster centers (valid Stokes vectors).
 
-    Outputs:
-    - kmeansA (initA): nonnegative factor A
-    - kmeansB (initB): nonnegative factor B
-    - kmeansC (initC): Each column is a Stokes vector (after projection)
+    Parameters:
+        T: np.ndarray
+            Input tensor of shape ``(I, J, 4)``.
+        R: int
+            Number of clusters / block terms.
+        Lr: list[int] or np.ndarray
+            Rank of the spatial maps. Uses ``Lr[0]`` as the NMF rank.
+        theta: np.ndarray
+            Constraint matrix from the BTD model.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray]:
+            Initialized factors ``(A, B, C)`` where A, B are non-negative
+            and each column of C is a valid Stokes vector.
     """
 
     # -------------------------
@@ -107,7 +150,7 @@ def kmeans_init(T, R, Lr, theta):
 
     # Project each cluster center using Stokes projection
     for r in range(R):
-        kmeansC[:, r] = stokes.stokesProjection(kmeansC[:, r])
+        kmeansC[:, r] = stokes.stokes_projection(kmeansC[:, r])
 
     # Normalize each cluster center so that its first component is 1
     for r in range(R):
@@ -170,8 +213,24 @@ def kmeans_init(T, R, Lr, theta):
     return kmeansA, kmeansB, kmeansC
 
 
-def init_Stokes_factors(Stokes_model, init="random", T=None):
-    # Add check to see if T has coherent dimensions
+def init_STOKES_factors(Stokes_model, init="random", T=None):
+    """
+    Initialize factor matrices for the Stokes-BTD decomposition.
+
+    Parameters:
+        Stokes_model: Stokes
+            An instance of the :class:`~pybbtd.stokes.Stokes` class.
+        init: str
+            Initialization strategy (default: ``"random"``).
+            Options: ``"random"``, ``"kmeans"``.
+        T: np.ndarray or None
+            Input tensor (required for ``"kmeans"`` initialization).
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray]:
+            Initialized factor matrices ``(A, B, C)`` where A, B are
+            non-negative and each column of C is a valid Stokes vector.
+    """
     import pybbtd.stokes as stokes
 
     theta = Stokes_model.get_constraint_matrix()
@@ -189,7 +248,7 @@ def init_Stokes_factors(Stokes_model, init="random", T=None):
     return A, B, C
 
 
-def Stokes_ADMM(
+def STOKES_ADMM(
     Stokes_model,
     T,
     init="random",
@@ -200,6 +259,39 @@ def Stokes_ADMM(
     abs_tol=10**-10,
     admm_tol=10**-8,
 ):
+    """
+    AO-ADMM solver for the Stokes-constrained BTD-LL1 decomposition.
+
+    Enforces non-negativity on spatial factors A, B and Stokes
+    physical constraints on C via alternating ADMM updates.
+
+    Parameters:
+        Stokes_model: Stokes
+            An instance of the :class:`~pybbtd.stokes.Stokes` class.
+        T: np.ndarray
+            Input tensor of shape ``(I, J, 4)`` to be decomposed.
+        init: str
+            Initialization strategy (default: ``"random"``).
+            Options: ``"random"``, ``"kmeans"``.
+        max_iter: int
+            Maximum number of outer iterations (default: 1000).
+        rho: float
+            ADMM penalty parameter (default: 1).
+        max_admm: int
+            Maximum number of inner ADMM iterations per factor update
+            (default: 1).
+        rel_tol: float
+            Relative tolerance for outer convergence (default: 1e-10).
+        abs_tol: float
+            Absolute tolerance for outer convergence (default: 1e-10).
+        admm_tol: float
+            Tolerance for inner ADMM convergence (default: 1e-8).
+
+    Returns:
+        Tuple[list, list]:
+            ``(factors, fit_error)`` where ``factors = [A, B, C]`` and
+            ``fit_error`` is a list of squared reconstruction errors.
+    """
     import pybbtd.stokes as stokes
 
     # Check that Stokes_model is an instance of the Stokes class
@@ -216,11 +308,11 @@ def Stokes_ADMM(
             f"T's dimensions ({T.shape}) do not match Stokes_model.dims ({Stokes_model.dims})."
         )
     if init == "random":
-        Ak, Bk, Ck = init_Stokes_factors(Stokes_model, init="random")
-        Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, init="random")
+        Ak, Bk, Ck = init_STOKES_factors(Stokes_model, init="random")
+        Atk, Btk, Ctk = init_STOKES_factors(Stokes_model, init="random")
     elif init == "kmeans":
-        Atk, Btk, Ctk = init_Stokes_factors(Stokes_model, "kmeans", T)
-        Ak, Bk, Ck = init_Stokes_factors(Stokes_model, "random")
+        Atk, Btk, Ctk = init_STOKES_factors(Stokes_model, "kmeans", T)
+        Ak, Bk, Ck = init_STOKES_factors(Stokes_model, "random")
     else:
         raise ValueError("not implemented")
 

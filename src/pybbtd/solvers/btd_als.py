@@ -7,6 +7,33 @@ from copy import deepcopy
 
 
 def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e-3):
+    """
+    Alternating Least Squares (ALS) solver for the BTD decomposition.
+
+    Supports all three block modes (``"LL1"``, ``"L1L"``, ``"1LL"``).
+    Internally transposes non-LL1 tensors so the ALS updates always
+    operate in LL1 form.
+
+    Parameters:
+        BTD_model: BTD
+            An instance of the :class:`~pybbtd.btd.BTD` class.
+        T: np.ndarray
+            Input 3D tensor to be decomposed, shape matching ``BTD_model.dims``.
+        init: str
+            Initialization strategy (default: ``"random"``).
+            Options: ``"random"``, ``"svd"``.
+        max_iter: int
+            Maximum number of ALS iterations (default: 1000).
+        abs_tol: float
+            Absolute tolerance for convergence (default: 1e-8).
+        rel_tol: float
+            Relative tolerance for convergence (default: 1e-3).
+
+    Returns:
+        Tuple[list, np.ndarray]:
+            ``(factors, fit_error)`` where ``factors = [A, B, C]`` and
+            ``fit_error`` is a 1-D array of squared reconstruction errors.
+    """
     # Check that BTD_model is an instance of the BTD class
     if not isinstance(BTD_model, btd.BTD):
         raise TypeError("BTD_model must be an instance of the BTD class.")
@@ -102,19 +129,21 @@ def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e
 
 
 def init_BTD_factors(BTD_model, strat="random", T=None):
-    """LL1-based init
+    """
+    Initialize factor matrices for the BTD decomposition.
 
-    Args:
-        BTD_model (_type_): _description_
-        strat (str, optional): _description_. Defaults to "random".
-        T (_type_, optional): _description_. Defaults to None.
-
-    Raises:
-        ValueError: _description_
-        ValueError: _description_
+    Parameters:
+        BTD_model: BTD
+            An instance of the :class:`~pybbtd.btd.BTD` class.
+        strat: str
+            Initialization strategy (default: ``"random"``).
+            Options: ``"random"``, ``"svd"``.
+        T: np.ndarray or None
+            Input tensor (required for ``"svd"`` initialization).
 
     Returns:
-        _type_: _description_
+        Tuple[np.ndarray, np.ndarray, np.ndarray]:
+            Initialized factor matrices ``(A, B, C)``.
     """
 
     # get BTD model params
