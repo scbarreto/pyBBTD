@@ -152,17 +152,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -279,33 +280,45 @@ document.write(`
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Stokes</span><span class="p">(</span><span class="n">BTD</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.</span>
+<span class="sd">    Class for tensors admitting a Stokes-constrained BTD-LL1 decomposition.</span>
 
-<span class="sd">    :param dims: Dimensions `(I, J, 4)` of the tensor.</span>
-<span class="sd">    :type dims: Tuple[int, int, int]</span>
-<span class="sd">    :param R: The rank of the decomposition (number of components).</span>
+<span class="sd">    Extends :class:`~pybbtd.btd.BTD` for polarimetric imaging: the third mode</span>
+<span class="sd">    is fixed to size 4 (Stokes parameters) and each column of the spectral</span>
+<span class="sd">    factor C must be a physically valid Stokes vector.</span>
+
+<span class="sd">    :param spatial_dims: Spatial dimensions ``(I, J)`` of the tensor.</span>
+<span class="sd">        The full tensor has shape ``(I, J, 4)``.</span>
+<span class="sd">    :type spatial_dims: list[int] or Tuple[int, int]</span>
+<span class="sd">    :param R: Number of block terms (rank of the decomposition).</span>
 <span class="sd">    :type R: int</span>
-<span class="sd">    :param L: Rank of the spatial maps.</span>
-<span class="sd">    :type L: int</span>
+<span class="sd">    :param L: Rank of the spatial maps in each term. Can be a single integer</span>
+<span class="sd">        or a list of R integers.</span>
+<span class="sd">    :type L: int or list[int]</span>
 
-<span class="sd">    :ivar A: Factor matrix of shape `(dims[0], L * R)`.</span>
-<span class="sd">    :vartype A: np.ndarray</span>
-<span class="sd">    :ivar B: Factor matrix of shape `(dims[1], L * R)`.</span>
-<span class="sd">    :vartype B: np.ndarray</span>
-<span class="sd">    :ivar C: Factor matrix of shape `(4, R)`, where each column is a Stokes vector.</span>
-<span class="sd">    :vartype C: np.ndarray</span>
+<span class="sd">    :ivar factors: List of factor matrices ``[A, B, C]`` after fitting,</span>
+<span class="sd">        or ``None`` before fitting.</span>
+<span class="sd">    :vartype factors: list[np.ndarray] or None</span>
+<span class="sd">    :ivar tensor: Reconstructed tensor after fitting, or ``None`` before fitting.</span>
+<span class="sd">    :vartype tensor: np.ndarray or None</span>
+<span class="sd">    :ivar fit_error: Array of fitting errors at each iteration, or ``None``</span>
+<span class="sd">        before fitting.</span>
+<span class="sd">    :vartype fit_error: np.ndarray or None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spatial_dims</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize Stokes-BTD model.</span>
+<span class="sd">        Initialize a Stokes-BTD model.</span>
+
+<span class="sd">        The block mode is automatically set to ``&quot;LL1&quot;`` and the third</span>
+<span class="sd">        dimension is fixed to 4.</span>
+
 <span class="sd">        Parameters:</span>
-<span class="sd">            spatial_dims: Tuple[int, int]</span>
-<span class="sd">                Spatial dimensions of the tensor (first two modes).</span>
+<span class="sd">            spatial_dims: list[int] or Tuple[int, int]</span>
+<span class="sd">                Spatial dimensions ``(I, J)`` of the tensor.</span>
 <span class="sd">            R: int</span>
-<span class="sd">                Rank of the decomposition (number of components).</span>
-<span class="sd">            L: int</span>
-<span class="sd">                Rank of the spatial maps.</span>
+<span class="sd">                Number of block terms (rank of the decomposition).</span>
+<span class="sd">            L: int or list[int]</span>
+<span class="sd">                Rank of the spatial maps in each term.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">spatial_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spatial_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
@@ -319,7 +332,16 @@ document.write(`
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes.generate_stokes_tensor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate_stokes_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a random Stokes tensor.</span>
+<span class="sd">        Generate a random Stokes tensor and store the factors.</span>
+
+<span class="sd">        Non-negative spatial factors A, B are drawn uniformly, and each</span>
+<span class="sd">        column of C is a valid Stokes vector built from a random coherency</span>
+<span class="sd">        matrix. Updates ``self.factors`` and ``self.tensor`` in place.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[list, np.ndarray]:</span>
+<span class="sd">                A tuple ``(factors, tensor)`` where ``factors = [A, B, C]``</span>
+<span class="sd">                and ``tensor`` has shape ``(I, J, 4)``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">generate_stokes_factors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
@@ -335,20 +357,25 @@ document.write(`
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.Stokes.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Computes Stokes-BTD factor matrices for provided data</span>
-<span class="sd">        using the specified algorithm.</span>
+<span class="sd">        Fit a Stokes-BTD model to the given data using the specified algorithm.</span>
+
+<span class="sd">        After fitting, ``self.factors``, ``self.tensor``, and ``self.fit_error``</span>
+<span class="sd">        are updated in place. The ADMM solver enforces Stokes constraints on C.</span>
 
 <span class="sd">        Parameters:</span>
 <span class="sd">            data: np.ndarray</span>
-<span class="sd">                Input tensor data to be approximated.</span>
+<span class="sd">                Input tensor of shape ``(I, J, 4)`` to be decomposed.</span>
 <span class="sd">            algorithm: str</span>
-<span class="sd">                Algorithm to use for fitting. Currently, only &quot;ADMM&quot; is implemented.</span>
-<span class="sd">            **kwargs: Additional keyword arguments for the fitting algorithm.</span>
+<span class="sd">                Algorithm to use for fitting (default: ``&quot;ADMM&quot;``).</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                Additional keyword arguments passed to the solver</span>
+<span class="sd">                (e.g. ``init``, ``max_iter``, ``rho``, ``max_admm``,</span>
+<span class="sd">                ``rel_tol``, ``abs_tol``, ``admm_tol``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.stokes_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stokes_ADMM</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.stokes_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">STOKES_ADMM</span>
 
         <span class="k">if</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;ADMM&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">Stokes_ADMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">STOKES_ADMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">btd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span>
                 <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">(),</span> <span class="n">block_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">block_mode</span>
             <span class="p">)</span>
@@ -358,9 +385,13 @@ document.write(`
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns constraint matrix for BTD-LL1 model (useful to CP-equivalent model)</span>
+<span class="sd">        Return the constraint matrix for the CP-equivalent BTD-LL1 model.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            This is a private alias. Use the inherited</span>
+<span class="sd">            :meth:`~pybbtd.btd.BTD.get_constraint_matrix` instead.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">btd</span><span class="o">.</span><span class="n">constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">btd</span><span class="o">.</span><span class="n">_constraint_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
 
 
 
@@ -370,21 +401,25 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate random factors that follow Stokes-BTD decomposition.</span>
 
-<span class="sd">    Args:</span>
+<span class="sd">    Non-negative spatial factors A, B are drawn from a uniform distribution.</span>
+<span class="sd">    Each column of C is a valid Stokes vector built from a random 2x2</span>
+<span class="sd">    coherency matrix.</span>
+
+<span class="sd">    Parameters:</span>
 <span class="sd">        dims (Tuple[int, int, int]):</span>
-<span class="sd">            Dimensions `(I, J, K)` of the tensor.</span>
+<span class="sd">            Dimensions ``(I, J, 4)`` of the tensor.</span>
 <span class="sd">        R (int):</span>
-<span class="sd">            The rank of the decomposition (number of components).</span>
-<span class="sd">        L (int):</span>
-<span class="sd">            Rank of the spatial maps.</span>
+<span class="sd">            Number of block terms (rank of the decomposition).</span>
+<span class="sd">        L (list[int] or np.ndarray):</span>
+<span class="sd">            Rank of the spatial maps. Uses ``L[0]`` for all terms.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
-<span class="sd">            A tuple containing the three factor matrices `(A, B, C)`:</span>
+<span class="sd">            A tuple ``(A, B, C)`` where:</span>
 
-<span class="sd">            - A (np.ndarray): Shape `(dims[0], L * R)`.</span>
-<span class="sd">            - B (np.ndarray): Shape `(dims[1], L * R)`.</span>
-<span class="sd">            - C (np.ndarray): Shape `(dims[2], R)`, where each column is a Stokes vector.</span>
+<span class="sd">            - A: Shape ``(I, L[0] * R)``, non-negative.</span>
+<span class="sd">            - B: Shape ``(J, L[0] * R)``, non-negative.</span>
+<span class="sd">            - C: Shape ``(4, R)``, each column is a valid Stokes vector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">L</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span>
@@ -405,8 +440,16 @@ document.write(`
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.validate_stokes_tensor">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">validate_stokes_tensor</span><span class="p">(</span><span class="n">T0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check if all pixels satisfy the Stokes constraints.</span>
-<span class="sd">    Shows a warning at the end with the percentage of invalid pixels (if any).</span>
+<span class="sd">    Check if all pixels in a tensor satisfy the Stokes constraints.</span>
+
+<span class="sd">    Each spatial pixel ``T0[i, j, :]`` is tested with</span>
+<span class="sd">    :func:`check_stokes_constraints`. Emits a warning with the percentage</span>
+<span class="sd">    of invalid pixels if any are found.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        T0: np.ndarray</span>
+<span class="sd">            Tensor of shape ``(I, J, 4)`` whose third mode contains</span>
+<span class="sd">            Stokes vectors.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">T0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">invalid_count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -432,7 +475,18 @@ document.write(`
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.check_stokes_constraints">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">check_stokes_constraints</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Check if a 4-D tensor satisfies the Stokes constraints.</span>
+<span class="sd">    Check if a single Stokes vector satisfies the physical constraints.</span>
+
+<span class="sd">    A valid Stokes vector must have :math:`S_0 \\geq 0` and</span>
+<span class="sd">    :math:`S_0^2 \\geq S_1^2 + S_2^2 + S_3^2`.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        S: np.ndarray</span>
+<span class="sd">            A 4-element Stokes vector ``[S0, S1, S2, S3]``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int:</span>
+<span class="sd">            1 if valid, 0 if invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="mi">0</span>
@@ -448,7 +502,17 @@ document.write(`
 <div class="viewcode-block" id="stokes2coh">
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.stokes2coh">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">stokes2coh</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
-    <span class="s2">&quot;construct Coherence matrix from Stokes parameters&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct the 2x2 coherency matrix from a Stokes vector.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        S: np.ndarray</span>
+<span class="sd">            A 4-element Stokes vector ``[S0, S1, S2, S3]``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            Complex Hermitian coherency matrix of shape ``(2, 2)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">S0</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">S1</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">S2</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
@@ -461,7 +525,17 @@ document.write(`
 <div class="viewcode-block" id="coh2stokes">
 <a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.coh2stokes">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">coh2stokes</span><span class="p">(</span><span class="n">coh</span><span class="p">):</span>
-    <span class="s2">&quot;Returns Stokes parameters from polarization (coherency) matrix&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Stokes vector from a 2x2 coherency matrix.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        coh: np.ndarray</span>
+<span class="sd">            Complex Hermitian coherency matrix of shape ``(2, 2)``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            A 4-element real Stokes vector ``[S0, S1, S2, S3]``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">S0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">coh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">S1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">coh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">S2</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coh</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
@@ -472,10 +546,23 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="projPSD">
-<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.projPSD">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">projPSD</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
-    <span class="s2">&quot;projection of matrix M onto the set of PSD hermitian matrices&quot;</span>
+<div class="viewcode-block" id="proj_psd">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.proj_psd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">proj_psd</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Project a matrix onto the set of positive semidefinite Hermitian matrices.</span>
+
+<span class="sd">    Symmetrizes M, computes its eigendecomposition, and zeroes out any</span>
+<span class="sd">    negative eigenvalues.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        M: np.ndarray</span>
+<span class="sd">            Square matrix to project.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            Nearest PSD Hermitian matrix (same shape as M).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">symM</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">+</span> <span class="n">M</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">symM</span><span class="p">)</span>
@@ -488,12 +575,25 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="stokesProjection">
-<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.stokesProjection">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">stokesProjection</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Projection of Stokes parameters onto the set of valid Stokes vectors.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="stokes_projection">
+<a class="viewcode-back" href="../../reference_stokes.html#pybbtd.stokes.stokes_projection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stokes_projection</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Project a Stokes vector onto the set of physically valid Stokes vectors.</span>
+
+<span class="sd">    Converts to a coherency matrix, projects onto the PSD cone via</span>
+<span class="sd">    :func:`proj_psd`, and converts back to Stokes parameters.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        S: np.ndarray</span>
+<span class="sd">            A 4-element Stokes vector ``[S0, S1, S2, S3]``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            Projected 4-element Stokes vector satisfying the physical constraints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">coh</span> <span class="o">=</span> <span class="n">stokes2coh</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
-    <span class="n">proj</span> <span class="o">=</span> <span class="n">projPSD</span><span class="p">(</span><span class="n">coh</span><span class="p">)</span>
+    <span class="n">proj</span> <span class="o">=</span> <span class="n">proj_psd</span><span class="p">(</span><span class="n">coh</span><span class="p">)</span>
     <span class="n">newS</span> <span class="o">=</span> <span class="n">coh2stokes</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">newS</span></div>
 

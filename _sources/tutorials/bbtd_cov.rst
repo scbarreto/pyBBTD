@@ -1,7 +1,7 @@
-BBTD tutorial (Constrained ADMM)
+AO-ADMM for Constrained BBTD
 ===================================
 
-This tutorial provides an introduction to the constrained Block-Block Term Decomposition (BBTD) for covariance imaging using the AO-ADMM solver. The constraints enforce non-negative spatial maps and conjugate symmetry (D = C*).
+This tutorial provides an introduction to the constrained Block-Block Terms Decomposition (BBTD) for covariance imaging using the AO-ADMM solver. The constraints enforce non-negative spatial maps and conjugate symmetry.
 
 Load required libraries
 ------------------------
@@ -11,7 +11,7 @@ Load required libraries
     import pybbtd.bbtd as bbtd
     from pybbtd.uniqueness import check_uniqueness_BBTD
     import numpy as np
-    from pybbtd.visualization import draw_metrics
+    from pybbtd.visualization import draw_metrics, draw_bbtd
 
 Define the BBTD model
 -----------------------------------------------------
@@ -113,3 +113,30 @@ After fitting, we check that the estimated factors satisfy the imposed constrain
     S_1 = A_1 @ B_1^T non-negative: True
     S_2 = A_2 @ B_2^T non-negative: True
     D ≈ C*: True
+
+Reconstruction error
+---------------------------------
+
+We compute the relative reconstruction error to verify that the decomposition faithfully approximates the original tensor.
+
+.. code:: python3
+
+    X_est = bbtd.factors_to_tensor(A_est, B_est, C_est, D_est, phi, psi)
+    print(np.linalg.norm(T0 - X_est) / np.linalg.norm(T0))  # relative error
+
+.. code-block:: text
+
+    3.0108540301376864e-08
+
+Visualize the results
+---------------------------------
+
+We use :func:`~pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms` to display
+the recovered non-negative spatial maps and normalised covariance matrices for
+each component.
+
+.. code:: python3
+
+    draw_bbtd.plot_BBTD_cov_terms(A_est, B_est, C_est, R, L1, L2)
+
+.. image:: bbtd_cov_files/bbtd_cov_terms.png

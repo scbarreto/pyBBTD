@@ -43,7 +43,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference_uniqueness';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Visualization" href="reference_visualization.html" />
+    <link rel="next" title="Solvers" href="reference_solvers.html" />
+    <link rel="prev" title="BBTD Class" href="reference_bbtd.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -152,17 +153,18 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -331,7 +333,7 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.uniqueness.check_uniqueness_BBTD">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.uniqueness.</span></span><span class="sig-name descname"><span class="pre">check_uniqueness_BBTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/uniqueness.html#check_uniqueness_BBTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.uniqueness.check_uniqueness_BBTD" title="Link to this definition">#</a></dt>
-<dd><p>Check if a fourth-order BBTD model with rank-(L1, L2, 1, 1) terms is unique
+<dd><p>Check if a fourth-order BBTD model with rank-(L1, L1, L2, L2) terms is unique
 for the given dimensions by examining two equivalent third-order models.</p>
 <p>The fourth-order tensor is unfolded into two third-order BTD models:</p>
 <ul class="simple">
@@ -415,13 +417,22 @@ Rank of the spatial maps (block rank).</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="reference_visualization.html"
+       href="reference_bbtd.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Visualization</p>
+        <p class="prev-next-title">BBTD Class</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="reference_solvers.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Solvers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>

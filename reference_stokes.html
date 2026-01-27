@@ -40,10 +40,11 @@
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference_stokes';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Solvers" href="reference_solvers.html" />
+    <link rel="next" title="BBTD Class" href="reference_bbtd.html" />
     <link rel="prev" title="Cov-LL1 Class" href="reference_covll1.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -153,17 +154,18 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -314,7 +316,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-methods">Core Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-methods">Class Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-functions">Module Functions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.Stokes"><code class="docutils literal notranslate"><span class="pre">Stokes</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.Stokes.fit"><code class="docutils literal notranslate"><span class="pre">Stokes.fit()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.Stokes.generate_stokes_tensor"><code class="docutils literal notranslate"><span class="pre">Stokes.generate_stokes_tensor()</span></code></a></li>
@@ -323,9 +326,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.check_stokes_constraints"><code class="docutils literal notranslate"><span class="pre">check_stokes_constraints()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.coh2stokes"><code class="docutils literal notranslate"><span class="pre">coh2stokes()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.generate_stokes_factors"><code class="docutils literal notranslate"><span class="pre">generate_stokes_factors()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.projPSD"><code class="docutils literal notranslate"><span class="pre">projPSD()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.proj_psd"><code class="docutils literal notranslate"><span class="pre">proj_psd()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.stokes2coh"><code class="docutils literal notranslate"><span class="pre">stokes2coh()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.stokesProjection"><code class="docutils literal notranslate"><span class="pre">stokesProjection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.stokes_projection"><code class="docutils literal notranslate"><span class="pre">stokes_projection()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.validate_stokes_tensor"><code class="docutils literal notranslate"><span class="pre">validate_stokes_tensor()</span></code></a></li>
 </ul>
 </li>
@@ -342,36 +345,44 @@ document.write(`
                   
   <section id="stokes-class">
 <span id="reference-stokes"></span><h1>Stokes Class<a class="headerlink" href="#stokes-class" title="Link to this heading">#</a></h1>
-<section id="core-methods">
-<h2>Core Methods<a class="headerlink" href="#core-methods" title="Link to this heading">#</a></h2>
+<section id="class-methods">
+<h2>Class Methods<a class="headerlink" href="#class-methods" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.Stokes.fit" title="pybbtd.stokes.Stokes.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a></p></td>
-<td><p>Computes Stokes-BTD factor matrices for provided data using the specified algorithm.</p></td>
+<td><p>Fit a Stokes-BTD model to the given data using the specified algorithm (default: ADMM).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.Stokes.generate_stokes_tensor" title="pybbtd.stokes.Stokes.generate_stokes_tensor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_stokes_tensor()</span></code></a></p></td>
-<td><p>Generates a random Stokes tensor.</p></td>
+<td><p>Generate a random Stokes tensor and store the factors.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.check_stokes_constraints" title="pybbtd.stokes.check_stokes_constraints"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_stokes_constraints()</span></code></a></p></td>
-<td><p>Check if a 4-D tensor satisfies the Stokes constraints..</p></td>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-functions">
+<h2>Module Functions<a class="headerlink" href="#module-functions" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.generate_stokes_factors" title="pybbtd.stokes.generate_stokes_factors"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_stokes_factors()</span></code></a></p></td>
+<td><p>Generate random non-negative spatial factors and valid Stokes columns.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.coh2stokes" title="pybbtd.stokes.coh2stokes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">coh2stokes()</span></code></a></p></td>
-<td><p>Returns Stokes parameters from polarization (coherency) matrix</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.validate_stokes_tensor" title="pybbtd.stokes.validate_stokes_tensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_stokes_tensor()</span></code></a></p></td>
+<td><p>Check if all Stokes vectors in a tensor satisfy the physical constraints.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.stokes2coh" title="pybbtd.stokes.stokes2coh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stokes2coh()</span></code></a></p></td>
-<td><p>Returns polarization (coherency) matrix from Stokes parameters</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.check_stokes_constraints" title="pybbtd.stokes.check_stokes_constraints"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_stokes_constraints()</span></code></a></p></td>
+<td><p>Check if a single Stokes vector satisfies the physical constraints.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.generate_stokes_factors" title="pybbtd.stokes.generate_stokes_factors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_stokes_factors()</span></code></a></p></td>
-<td><p>Generates random factors that follow Stokes-BTD decomposition.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.stokes2coh" title="pybbtd.stokes.stokes2coh"><code class="xref py py-func docutils literal notranslate"><span class="pre">stokes2coh()</span></code></a></p></td>
+<td><p>Construct the 2x2 coherency matrix from a Stokes vector.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.projPSD" title="pybbtd.stokes.projPSD"><code class="xref py py-meth docutils literal notranslate"><span class="pre">projPSD()</span></code></a></p></td>
-<td><p>Projection of matrix onto the set of PSD hermitian matrices.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.coh2stokes" title="pybbtd.stokes.coh2stokes"><code class="xref py py-func docutils literal notranslate"><span class="pre">coh2stokes()</span></code></a></p></td>
+<td><p>Compute the Stokes vector from a 2x2 coherency matrix.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.stokesProjection" title="pybbtd.stokes.stokesProjection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stokesProjection()</span></code></a></p></td>
-<td><p>Projection of Stokes parameters onto the set of valid Stokes vectors.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.stokes.proj_psd" title="pybbtd.stokes.proj_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">proj_psd()</span></code></a></p></td>
+<td><p>Project a matrix onto the set of positive semidefinite Hermitian matrices.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.validate_stokes_tensor" title="pybbtd.stokes.validate_stokes_tensor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validate_stokes_tensor()</span></code></a></p></td>
-<td><p>Checks if all Stokes vectors in a tensor are valid.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.stokes.stokes_projection" title="pybbtd.stokes.stokes_projection"><code class="xref py py-func docutils literal notranslate"><span class="pre">stokes_projection()</span></code></a></p></td>
+<td><p>Project a Stokes vector onto the set of physically valid Stokes vectors.</p></td>
 </tr>
 </tbody>
 </table>
@@ -380,36 +391,46 @@ document.write(`
 <dt class="sig sig-object py" id="pybbtd.stokes.Stokes">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">Stokes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#Stokes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.Stokes" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD" title="pybbtd.btd.BTD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BTD</span></code></a></p>
-<p>Class for tensors admitting a Block Tensor Decomposition (BTD)-LL1, where each vector in the rank-one mode respects the Stokes constraints.</p>
+<p>Class for tensors admitting a Stokes-constrained BTD-LL1 decomposition.</p>
+<p>Extends <a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD" title="pybbtd.btd.BTD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BTD</span></code></a> for polarimetric imaging: the third mode
+is fixed to size 4 (Stokes parameters) and each column of the spectral
+factor C must be a physically valid Stokes vector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <cite>(I, J, 4)</cite> of the tensor.</p></li>
-<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
-<li><p><strong>L</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+<li><p><strong>spatial_dims</strong> (<em>list</em><em>[</em><em>int</em><em>] or </em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – Spatial dimensions <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J)</span></code> of the tensor.
+The full tensor has shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code>.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – Number of block terms (rank of the decomposition).</p></li>
+<li><p><strong>L</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Rank of the spatial maps in each term. Can be a single integer
+or a list of R integers.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>A</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[0], L * R)</cite>.</p></li>
-<li><p><strong>B</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(dims[1], L * R)</cite>.</p></li>
-<li><p><strong>C</strong> (<em>np.ndarray</em>) – Factor matrix of shape <cite>(4, R)</cite>, where each column is a Stokes vector.</p></li>
+<li><p><strong>factors</strong> (<em>list</em><em>[</em><em>np.ndarray</em><em>] or </em><em>None</em>) – List of factor matrices <code class="docutils literal notranslate"><span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> after fitting,
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> before fitting.</p></li>
+<li><p><strong>tensor</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Reconstructed tensor after fitting, or <code class="docutils literal notranslate"><span class="pre">None</span></code> before fitting.</p></li>
+<li><p><strong>fit_error</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – Array of fitting errors at each iteration, or <code class="docutils literal notranslate"><span class="pre">None</span></code>
+before fitting.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.stokes.Stokes.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ADMM'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#Stokes.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.Stokes.fit" title="Link to this definition">#</a></dt>
-<dd><p>Computes Stokes-BTD factor matrices for provided data
-using the specified algorithm.</p>
+<dd><p>Fit a Stokes-BTD model to the given data using the specified algorithm.</p>
+<p>After fitting, <code class="docutils literal notranslate"><span class="pre">self.factors</span></code>, <code class="docutils literal notranslate"><span class="pre">self.tensor</span></code>, and <code class="docutils literal notranslate"><span class="pre">self.fit_error</span></code>
+are updated in place. The ADMM solver enforces Stokes constraints on C.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> – np.ndarray
-Input tensor data to be approximated.</p></li>
+Input tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code> to be decomposed.</p></li>
 <li><p><strong>algorithm</strong> – str
-Algorithm to use for fitting. Currently, only “ADMM” is implemented.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments for the fitting algorithm.</p></li>
+Algorithm to use for fitting (default: <code class="docutils literal notranslate"><span class="pre">&quot;ADMM&quot;</span></code>).</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments passed to the solver
+(e.g. <code class="docutils literal notranslate"><span class="pre">init</span></code>, <code class="docutils literal notranslate"><span class="pre">max_iter</span></code>, <code class="docutils literal notranslate"><span class="pre">rho</span></code>, <code class="docutils literal notranslate"><span class="pre">max_admm</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rel_tol</span></code>, <code class="docutils literal notranslate"><span class="pre">abs_tol</span></code>, <code class="docutils literal notranslate"><span class="pre">admm_tol</span></code>).</p></li>
 </ul>
 </dd>
 </dl>
@@ -418,7 +439,19 @@ Algorithm to use for fitting. Currently, only “ADMM” is implemented.</p></li
 <dl class="py method">
 <dt class="sig sig-object py" id="pybbtd.stokes.Stokes.generate_stokes_tensor">
 <span class="sig-name descname"><span class="pre">generate_stokes_tensor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#Stokes.generate_stokes_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.Stokes.generate_stokes_tensor" title="Link to this definition">#</a></dt>
-<dd><p>Generate a random Stokes tensor.</p>
+<dd><p>Generate a random Stokes tensor and store the factors.</p>
+<p>Non-negative spatial factors A, B are drawn uniformly, and each
+column of C is a valid Stokes vector built from a random coherency
+matrix. Updates <code class="docutils literal notranslate"><span class="pre">self.factors</span></code> and <code class="docutils literal notranslate"><span class="pre">self.tensor</span></code> in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple <code class="docutils literal notranslate"><span class="pre">(factors,</span> <span class="pre">tensor)</span></code> where <code class="docutils literal notranslate"><span class="pre">factors</span> <span class="pre">=</span> <span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code>
+and <code class="docutils literal notranslate"><span class="pre">tensor</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[list, np.ndarray]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -426,33 +459,62 @@ Algorithm to use for fitting. Currently, only “ADMM” is implemented.</p></li
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.stokes.check_stokes_constraints">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">check_stokes_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#check_stokes_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.check_stokes_constraints" title="Link to this definition">#</a></dt>
-<dd><p>Check if a 4-D tensor satisfies the Stokes constraints.</p>
+<dd><p>Check if a single Stokes vector satisfies the physical constraints.</p>
+<p>A valid Stokes vector must have <span class="math notranslate nohighlight">\(S_0 \geq 0\)</span> and
+<span class="math notranslate nohighlight">\(S_0^2 \geq S_1^2 + S_2^2 + S_3^2\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> – np.ndarray
+A 4-element Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 if valid, 0 if invalid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.stokes.coh2stokes">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">coh2stokes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#coh2stokes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.coh2stokes" title="Link to this definition">#</a></dt>
-<dd><p>Returns Stokes parameters from polarization (coherency) matrix</p>
+<dd><p>Compute the Stokes vector from a 2x2 coherency matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>coh</strong> – np.ndarray
+Complex Hermitian coherency matrix of shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 4-element real Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.stokes.generate_stokes_factors">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">generate_stokes_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#generate_stokes_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.generate_stokes_factors" title="Link to this definition">#</a></dt>
 <dd><p>Generate random factors that follow Stokes-BTD decomposition.</p>
+<p>Non-negative spatial factors A, B are drawn from a uniform distribution.
+Each column of C is a valid Stokes vector built from a random 2x2
+coherency matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <cite>(I, J, K)</cite> of the tensor.</p></li>
-<li><p><strong>R</strong> (<em>int</em>) – The rank of the decomposition (number of components).</p></li>
-<li><p><strong>L</strong> (<em>int</em>) – Rank of the spatial maps.</p></li>
+<li><p><strong>dims</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dimensions <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code> of the tensor.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – Number of block terms (rank of the decomposition).</p></li>
+<li><p><strong>L</strong> (<em>list</em><em>[</em><em>int</em><em>] or </em><em>np.ndarray</em>) – Rank of the spatial maps. Uses <code class="docutils literal notranslate"><span class="pre">L[0]</span></code> for all terms.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>A tuple containing the three factor matrices <cite>(A, B, C)</cite>:</p>
+<dd class="field-even"><p><p>A tuple <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code> where:</p>
 <ul class="simple">
-<li><p>A (np.ndarray): Shape <cite>(dims[0], L * R)</cite>.</p></li>
-<li><p>B (np.ndarray): Shape <cite>(dims[1], L * R)</cite>.</p></li>
-<li><p>C (np.ndarray): Shape <cite>(dims[2], R)</cite>, where each column is a Stokes vector.</p></li>
+<li><p>A: Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">L[0]</span> <span class="pre">*</span> <span class="pre">R)</span></code>, non-negative.</p></li>
+<li><p>B: Shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">L[0]</span> <span class="pre">*</span> <span class="pre">R)</span></code>, non-negative.</p></li>
+<li><p>C: Shape <code class="docutils literal notranslate"><span class="pre">(4,</span> <span class="pre">R)</span></code>, each column is a valid Stokes vector.</p></li>
 </ul>
 </p>
 </dd>
@@ -463,28 +525,77 @@ Algorithm to use for fitting. Currently, only “ADMM” is implemented.</p></li
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.stokes.projPSD">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">projPSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#projPSD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.projPSD" title="Link to this definition">#</a></dt>
-<dd><p>projection of matrix M onto the set of PSD hermitian matrices</p>
+<dt class="sig sig-object py" id="pybbtd.stokes.proj_psd">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">proj_psd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#proj_psd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.proj_psd" title="Link to this definition">#</a></dt>
+<dd><p>Project a matrix onto the set of positive semidefinite Hermitian matrices.</p>
+<p>Symmetrizes M, computes its eigendecomposition, and zeroes out any
+negative eigenvalues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>M</strong> – np.ndarray
+Square matrix to project.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nearest PSD Hermitian matrix (same shape as M).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.stokes.stokes2coh">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">stokes2coh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#stokes2coh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.stokes2coh" title="Link to this definition">#</a></dt>
-<dd><p>construct Coherence matrix from Stokes parameters</p>
+<dd><p>Construct the 2x2 coherency matrix from a Stokes vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> – np.ndarray
+A 4-element Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Complex Hermitian coherency matrix of shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.stokes.stokesProjection">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">stokesProjection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#stokesProjection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.stokesProjection" title="Link to this definition">#</a></dt>
-<dd><p>Projection of Stokes parameters onto the set of valid Stokes vectors.</p>
+<dt class="sig sig-object py" id="pybbtd.stokes.stokes_projection">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">stokes_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#stokes_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.stokes_projection" title="Link to this definition">#</a></dt>
+<dd><p>Project a Stokes vector onto the set of physically valid Stokes vectors.</p>
+<p>Converts to a coherency matrix, projects onto the PSD cone via
+<a class="reference internal" href="#pybbtd.stokes.proj_psd" title="pybbtd.stokes.proj_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">proj_psd()</span></code></a>, and converts back to Stokes parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> – np.ndarray
+A 4-element Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Projected 4-element Stokes vector satisfying the physical constraints.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pybbtd.stokes.validate_stokes_tensor">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.stokes.</span></span><span class="sig-name descname"><span class="pre">validate_stokes_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/stokes.html#validate_stokes_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.stokes.validate_stokes_tensor" title="Link to this definition">#</a></dt>
-<dd><p>Check if all pixels satisfy the Stokes constraints.
-Shows a warning at the end with the percentage of invalid pixels (if any).</p>
+<dd><p>Check if all pixels in a tensor satisfy the Stokes constraints.</p>
+<p>Each spatial pixel <code class="docutils literal notranslate"><span class="pre">T0[i,</span> <span class="pre">j,</span> <span class="pre">:]</span></code> is tested with
+<a class="reference internal" href="#pybbtd.stokes.check_stokes_constraints" title="pybbtd.stokes.check_stokes_constraints"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_stokes_constraints()</span></code></a>. Emits a warning with the percentage
+of invalid pixels if any are found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T0</strong> – np.ndarray
+Tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code> whose third mode contains
+Stokes vectors.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -511,11 +622,11 @@ Shows a warning at the end with the percentage of invalid pixels (if any).</p>
       </div>
     </a>
     <a class="right-next"
-       href="reference_solvers.html"
+       href="reference_bbtd.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Solvers</p>
+        <p class="prev-next-title">BBTD Class</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -535,7 +646,8 @@ Shows a warning at the end with the percentage of invalid pixels (if any).</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-methods">Core Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-methods">Class Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-functions">Module Functions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.Stokes"><code class="docutils literal notranslate"><span class="pre">Stokes</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.Stokes.fit"><code class="docutils literal notranslate"><span class="pre">Stokes.fit()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.Stokes.generate_stokes_tensor"><code class="docutils literal notranslate"><span class="pre">Stokes.generate_stokes_tensor()</span></code></a></li>
@@ -544,9 +656,9 @@ Shows a warning at the end with the percentage of invalid pixels (if any).</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.check_stokes_constraints"><code class="docutils literal notranslate"><span class="pre">check_stokes_constraints()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.coh2stokes"><code class="docutils literal notranslate"><span class="pre">coh2stokes()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.generate_stokes_factors"><code class="docutils literal notranslate"><span class="pre">generate_stokes_factors()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.projPSD"><code class="docutils literal notranslate"><span class="pre">projPSD()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.proj_psd"><code class="docutils literal notranslate"><span class="pre">proj_psd()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.stokes2coh"><code class="docutils literal notranslate"><span class="pre">stokes2coh()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.stokesProjection"><code class="docutils literal notranslate"><span class="pre">stokesProjection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.stokes_projection"><code class="docutils literal notranslate"><span class="pre">stokes_projection()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.stokes.validate_stokes_tensor"><code class="docutils literal notranslate"><span class="pre">validate_stokes_tensor()</span></code></a></li>
 </ul>
 </li>

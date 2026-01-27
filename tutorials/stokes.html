@@ -40,10 +40,11 @@
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/stokes';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="BBTD tutorial (Vanilla ALS)" href="bbtd_vanilla.html" />
+    <link rel="next" title="ALS for Unconstrained BBTD" href="bbtd_vanilla.html" />
     <link rel="prev" title="Cov-LL1 tutorial" href="covll1.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -153,17 +154,18 @@
 <li class="toctree-l2"><a class="reference internal" href="btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -324,6 +326,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Load required libraries</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-tensor-and-define-parameters">Load the data tensor and define parameters</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-results">Visualize the results</a></li>
 </ul>
 </li>
 </ul>
@@ -353,7 +356,7 @@ document.write(`
 <p>Define Stokes-BTD parameters and spatial map dimensions</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of components</span>
 <span class="n">L</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Rank of Spatial maps</span>
-<span class="n">btd</span><span class="o">.</span><span class="n">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">btd</span><span class="o">.</span><span class="n">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="c1"># Define spatial maps of size 25x25.</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">Stokes</span><span class="p">([</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
@@ -413,8 +416,7 @@ Stokes parameters and corresponding polarization ellipses.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.btd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">btd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pybbtd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw_metrics</span><span class="p">,</span> <span class="n">draw_stokes</span>
 </pre></div>
 </div>
 </section>
@@ -425,7 +427,7 @@ Stokes parameters and corresponding polarization ellipses.</p>
 <span class="c1"># Create Stokes model</span>
 <span class="n">R</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">L</span> <span class="o">=</span> <span class="mi">25</span>
-<span class="n">btd</span><span class="o">.</span><span class="n">validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+<span class="n">btd</span><span class="o">.</span><span class="n">_validate_R_L</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">Stokes</span><span class="p">([</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -435,7 +437,16 @@ Stokes parameters and corresponding polarization ellipses.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tensor</span><span class="p">,</span><span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ADMM&quot;</span><span class="p">,</span><span class="n">init</span><span class="o">=</span><span class="s2">&quot;kmeans&quot;</span><span class="p">,</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">max_admm</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">rel_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">5</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">7</span><span class="p">,</span> <span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Visualize the results, module pybbtd.draw will be soon have a method to plot the Stokes vectors as ellipses.</p>
+</section>
+<section id="visualize-the-results">
+<h3>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Link to this heading">#</a></h3>
+<p>We use <a class="reference internal" href="../reference_visualization.html#pybbtd.visualization.draw_stokes.plot_stokes_terms" title="pybbtd.visualization.draw_stokes.plot_stokes_terms"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_stokes_terms()</span></code></a> to display the
+recovered spatial maps <span class="math notranslate nohighlight">\(A_r B_r^{\top}\)</span> and the corresponding polarization
+ellipses for each component.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">Afit</span><span class="p">,</span> <span class="n">Bfit</span><span class="p">,</span> <span class="n">Cfit</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">factors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">draw_stokes</span><span class="o">.</span><span class="n">plot_stokes_terms</span><span class="p">(</span><span class="n">Afit</span><span class="p">,</span> <span class="n">Bfit</span><span class="p">,</span> <span class="n">Cfit</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+</pre></div>
+</div>
 <img alt="../_images/bbtd_board_results.png" src="../_images/bbtd_board_results.png" />
 </section>
 </section>
@@ -466,7 +477,7 @@ Stokes parameters and corresponding polarization ellipses.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">BBTD tutorial (Vanilla ALS)</p>
+        <p class="prev-next-title">ALS for Unconstrained BBTD</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -496,6 +507,7 @@ Stokes parameters and corresponding polarization ellipses.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Load required libraries</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-tensor-and-define-parameters">Load the data tensor and define parameters</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-stokes-btd-model-to-the-data-tensor">Fit the Stokes-BTD model to the data tensor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-results">Visualize the results</a></li>
 </ul>
 </li>
 </ul>

@@ -155,17 +155,18 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -290,6 +291,11 @@ document.write(`
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
+       <a href="reference_bbtd.html#module-pybbtd.bbtd"><code class="xref">pybbtd.bbtd</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
        <a href="reference_btd.html#module-pybbtd.btd"><code class="xref">pybbtd.btd</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
@@ -300,7 +306,22 @@ document.write(`
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
+       <a href="reference_solvers.html#module-pybbtd.solvers.bbtd_cov_admm"><code class="xref">pybbtd.solvers.bbtd_cov_admm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference_solvers.html#module-pybbtd.solvers.bbtd_vanilla_als"><code class="xref">pybbtd.solvers.bbtd_vanilla_als</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
        <a href="reference_solvers.html#module-pybbtd.solvers.btd_als"><code class="xref">pybbtd.solvers.btd_als</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference_solvers.html#module-pybbtd.solvers.covll1_admm"><code class="xref">pybbtd.solvers.covll1_admm</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -320,7 +341,17 @@ document.write(`
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="reference_visualization.html#module-pybbtd.visualization"><code class="xref">pybbtd.visualization</code></a></td><td>
+       <a href="reference_visualization.html#module-pybbtd.visualization.draw_bbtd"><code class="xref">pybbtd.visualization.draw_bbtd</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference_visualization.html#module-pybbtd.visualization.draw_metrics"><code class="xref">pybbtd.visualization.draw_metrics</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference_visualization.html#module-pybbtd.visualization.draw_stokes"><code class="xref">pybbtd.visualization.draw_stokes</code></a></td><td>
        <em></em></td></tr>
    </table>
 

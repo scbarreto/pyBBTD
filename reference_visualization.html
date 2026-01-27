@@ -40,10 +40,10 @@
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference_visualization';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Uniqueness" href="reference_uniqueness.html" />
     <link rel="prev" title="Solvers" href="reference_solvers.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -153,17 +153,18 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -291,7 +292,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -307,6 +310,26 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#draw-metrics">draw_metrics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_metrics.plot_error"><code class="docutils literal notranslate"><span class="pre">plot_error()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#draw-bbtd">draw_bbtd</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms"><code class="docutils literal notranslate"><span class="pre">plot_BBTD_cov_terms()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#draw-stokes">draw_stokes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_stokes.plot_stokes_terms"><code class="docutils literal notranslate"><span class="pre">plot_stokes_terms()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_stokes.stokes_to_ellipse"><code class="docutils literal notranslate"><span class="pre">stokes_to_ellipse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -316,8 +339,170 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-pybbtd.visualization">
-<span id="visualization"></span><span id="reference-visualization"></span><h1>Visualization<a class="headerlink" href="#module-pybbtd.visualization" title="Link to this heading">#</a></h1>
+  <section id="visualization">
+<span id="reference-visualization"></span><h1>Visualization<a class="headerlink" href="#visualization" title="Link to this heading">#</a></h1>
+<section id="draw-metrics">
+<h2>draw_metrics<a class="headerlink" href="#draw-metrics" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.visualization.draw_metrics.plot_error" title="pybbtd.visualization.draw_metrics.plot_error"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_error()</span></code></a></p></td>
+<td><p>Plot one or multiple convergence / error curves.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.visualization.draw_metrics">
+<dt class="sig sig-object py" id="pybbtd.visualization.draw_metrics.plot_error">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.visualization.draw_metrics.</span></span><span class="sig-name descname"><span class="pre">plot_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Iteration</span> <span class="pre">Number'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Fit</span> <span class="pre">Error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semilogy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/visualization/draw_metrics.html#plot_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.visualization.draw_metrics.plot_error" title="Link to this definition">#</a></dt>
+<dd><p>Plots one or multiple convergence/error curves</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>errors</strong> (<em>array-like</em><em> or </em><em>list</em><em> of </em><em>array-like</em>) – One or multiple sequences of error values.</p></li>
+<li><p><strong>labels</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Label(s) for the plotted curves.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Axis labels (LaTeX supported).</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Axis labels (LaTeX supported).</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Figure title.</p></li>
+<li><p><strong>semilogy</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, plot errors on a log scale.</p></li>
+<li><p><strong>grid</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, display gridlines.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="draw-bbtd">
+<h2>draw_bbtd<a class="headerlink" href="#draw-bbtd" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms" title="pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_BBTD_cov_terms()</span></code></a></p></td>
+<td><p>Visualise the spatial maps and covariance matrices of a BBTD model.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.visualization.draw_bbtd">
+<dt class="sig sig-object py" id="pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.visualization.draw_bbtd.</span></span><span class="sig-name descname"><span class="pre">plot_BBTD_cov_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_spatial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_cov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'seismic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/visualization/draw_bbtd.html#plot_BBTD_cov_terms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms" title="Link to this definition">#</a></dt>
+<dd><p>Visualize the spatial maps and covariance matrices of a BBTD model.</p>
+<p>For each component <em>r</em> the function displays:</p>
+<ul class="simple">
+<li><p><strong>Top row</strong> — the non-negative spatial maps
+<span class="math notranslate nohighlight">\(\max(0,\; A_r B_r^{\top})\)</span> as a heatmap.</p></li>
+<li><p><strong>Bottom row</strong> — the normalized sample covariance
+<span class="math notranslate nohighlight">\(C_r C_r^{H} / \|C_r C_r^{H}\|_{\infty}\)</span> (real part).</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outA</strong> (<em>np.ndarray</em>) – Spatial factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">R*L1)</span></code>.
+Columns are grouped in contiguous blocks of <em>L1</em> for each
+component.</p></li>
+<li><p><strong>outB</strong> (<em>np.ndarray</em>) – Spatial factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">R*L1)</span></code>, with the same
+block structure as <em>outA</em>.</p></li>
+<li><p><strong>outC</strong> (<em>np.ndarray</em>) – Spectral factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(K,</span> <span class="pre">R*L2)</span></code>.
+Columns are grouped in contiguous blocks of <em>L2</em> for each
+component.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – Number of components (block terms).</p></li>
+<li><p><strong>L1</strong> (<em>int</em>) – Spatial rank shared by every component in <em>outA</em> / <em>outB</em>.</p></li>
+<li><p><strong>L2</strong> (<em>int</em>) – Spectral rank shared by every component in <em>outC</em>.</p></li>
+<li><p><strong>cmap_spatial</strong> (<em>matplotlib.colors.Colormap</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Colormap for the spatial heatmaps.  Defaults to the
+Matplotlib default colormap when <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>cmap_cov</strong> (<em>matplotlib.colors.Colormap</em><em> or </em><em>str</em><em>, </em><em>optional</em>) – Colormap for the covariance matrices (default: <code class="docutils literal notranslate"><span class="pre">&quot;seismic&quot;</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The figure is displayed via <code class="docutils literal notranslate"><span class="pre">plt.show()</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="draw-stokes">
+<h2>draw_stokes<a class="headerlink" href="#draw-stokes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.visualization.draw_stokes.stokes_to_ellipse" title="pybbtd.visualization.draw_stokes.stokes_to_ellipse"><code class="xref py py-func docutils literal notranslate"><span class="pre">stokes_to_ellipse()</span></code></a></p></td>
+<td><p>Convert a Stokes vector to a polarization ellipse in the transverse plane.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.visualization.draw_stokes.plot_stokes_terms" title="pybbtd.visualization.draw_stokes.plot_stokes_terms"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_stokes_terms()</span></code></a></p></td>
+<td><p>Visualise the spatial maps and polarization ellipses of a Stokes-BTD.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.visualization.draw_stokes">
+<dt class="sig sig-object py" id="pybbtd.visualization.draw_stokes.plot_stokes_terms">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.visualization.draw_stokes.</span></span><span class="sig-name descname"><span class="pre">plot_stokes_terms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/visualization/draw_stokes.html#plot_stokes_terms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.visualization.draw_stokes.plot_stokes_terms" title="Link to this definition">#</a></dt>
+<dd><p>Visualise the spatial maps and polarization ellipses of a Stokes-BTD.</p>
+<p>For each component <em>r</em> the function displays:</p>
+<ul class="simple">
+<li><p><strong>Top row</strong> — the rank-<em>L</em> spatial reconstruction
+<span class="math notranslate nohighlight">\(A_r B_r^{\top}\)</span>, min–max normalised, as a heatmap.</p></li>
+<li><p><strong>Bottom row</strong> — the polarization ellipse derived from the
+Stokes vector <span class="math notranslate nohighlight">\(c_r\)</span>, annotated with orientation
+<span class="math notranslate nohighlight">\(\psi\)</span>, ellipticity <span class="math notranslate nohighlight">\(\chi\)</span>, and handedness.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outA</strong> (<em>np.ndarray</em>) – Spatial factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(N1,</span> <span class="pre">R*L)</span></code>.
+Columns are grouped in contiguous blocks of <em>L</em> for each
+component.</p></li>
+<li><p><strong>outB</strong> (<em>np.ndarray</em>) – Spatial factor matrix of shape <code class="docutils literal notranslate"><span class="pre">(N2,</span> <span class="pre">R*L)</span></code>, with the same
+block structure as <em>outA</em>.</p></li>
+<li><p><strong>outC</strong> (<em>np.ndarray</em>) – Stokes matrix of shape <code class="docutils literal notranslate"><span class="pre">(4,</span> <span class="pre">R)</span></code>.  Each column is a Stokes
+vector <span class="math notranslate nohighlight">\([S_0, S_1, S_2, S_3]^{\top}\)</span>.</p></li>
+<li><p><strong>R</strong> (<em>int</em>) – Number of components (block terms).</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Column rank shared by every component in <em>outA</em> / <em>outB</em>.</p></li>
+<li><p><strong>cmap</strong> (<em>matplotlib.colors.Colormap</em><em>, </em><em>optional</em>) – Colormap for the heatmaps.  Defaults to
+<code class="docutils literal notranslate"><span class="pre">palettable.cmocean.sequential.Ice_15</span></code> when available,
+otherwise <code class="docutils literal notranslate"><span class="pre">plt.cm.viridis</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fig</strong> (<em>matplotlib.figure.Figure</em>) – The created figure.</p></li>
+<li><p><strong>axes</strong> (<em>np.ndarray</em>) – Array of axes with shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">R+1)</span></code>.  The last column
+holds the shared colorbar (top) and an empty slot (bottom).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.visualization.draw_stokes.stokes_to_ellipse">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.visualization.draw_stokes.</span></span><span class="sig-name descname"><span class="pre">stokes_to_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/visualization/draw_stokes.html#stokes_to_ellipse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.visualization.draw_stokes.stokes_to_ellipse" title="Link to this definition">#</a></dt>
+<dd><p>Convert a Stokes vector to a polarization ellipse in the transverse plane.</p>
+<p>Computes the orientation angle <span class="math notranslate nohighlight">\(\psi\)</span> and ellipticity angle
+<span class="math notranslate nohighlight">\(\chi\)</span> from a single Stokes vector, then traces out the
+corresponding normalised polarization ellipse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>array-like</em>) – Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.</p></li>
+<li><p><strong>n_points</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of points used to sample the ellipse (default: 200).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – Horizontal coordinates of the ellipse, shape <code class="docutils literal notranslate"><span class="pre">(n_points,)</span></code>.</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Vertical coordinates of the ellipse, shape <code class="docutils literal notranslate"><span class="pre">(n_points,)</span></code>.</p></li>
+<li><p><strong>psi</strong> (<em>float</em>) – Orientation angle in radians.</p></li>
+<li><p><strong>chi</strong> (<em>float</em>) – Ellipticity angle in radians.  The sign of <code class="docutils literal notranslate"><span class="pre">tan(chi)</span></code>
+encodes the handedness (positive = left-handed,
+negative = right-handed).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -340,21 +525,39 @@ document.write(`
         <p class="prev-next-title">Solvers</p>
       </div>
     </a>
-    <a class="right-next"
-       href="reference_uniqueness.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Uniqueness</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#draw-metrics">draw_metrics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_metrics.plot_error"><code class="docutils literal notranslate"><span class="pre">plot_error()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#draw-bbtd">draw_bbtd</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms"><code class="docutils literal notranslate"><span class="pre">plot_BBTD_cov_terms()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#draw-stokes">draw_stokes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_stokes.plot_stokes_terms"><code class="docutils literal notranslate"><span class="pre">plot_stokes_terms()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.visualization.draw_stokes.stokes_to_ellipse"><code class="docutils literal notranslate"><span class="pre">stokes_to_ellipse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

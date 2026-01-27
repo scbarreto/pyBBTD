@@ -1,0 +1,624 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pybbtd.bbtd &#8212; pyBBTD  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pybbtd/bbtd';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">pyBBTD  documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html"><strong>Tutorials</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/btd.html">BTD tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_btd.html">BTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_covll1.html">Cov-LL1 Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_uniqueness.html">Uniqueness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_solvers.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference_visualization.html">Visualization</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pybbtd.bbtd</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">block_diag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorly.cp_tensor</span><span class="w"> </span><span class="kn">import</span> <span class="n">cp_to_tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.uniqueness</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_uniqueness_BBTD</span>
+
+
+<div class="viewcode-block" id="BBTD">
+<a class="viewcode-back" href="../../reference_bbtd.html#pybbtd.bbtd.BBTD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BBTD</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for tensors admitting a Block-Block Term Decomposition (BBTD)</span>
+<span class="sd">    into rank-:math:`(L_1, L_1, L_2, L_2)` terms.</span>
+
+<span class="sd">    A BBTD decomposes a 4-D tensor :math:`\\mathcal{T} \\in</span>
+<span class="sd">    \\mathbb{R}^{I \\times J \\times K \\times M}` as a sum of :math:`R`</span>
+<span class="sd">    block terms, each of which is a rank-:math:`(L_1, L_1, L_2, L_2)`</span>
+<span class="sd">    term built from four factor matrices A, B, C, D and two constraint</span>
+<span class="sd">    matrices :math:`\\Phi` and :math:`\\Psi`.</span>
+
+<span class="sd">    :param dims: Dimensions ``(I, J, K, M)`` of the 4-D tensor.</span>
+<span class="sd">    :type dims: list[int] or Tuple[int, int, int, int]</span>
+<span class="sd">    :param R: Number of block terms (rank of the decomposition).</span>
+<span class="sd">    :type R: int</span>
+<span class="sd">    :param L1: Rank of the spatial block (shared by modes A and B).</span>
+<span class="sd">    :type L1: int</span>
+<span class="sd">    :param L2: Rank of the spectral block (shared by modes C and D).</span>
+<span class="sd">    :type L2: int</span>
+
+<span class="sd">    :ivar factors: List of factor matrices ``[A, B, C, D]`` after fitting,</span>
+<span class="sd">        or ``None`` before fitting.</span>
+<span class="sd">    :vartype factors: list[np.ndarray] or None</span>
+<span class="sd">    :ivar tensor: Reconstructed tensor after fitting, or ``None`` before</span>
+<span class="sd">        fitting.</span>
+<span class="sd">    :vartype tensor: np.ndarray or None</span>
+<span class="sd">    :ivar fit_error: Array of fitting errors at each iteration, or ``None``</span>
+<span class="sd">        before fitting.</span>
+<span class="sd">    :vartype fit_error: np.ndarray or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">L2</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a BBTD model.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            dims: list[int] or Tuple[int, int, int, int]</span>
+<span class="sd">                Dimensions ``(I, J, K, M)`` of the 4-D tensor.  Must contain</span>
+<span class="sd">                exactly four positive integers.</span>
+<span class="sd">            R: int</span>
+<span class="sd">                Number of block terms (rank of the decomposition).</span>
+<span class="sd">            L1: int</span>
+<span class="sd">                Rank of the spatial block (shared by modes A and B).</span>
+<span class="sd">            L2: int</span>
+<span class="sd">                Rank of the spectral block (shared by modes C and D).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If ``dims`` is not a list/tuple of four positive</span>
+<span class="sd">                integers, or if R, L1, L2 are not positive integers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate dims</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+            <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span>
+            <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;dims should be a list or tuple of four positive integers.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+
+        <span class="c1"># Validate R, L1, L2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span> <span class="o">=</span> <span class="n">_validate_R_L1_L2</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">)</span>
+
+        <span class="c1"># check uniqueness, raise warning if parameters cannot be guaranteed to lead to unique solution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_uniqueness</span><span class="p">()</span>
+
+        <span class="c1"># Initialize additional variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BBTD.check_uniqueness">
+<a class="viewcode-back" href="../../reference_bbtd.html#pybbtd.bbtd.BBTD.check_uniqueness">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_uniqueness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if sufficient conditions for essential uniqueness are satisfied.</span>
+
+<span class="sd">        Uses the algebraic conditions from the literature for the BBTD model.</span>
+<span class="sd">        Prints whether uniqueness can be guaranteed or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">check_uniqueness_BBTD</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unique</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sufficient condition for uniqueness satisfied&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cannot guarantee uniqueness. Proceed at your own risk.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BBTD.get_constraint_matrices">
+<a class="viewcode-back" href="../../reference_bbtd.html#pybbtd.bbtd.BBTD.get_constraint_matrices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_constraint_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the constraint matrices :math:`\\Phi` and :math:`\\Psi` for</span>
+<span class="sd">        the CP-equivalent BBTD model.</span>
+
+<span class="sd">        :math:`\\Phi` maps the spatial factors (A, B) and :math:`\\Psi`</span>
+<span class="sd">        maps the spectral factors (C, D) so that the BBTD can be</span>
+<span class="sd">        expressed as a CP decomposition.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[np.ndarray, np.ndarray]:</span>
+<span class="sd">                ``(phi, psi)`` where ``phi`` has shape</span>
+<span class="sd">                ``(L1 * L2 * R, L1 * R)`` and ``psi`` has shape</span>
+<span class="sd">                ``(L2 * R, L1 * L2 * R)``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_constraint_matrices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BBTD.fit">
+<a class="viewcode-back" href="../../reference_bbtd.html#pybbtd.bbtd.BBTD.fit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;ALS&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit a BBTD model to the given data using the specified algorithm.</span>
+
+<span class="sd">        After fitting, ``self.factors``, ``self.tensor``, and</span>
+<span class="sd">        ``self.fit_error`` are updated in place.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            data: np.ndarray</span>
+<span class="sd">                Input 4-D tensor of shape matching ``self.dims``.</span>
+<span class="sd">            algorithm: str</span>
+<span class="sd">                Algorithm to use for fitting (default: ``&quot;ALS&quot;``).</span>
+<span class="sd">                Options: ``&quot;ALS&quot;`` (vanilla Alternating Least Squares),</span>
+<span class="sd">                ``&quot;ADMM&quot;`` (constrained AO-ADMM with non-negativity on</span>
+<span class="sd">                A, B and conjugate symmetry D = C*).</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                Additional keyword arguments passed to the solver</span>
+<span class="sd">                (e.g. ``init``, ``max_iter``, ``rel_tol``, ``abs_tol``).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: If ``algorithm`` is not ``&quot;ALS&quot;`` or</span>
+<span class="sd">                ``&quot;ADMM&quot;``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;ALS&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.bbtd_vanilla_als</span><span class="w"> </span><span class="kn">import</span> <span class="n">BBTD_ALS</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">BBTD_ALS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">algorithm</span> <span class="o">==</span> <span class="s2">&quot;ADMM&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.solvers.bbtd_cov_admm</span><span class="w"> </span><span class="kn">import</span> <span class="n">BBTD_COV_ADMM</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_error</span> <span class="o">=</span> <span class="n">BBTD_COV_ADMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Algorithm &#39;</span><span class="si">{</span><span class="n">algorithm</span><span class="si">}</span><span class="s2">&#39; not implemented yet.&quot;</span><span class="p">)</span>
+
+        <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_constraint_matrices</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensor</span> <span class="o">=</span> <span class="n">factors_to_tensor</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">factors</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_R_L1_L2</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate that R, L1, and L2 are positive integers.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Number of block terms.</span>
+<span class="sd">        L1: int</span>
+<span class="sd">            Rank of the spatial block.</span>
+<span class="sd">        L2: int</span>
+<span class="sd">            Rank of the spectral block.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[int, int, int]:</span>
+<span class="sd">            Validated ``(R, L1, L2)``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If any argument is not a positive integer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">R</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;R should be a positive integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L1</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">L1</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;L1 should be a positive integer.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">L2</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">L2</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;L2 should be a positive integer.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_repeat_list_nested</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Repeat a list *n* times as nested elements.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        input_list: list</span>
+<span class="sd">            The list to repeat.</span>
+<span class="sd">        n: int</span>
+<span class="sd">            Number of repetitions.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list:</span>
+<span class="sd">            A list of *n* references to ``input_list``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">input_list</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_constraint_matrices</span><span class="p">(</span><span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the block-diagonal constraint matrices :math:`\\Phi` and</span>
+<span class="sd">    :math:`\\Psi` for the BBTD model.</span>
+
+<span class="sd">    :math:`\\Phi` expands the spatial factors (A, B) and :math:`\\Psi`</span>
+<span class="sd">    selects the spectral factors (C, D) so that the BBTD can be written</span>
+<span class="sd">    as a standard CP decomposition.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        L1: int</span>
+<span class="sd">            Rank of the spatial block (shared by A and B).</span>
+<span class="sd">        L2: int</span>
+<span class="sd">            Rank of the spectral block (shared by C and D).</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Number of block terms.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray]:</span>
+<span class="sd">            ``(phi, psi)`` where ``phi`` has shape</span>
+<span class="sd">            ``(L1 * L2 * R, L1 * R)`` and ``psi`` has shape</span>
+<span class="sd">            ``(L2 * R, L1 * L2 * R)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Phi: constraint matrix for the first block (A, B)</span>
+    <span class="n">onesL2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">L2</span><span class="p">)</span>
+    <span class="n">listL2</span> <span class="o">=</span> <span class="n">_repeat_list_nested</span><span class="p">(</span><span class="n">onesL2</span><span class="p">,</span> <span class="n">L1</span><span class="p">)</span>
+    <span class="n">phir</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">listL2</span><span class="p">)</span>
+    <span class="n">listphi</span> <span class="o">=</span> <span class="n">_repeat_list_nested</span><span class="p">(</span><span class="n">phir</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">listphi</span><span class="p">)</span>
+
+    <span class="c1"># Psi: constraint matrix for the second block (C, D)</span>
+    <span class="n">identityL2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">L2</span><span class="p">)</span>
+    <span class="n">listidentities2</span> <span class="o">=</span> <span class="n">_repeat_list_nested</span><span class="p">(</span><span class="n">identityL2</span><span class="p">,</span> <span class="n">L1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">psir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">identityL2</span><span class="p">,</span> <span class="o">*</span><span class="n">listidentities2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">listpsi</span> <span class="o">=</span> <span class="n">_repeat_list_nested</span><span class="p">(</span><span class="n">psir</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+    <span class="n">psi</span> <span class="o">=</span> <span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">listpsi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span>
+
+
+<div class="viewcode-block" id="factors_to_tensor">
+<a class="viewcode-back" href="../../reference_bbtd.html#pybbtd.bbtd.factors_to_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">factors_to_tensor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reconstruct a full 4-D tensor from BBTD factor matrices and</span>
+<span class="sd">    constraint matrices.</span>
+
+<span class="sd">    Computes ``A @ phi``, ``B @ phi``, ``C @ psi``, ``D @ psi`` and</span>
+<span class="sd">    assembles the CP-equivalent tensor.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        A: np.ndarray</span>
+<span class="sd">            Factor matrix of shape ``(I, L1 * R)``.</span>
+<span class="sd">        B: np.ndarray</span>
+<span class="sd">            Factor matrix of shape ``(J, L1 * R)``.</span>
+<span class="sd">        C: np.ndarray</span>
+<span class="sd">            Factor matrix of shape ``(K, L2 * R)``.</span>
+<span class="sd">        D: np.ndarray</span>
+<span class="sd">            Factor matrix of shape ``(M, L2 * R)``.</span>
+<span class="sd">        phi: np.ndarray</span>
+<span class="sd">            Constraint matrix for the spatial block (A, B).</span>
+<span class="sd">        psi: np.ndarray</span>
+<span class="sd">            Constraint matrix for the spectral block (C, D).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray:</span>
+<span class="sd">            Reconstructed 4-D tensor of shape ``(I, J, K, M)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">APhi</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">phi</span>
+    <span class="n">BPhi</span> <span class="o">=</span> <span class="n">B</span> <span class="o">@</span> <span class="n">phi</span>
+    <span class="n">CPsi</span> <span class="o">=</span> <span class="n">C</span> <span class="o">@</span> <span class="n">psi</span>
+    <span class="n">DPsi</span> <span class="o">=</span> <span class="n">D</span> <span class="o">@</span> <span class="n">psi</span>
+    <span class="n">fac_matrices</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">APhi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">BPhi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">CPsi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">DPsi</span><span class="p">)]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">phi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">cp_tensor_repr</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">fac_matrices</span><span class="p">)</span>
+    <span class="n">full_tensor</span> <span class="o">=</span> <span class="n">cp_to_tensor</span><span class="p">(</span><span class="n">cp_tensor_repr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">full_tensor</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Saulo Barreto
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Saulo Barreto.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

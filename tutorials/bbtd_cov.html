@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>BBTD tutorial (Constrained ADMM) &#8212; pyBBTD  documentation</title>
+    <title>AO-ADMM for Constrained BBTD &#8212; pyBBTD  documentation</title>
   
   
   
@@ -44,7 +44,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Reference API" href="../reference_api.html" />
-    <link rel="prev" title="BBTD tutorial (Vanilla ALS)" href="bbtd_vanilla.html" />
+    <link rel="prev" title="ALS for Unconstrained BBTD" href="bbtd_vanilla.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -153,17 +153,18 @@
 <li class="toctree-l2"><a class="reference internal" href="btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -304,7 +305,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>BBTD tutorial (Constrained ADMM)</h1>
+    <h1>AO-ADMM for Constrained BBTD</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -320,6 +321,8 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-noisy-covariance-data">Generate noisy covariance data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-constrained-bbtd-model">Fit the constrained BBTD model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-constraints">Verify constraints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reconstruction-error">Reconstruction error</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-results">Visualize the results</a></li>
 </ul>
             </nav>
         </div>
@@ -331,15 +334,15 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="bbtd-tutorial-constrained-admm">
-<h1>BBTD tutorial (Constrained ADMM)<a class="headerlink" href="#bbtd-tutorial-constrained-admm" title="Link to this heading">#</a></h1>
-<p>This tutorial provides an introduction to the constrained Block-Block Term Decomposition (BBTD) for covariance imaging using the AO-ADMM solver. The constraints enforce non-negative spatial maps and conjugate symmetry (D = C*).</p>
+  <section id="ao-admm-for-constrained-bbtd">
+<h1>AO-ADMM for Constrained BBTD<a class="headerlink" href="#ao-admm-for-constrained-bbtd" title="Link to this heading">#</a></h1>
+<p>This tutorial provides an introduction to the constrained Block-Block Terms Decomposition (BBTD) for covariance imaging using the AO-ADMM solver. The constraints enforce non-negative spatial maps and conjugate symmetry.</p>
 <section id="load-required-libraries">
 <h2>Load required libraries<a class="headerlink" href="#load-required-libraries" title="Link to this heading">#</a></h2>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.bbtd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bbtd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.uniqueness</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_uniqueness_BBTD</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw_metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pybbtd.visualization</span><span class="w"> </span><span class="kn">import</span> <span class="n">draw_metrics</span><span class="p">,</span> <span class="n">draw_bbtd</span>
 </pre></div>
 </div>
 </section>
@@ -431,6 +434,27 @@ D ≈ C*: True
 </pre></div>
 </div>
 </section>
+<section id="reconstruction-error">
+<h2>Reconstruction error<a class="headerlink" href="#reconstruction-error" title="Link to this heading">#</a></h2>
+<p>We compute the relative reconstruction error to verify that the decomposition faithfully approximates the original tensor.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_est</span> <span class="o">=</span> <span class="n">bbtd</span><span class="o">.</span><span class="n">factors_to_tensor</span><span class="p">(</span><span class="n">A_est</span><span class="p">,</span> <span class="n">B_est</span><span class="p">,</span> <span class="n">C_est</span><span class="p">,</span> <span class="n">D_est</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">T0</span> <span class="o">-</span> <span class="n">X_est</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">T0</span><span class="p">))</span>  <span class="c1"># relative error</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>3.0108540301376864e-08
+</pre></div>
+</div>
+</section>
+<section id="visualize-the-results">
+<h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Link to this heading">#</a></h2>
+<p>We use <a class="reference internal" href="../reference_visualization.html#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms" title="pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_BBTD_cov_terms()</span></code></a> to display
+the recovered non-negative spatial maps and normalised covariance matrices for
+each component.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">draw_bbtd</span><span class="o">.</span><span class="n">plot_BBTD_cov_terms</span><span class="p">(</span><span class="n">A_est</span><span class="p">,</span> <span class="n">B_est</span><span class="p">,</span> <span class="n">C_est</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/bbtd_cov_terms.png" src="../_images/bbtd_cov_terms.png" />
+</section>
 </section>
 
 
@@ -450,7 +474,7 @@ D ≈ C*: True
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">BBTD tutorial (Vanilla ALS)</p>
+        <p class="prev-next-title">ALS for Unconstrained BBTD</p>
       </div>
     </a>
     <a class="right-next"
@@ -484,6 +508,8 @@ D ≈ C*: True
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-noisy-covariance-data">Generate noisy covariance data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-the-constrained-bbtd-model">Fit the constrained BBTD model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-constraints">Verify constraints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reconstruction-error">Reconstruction error</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-results">Visualize the results</a></li>
 </ul>
   </nav></div>
 

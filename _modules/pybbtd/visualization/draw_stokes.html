@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pybbtd.visualization.draw_stokes &#8212; pyBBTD  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pybbtd/visualization/draw_stokes';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">pyBBTD  documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tutorials/index.html"><strong>Tutorials</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/btd.html">BTD tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/stokes.html">Stokes Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_btd.html">BTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_covll1.html">Cov-LL1 Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_uniqueness.html">Uniqueness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_solvers.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_visualization.html">Visualization</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for pybbtd.visualization.draw_stokes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">palettable.cmocean.sequential</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ice_15</span>
+
+
+<div class="viewcode-block" id="stokes_to_ellipse">
+<a class="viewcode-back" href="../../../reference_visualization.html#pybbtd.visualization.draw_stokes.stokes_to_ellipse">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">stokes_to_ellipse</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a Stokes vector to a polarization ellipse in the transverse plane.</span>
+
+<span class="sd">    Computes the orientation angle :math:`\\psi` and ellipticity angle</span>
+<span class="sd">    :math:`\\chi` from a single Stokes vector, then traces out the</span>
+<span class="sd">    corresponding normalised polarization ellipse.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    S : array-like</span>
+<span class="sd">        Stokes vector ``[S0, S1, S2, S3]``.</span>
+<span class="sd">    n_points : int, optional</span>
+<span class="sd">        Number of points used to sample the ellipse (default: 200).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : np.ndarray</span>
+<span class="sd">        Horizontal coordinates of the ellipse, shape ``(n_points,)``.</span>
+<span class="sd">    y : np.ndarray</span>
+<span class="sd">        Vertical coordinates of the ellipse, shape ``(n_points,)``.</span>
+<span class="sd">    psi : float</span>
+<span class="sd">        Orientation angle in radians.</span>
+<span class="sd">    chi : float</span>
+<span class="sd">        Ellipticity angle in radians.  The sign of ``tan(chi)``</span>
+<span class="sd">        encodes the handedness (positive = left-handed,</span>
+<span class="sd">        negative = right-handed).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S0</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">S3</span> <span class="o">=</span> <span class="n">S</span>
+
+    <span class="c1"># Orientation (psi) and ellipticity angle (chi)</span>
+    <span class="n">psi</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span> <span class="n">S1</span><span class="p">)</span>  <span class="c1"># radians</span>
+    <span class="n">chi</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">S3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">S1</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">S2</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># Semi-axes (unnormalized)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>  <span class="c1"># major-ish</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>  <span class="c1"># minor-ish, carries handedness sign</span>
+
+    <span class="c1"># Parametric ellipse in principal frame</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+    <span class="n">xp</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">yp</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># Rotate by psi into lab frame</span>
+    <span class="n">cpsi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+    <span class="n">spsi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">xp</span> <span class="o">*</span> <span class="n">cpsi</span> <span class="o">-</span> <span class="n">yp</span> <span class="o">*</span> <span class="n">spsi</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">xp</span> <span class="o">*</span> <span class="n">spsi</span> <span class="o">+</span> <span class="n">yp</span> <span class="o">*</span> <span class="n">cpsi</span>
+
+    <span class="c1"># Normalize ellipse size for visualization</span>
+    <span class="n">rmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rmax</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">rmax</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="n">rmax</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">chi</span></div>
+
+
+
+<div class="viewcode-block" id="plot_stokes_terms">
+<a class="viewcode-back" href="../../../reference_visualization.html#pybbtd.visualization.draw_stokes.plot_stokes_terms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_stokes_terms</span><span class="p">(</span><span class="n">outA</span><span class="p">,</span> <span class="n">outB</span><span class="p">,</span> <span class="n">outC</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Visualise the spatial maps and polarization ellipses of a Stokes-BTD.</span>
+
+<span class="sd">    For each component *r* the function displays:</span>
+
+<span class="sd">    * **Top row** — the rank-*L* spatial reconstruction</span>
+<span class="sd">      :math:`A_r B_r^{\\top}`, min–max normalised, as a heatmap.</span>
+<span class="sd">    * **Bottom row** — the polarization ellipse derived from the</span>
+<span class="sd">      Stokes vector :math:`c_r`, annotated with orientation</span>
+<span class="sd">      :math:`\\psi`, ellipticity :math:`\\chi`, and handedness.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outA : np.ndarray</span>
+<span class="sd">        Spatial factor matrix of shape ``(N1, R*L)``.</span>
+<span class="sd">        Columns are grouped in contiguous blocks of *L* for each</span>
+<span class="sd">        component.</span>
+<span class="sd">    outB : np.ndarray</span>
+<span class="sd">        Spatial factor matrix of shape ``(N2, R*L)``, with the same</span>
+<span class="sd">        block structure as *outA*.</span>
+<span class="sd">    outC : np.ndarray</span>
+<span class="sd">        Stokes matrix of shape ``(4, R)``.  Each column is a Stokes</span>
+<span class="sd">        vector :math:`[S_0, S_1, S_2, S_3]^{\\top}`.</span>
+<span class="sd">    R : int</span>
+<span class="sd">        Number of components (block terms).</span>
+<span class="sd">    L : int</span>
+<span class="sd">        Column rank shared by every component in *outA* / *outB*.</span>
+<span class="sd">    cmap : matplotlib.colors.Colormap, optional</span>
+<span class="sd">        Colormap for the heatmaps.  Defaults to</span>
+<span class="sd">        ``palettable.cmocean.sequential.Ice_15`` when available,</span>
+<span class="sd">        otherwise ``plt.cm.viridis``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : matplotlib.figure.Figure</span>
+<span class="sd">        The created figure.</span>
+<span class="sd">    axes : np.ndarray</span>
+<span class="sd">        Array of axes with shape ``(2, R+1)``.  The last column</span>
+<span class="sd">        holds the shared colorbar (top) and an empty slot (bottom).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ---------- Safety / sanity checks ----------</span>
+    <span class="c1"># Check outC</span>
+    <span class="k">if</span> <span class="n">outC</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">outC</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;outC must have shape (4, R) with rows [S0,S1,S2,S3].&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outC</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">R</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outC has </span><span class="si">{</span><span class="n">outC</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> columns, but R=</span><span class="si">{</span><span class="n">R</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check outA, outB</span>
+    <span class="k">if</span> <span class="n">outA</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">outB</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;outA and outB must be 2D arrays.&quot;</span><span class="p">)</span>
+
+    <span class="n">N1</span><span class="p">,</span> <span class="n">colsA</span> <span class="o">=</span> <span class="n">outA</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">N2</span><span class="p">,</span> <span class="n">colsB</span> <span class="o">=</span> <span class="n">outB</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="k">if</span> <span class="n">colsA</span> <span class="o">!=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">L</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outA has </span><span class="si">{</span><span class="n">colsA</span><span class="si">}</span><span class="s2"> columns, expected R*L = </span><span class="si">{</span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">L</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colsB</span> <span class="o">!=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">L</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outB has </span><span class="si">{</span><span class="n">colsB</span><span class="si">}</span><span class="s2"> columns, expected R*L = </span><span class="si">{</span><span class="n">R</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">L</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Set a colormap</span>
+    <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">Ice_15</span><span class="o">.</span><span class="n">mpl_colormap</span>
+        <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span>
+
+    <span class="c1"># ---------- Figure layout ----------</span>
+    <span class="c1"># R heatmaps in the top row, plus one extra column for the colorbar.</span>
+    <span class="c1"># Bottom row: R ellipses + one empty slot.</span>
+    <span class="n">width_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+    <span class="n">width_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">width_ratio</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">)</span>  <span class="c1"># skinny column for colorbar</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">R</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">3.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">R</span><span class="p">),</span> <span class="mf">3.5</span> <span class="o">*</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;width_ratios&quot;</span><span class="p">:</span> <span class="n">width_ratio</span><span class="p">,</span>
+            <span class="s2">&quot;height_ratios&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">last_im</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">))</span>
+
+    <span class="c1"># ---------- Top row: A_r B_r^T heatmaps ----------</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="c1"># Slice out the r-th block of L columns</span>
+        <span class="n">A_block</span> <span class="o">=</span> <span class="n">outA</span><span class="p">[:,</span> <span class="n">r</span> <span class="o">*</span> <span class="n">L</span> <span class="p">:</span> <span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">L</span><span class="p">]</span>  <span class="c1"># shape (Na, L)</span>
+        <span class="n">B_block</span> <span class="o">=</span> <span class="n">outB</span><span class="p">[:,</span> <span class="n">r</span> <span class="o">*</span> <span class="n">L</span> <span class="p">:</span> <span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">L</span><span class="p">]</span>  <span class="c1"># shape (Nb, L)</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">A_block</span> <span class="o">@</span> <span class="n">B_block</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># Min-max normalize for display so contrast is comparable</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+        <span class="n">block_min</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">block_max</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="n">block_max</span> <span class="o">-</span> <span class="n">block_min</span>
+        <span class="k">if</span> <span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Avoid division by zero: flat patch</span>
+            <span class="n">normalized_block</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">normalized_block</span> <span class="o">=</span> <span class="p">(</span><span class="n">block</span> <span class="o">-</span> <span class="n">block_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
+
+        <span class="c1"># Show the normalized block</span>
+        <span class="n">ax_heat</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">ax_heat</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">normalized_block</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+        <span class="n">last_im</span> <span class="o">=</span> <span class="n">im</span>
+
+        <span class="c1"># No ticks, just the visual texture</span>
+        <span class="n">ax_heat</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="n">ax_heat</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+            <span class="sa">rf</span><span class="s2">&quot;$A_</span><span class="se">{{</span><span class="si">{</span><span class="n">r</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">}}</span><span class="s2">B_</span><span class="se">{{</span><span class="si">{</span><span class="n">r</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">}}</span><span class="s2">^</span><span class="se">{{</span><span class="s2">\top</span><span class="se">}}</span><span class="s2">$&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Add a shared colorbar in the last column of the top row</span>
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">R</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">last_im</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
+            <span class="n">last_im</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">cax</span><span class="p">,</span>
+            <span class="n">aspect</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+            <span class="n">fraction</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+    <span class="n">cax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ---------- Bottom row: polarization ellipses from Stokes vectors ----------</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+        <span class="n">ax_ellipse</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span>
+
+        <span class="n">S</span> <span class="o">=</span> <span class="n">outC</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span>  <span class="c1"># [S0, S1, S2, S3]</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">chi</span> <span class="o">=</span> <span class="n">stokes_to_ellipse</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+        <span class="c1"># Draw the ellipse trace</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Compute orientation / ellipticity</span>
+        <span class="n">S0</span><span class="p">,</span> <span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">S3</span> <span class="o">=</span> <span class="n">S</span>
+
+        <span class="c1"># Signed ellipticity ratio (minor/major). Sign gives handedness.</span>
+        <span class="n">ellipticity_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>
+        <span class="n">handed</span> <span class="o">=</span> <span class="s2">&quot;LH&quot;</span> <span class="k">if</span> <span class="n">ellipticity_ratio</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;RH&quot;</span>
+
+        <span class="c1"># Format subplot title</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+            <span class="sa">rf</span><span class="s2">&quot;$c_</span><span class="se">{{</span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="se">}}</span><span class="s2">$:  &quot;</span>
+            <span class="sa">rf</span><span class="s2">&quot;$\psi = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">^\circ$&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">rf</span><span class="s2">&quot;$\chi = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">^\circ$ &quot;</span>
+            <span class="sa">rf</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">handed</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Fixed aspect and clean grid</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;box&quot;</span><span class="p">)</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+
+        <span class="c1"># Strip ticks and labels to emphasize shape only</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span>
+            <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+            <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+            <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">ax_ellipse</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># The final (R+1)-th axis in the bottom row is empty</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">R</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Saulo Barreto
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Saulo Barreto.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

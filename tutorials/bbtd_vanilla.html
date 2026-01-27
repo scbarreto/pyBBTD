@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>BBTD tutorial (Vanilla ALS) &#8212; pyBBTD  documentation</title>
+    <title>ALS for Unconstrained BBTD &#8212; pyBBTD  documentation</title>
   
   
   
@@ -43,7 +43,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/bbtd_vanilla';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="BBTD tutorial (Constrained ADMM)" href="bbtd_cov.html" />
+    <link rel="next" title="AO-ADMM for Constrained BBTD" href="bbtd_cov.html" />
     <link rel="prev" title="Stokes Tutorials" href="stokes.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -153,17 +153,18 @@
 <li class="toctree-l2"><a class="reference internal" href="btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -304,7 +305,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>BBTD tutorial (Vanilla ALS)</h1>
+    <h1>ALS for Unconstrained BBTD</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -331,9 +332,9 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="bbtd-tutorial-vanilla-als">
-<h1>BBTD tutorial (Vanilla ALS)<a class="headerlink" href="#bbtd-tutorial-vanilla-als" title="Link to this heading">#</a></h1>
-<p>This tutorial provides an introduction to the Block-Block Term Decomposition (BBTD) into rank-(L1, L2, 1, 1) terms using the vanilla ALS solver.</p>
+  <section id="als-for-unconstrained-bbtd">
+<h1>ALS for Unconstrained BBTD<a class="headerlink" href="#als-for-unconstrained-bbtd" title="Link to this heading">#</a></h1>
+<p>This tutorial provides an introduction to the Block-Block Term Decomposition (BBTD) into rank-(L1, L1, L2, L2) terms using the vanilla ALS solver.</p>
 <section id="load-required-libraries">
 <h2>Load required libraries<a class="headerlink" href="#load-required-libraries" title="Link to this heading">#</a></h2>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.bbtd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bbtd</span>
@@ -456,7 +457,7 @@ document.write(`
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">BBTD tutorial (Constrained ADMM)</p>
+        <p class="prev-next-title">AO-ADMM for Constrained BBTD</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

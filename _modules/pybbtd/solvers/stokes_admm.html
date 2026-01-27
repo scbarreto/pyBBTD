@@ -152,17 +152,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -284,6 +285,44 @@ document.write(`
 <div class="viewcode-block" id="ADMM_C">
 <a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_C">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ADMM_C</span><span class="p">(</span><span class="n">Y3</span><span class="p">,</span> <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Cinit</span><span class="p">,</span> <span class="n">Ctinit</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">nitermax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inner ADMM update for factor C with Stokes constraint.</span>
+
+<span class="sd">    Solves the augmented Lagrangian subproblem for C using the third</span>
+<span class="sd">    mode unfolding, projecting each column onto the set of physically</span>
+<span class="sd">    valid Stokes vectors via</span>
+<span class="sd">    :func:`~pybbtd.stokes.stokes_projection`.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        Y3: np.ndarray</span>
+<span class="sd">            Third mode unfolding of the input tensor.</span>
+<span class="sd">        Ak: np.ndarray</span>
+<span class="sd">            Current estimate of factor A.</span>
+<span class="sd">        Bk: np.ndarray</span>
+<span class="sd">            Current estimate of factor B.</span>
+<span class="sd">        Cinit: np.ndarray</span>
+<span class="sd">            Initial primal variable for C.</span>
+<span class="sd">        Ctinit: np.ndarray</span>
+<span class="sd">            Initial projected (valid Stokes) variable for C.</span>
+<span class="sd">        theta: np.ndarray</span>
+<span class="sd">            Constraint matrix from the BTD model.</span>
+<span class="sd">        rho: float</span>
+<span class="sd">            ADMM penalty parameter.</span>
+<span class="sd">        L: int</span>
+<span class="sd">            Rank of the spatial maps.</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Number of block terms.</span>
+<span class="sd">        nitermax: int</span>
+<span class="sd">            Maximum number of inner ADMM iterations (default: 100).</span>
+<span class="sd">        tol: float</span>
+<span class="sd">            Convergence tolerance (default: 1e-14).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, float]:</span>
+<span class="sd">            ``(Ctilde, C, primal_residue)`` where ``Ctilde`` is the</span>
+<span class="sd">            Stokes-projected factor, ``C`` is the unconstrained factor,</span>
+<span class="sd">            and ``primal_residue`` is the final primal residual.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># init variables</span>
 
     <span class="n">Cl</span> <span class="o">=</span> <span class="n">Cinit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -313,7 +352,7 @@ document.write(`
         <span class="c1"># update \tilde{C}_{l+1}</span>
         <span class="n">Ctl1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">Ctl</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
-            <span class="n">Ctl1</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">stokesProjection</span><span class="p">((</span><span class="n">Cl1</span> <span class="o">+</span> <span class="n">Ul</span><span class="p">)[:,</span> <span class="n">r</span><span class="p">])</span>
+            <span class="n">Ctl1</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">stokes_projection</span><span class="p">((</span><span class="n">Cl1</span> <span class="o">+</span> <span class="n">Ul</span><span class="p">)[:,</span> <span class="n">r</span><span class="p">])</span>
 
         <span class="c1"># update dual</span>
         <span class="n">Ul1</span> <span class="o">=</span> <span class="n">Ul</span> <span class="o">+</span> <span class="n">Cl1</span> <span class="o">-</span> <span class="n">Ctl1</span>
@@ -348,21 +387,26 @@ document.write(`
 <a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.kmeans_init">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">kmeans_init</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">Lr</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Full initializer that:</span>
-<span class="sd">    1. Runs KMeans on unfolded T to get cluster maps and cluster spectra.</span>
-<span class="sd">    2. Runs NMF on those maps to get nonnegative spatial factors A, B.</span>
-<span class="sd">    3. Builds C from the projected cluster centers (Stokes vectors).</span>
+<span class="sd">    K-means based initialization for the Stokes-BTD decomposition.</span>
 
-<span class="sd">    Inputs:</span>
-<span class="sd">    - T: data tensor</span>
-<span class="sd">    - R: number of clusters / block terms</span>
-<span class="sd">    - Lr: list/array where Lr[0] is the NMF rank per block matching the rank of the spatial maps</span>
-<span class="sd">    - theta: model parameter passed to btd.factors_to_tensor</span>
+<span class="sd">    Clusters spatial pixels via K-means, applies NMF on each cluster&#39;s</span>
+<span class="sd">    spatial map to obtain non-negative factors A, B, and builds C from</span>
+<span class="sd">    the projected cluster centers (valid Stokes vectors).</span>
 
-<span class="sd">    Outputs:</span>
-<span class="sd">    - kmeansA (initA): nonnegative factor A</span>
-<span class="sd">    - kmeansB (initB): nonnegative factor B</span>
-<span class="sd">    - kmeansC (initC): Each column is a Stokes vector (after projection)</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        T: np.ndarray</span>
+<span class="sd">            Input tensor of shape ``(I, J, 4)``.</span>
+<span class="sd">        R: int</span>
+<span class="sd">            Number of clusters / block terms.</span>
+<span class="sd">        Lr: list[int] or np.ndarray</span>
+<span class="sd">            Rank of the spatial maps. Uses ``Lr[0]`` as the NMF rank.</span>
+<span class="sd">        theta: np.ndarray</span>
+<span class="sd">            Constraint matrix from the BTD model.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">            Initialized factors ``(A, B, C)`` where A, B are non-negative</span>
+<span class="sd">            and each column of C is a valid Stokes vector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># -------------------------</span>
@@ -382,7 +426,7 @@ document.write(`
 
     <span class="c1"># Project each cluster center using Stokes projection</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
-        <span class="n">kmeansC</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">stokesProjection</span><span class="p">(</span><span class="n">kmeansC</span><span class="p">[:,</span> <span class="n">r</span><span class="p">])</span>
+        <span class="n">kmeansC</span><span class="p">[:,</span> <span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">stokes</span><span class="o">.</span><span class="n">stokes_projection</span><span class="p">(</span><span class="n">kmeansC</span><span class="p">[:,</span> <span class="n">r</span><span class="p">])</span>
 
     <span class="c1"># Normalize each cluster center so that its first component is 1</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
@@ -446,10 +490,26 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="init_Stokes_factors">
-<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.init_Stokes_factors">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="c1"># Add check to see if T has coherent dimensions</span>
+<div class="viewcode-block" id="init_STOKES_factors">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.init_STOKES_factors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_STOKES_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize factor matrices for the Stokes-BTD decomposition.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        Stokes_model: Stokes</span>
+<span class="sd">            An instance of the :class:`~pybbtd.stokes.Stokes` class.</span>
+<span class="sd">        init: str</span>
+<span class="sd">            Initialization strategy (default: ``&quot;random&quot;``).</span>
+<span class="sd">            Options: ``&quot;random&quot;``, ``&quot;kmeans&quot;``.</span>
+<span class="sd">        T: np.ndarray or None</span>
+<span class="sd">            Input tensor (required for ``&quot;kmeans&quot;`` initialization).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">            Initialized factor matrices ``(A, B, C)`` where A, B are</span>
+<span class="sd">            non-negative and each column of C is a valid Stokes vector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
 
     <span class="n">theta</span> <span class="o">=</span> <span class="n">Stokes_model</span><span class="o">.</span><span class="n">get_constraint_matrix</span><span class="p">()</span>
@@ -468,9 +528,9 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="Stokes_ADMM">
-<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.Stokes_ADMM">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">Stokes_ADMM</span><span class="p">(</span>
+<div class="viewcode-block" id="STOKES_ADMM">
+<a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.stokes_admm.STOKES_ADMM">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">STOKES_ADMM</span><span class="p">(</span>
     <span class="n">Stokes_model</span><span class="p">,</span>
     <span class="n">T</span><span class="p">,</span>
     <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
@@ -481,6 +541,39 @@ document.write(`
     <span class="n">abs_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">admm_tol</span><span class="o">=</span><span class="mi">10</span><span class="o">**-</span><span class="mi">8</span><span class="p">,</span>
 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    AO-ADMM solver for the Stokes-constrained BTD-LL1 decomposition.</span>
+
+<span class="sd">    Enforces non-negativity on spatial factors A, B and Stokes</span>
+<span class="sd">    physical constraints on C via alternating ADMM updates.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        Stokes_model: Stokes</span>
+<span class="sd">            An instance of the :class:`~pybbtd.stokes.Stokes` class.</span>
+<span class="sd">        T: np.ndarray</span>
+<span class="sd">            Input tensor of shape ``(I, J, 4)`` to be decomposed.</span>
+<span class="sd">        init: str</span>
+<span class="sd">            Initialization strategy (default: ``&quot;random&quot;``).</span>
+<span class="sd">            Options: ``&quot;random&quot;``, ``&quot;kmeans&quot;``.</span>
+<span class="sd">        max_iter: int</span>
+<span class="sd">            Maximum number of outer iterations (default: 1000).</span>
+<span class="sd">        rho: float</span>
+<span class="sd">            ADMM penalty parameter (default: 1).</span>
+<span class="sd">        max_admm: int</span>
+<span class="sd">            Maximum number of inner ADMM iterations per factor update</span>
+<span class="sd">            (default: 1).</span>
+<span class="sd">        rel_tol: float</span>
+<span class="sd">            Relative tolerance for outer convergence (default: 1e-10).</span>
+<span class="sd">        abs_tol: float</span>
+<span class="sd">            Absolute tolerance for outer convergence (default: 1e-10).</span>
+<span class="sd">        admm_tol: float</span>
+<span class="sd">            Tolerance for inner ADMM convergence (default: 1e-8).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[list, list]:</span>
+<span class="sd">            ``(factors, fit_error)`` where ``factors = [A, B, C]`` and</span>
+<span class="sd">            ``fit_error`` is a list of squared reconstruction errors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">pybbtd.stokes</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stokes</span>
 
     <span class="c1"># Check that Stokes_model is an instance of the Stokes class</span>
@@ -497,11 +590,11 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;T&#39;s dimensions (</span><span class="si">{</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">) do not match Stokes_model.dims (</span><span class="si">{</span><span class="n">Stokes_model</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">).&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">init</span> <span class="o">==</span> <span class="s2">&quot;random&quot;</span><span class="p">:</span>
-        <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
-        <span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+        <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_STOKES_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+        <span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span> <span class="o">=</span> <span class="n">init_STOKES_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">init</span> <span class="o">==</span> <span class="s2">&quot;kmeans&quot;</span><span class="p">:</span>
-        <span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="s2">&quot;kmeans&quot;</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
-        <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_Stokes_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">)</span>
+        <span class="n">Atk</span><span class="p">,</span> <span class="n">Btk</span><span class="p">,</span> <span class="n">Ctk</span> <span class="o">=</span> <span class="n">init_STOKES_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="s2">&quot;kmeans&quot;</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">Ak</span><span class="p">,</span> <span class="n">Bk</span><span class="p">,</span> <span class="n">Ck</span> <span class="o">=</span> <span class="n">init_STOKES_factors</span><span class="p">(</span><span class="n">Stokes_model</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;not implemented&quot;</span><span class="p">)</span>
 

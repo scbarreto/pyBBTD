@@ -152,17 +152,18 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -281,25 +282,40 @@ document.write(`
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
  | <a href="#V"><strong>V</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_C">ADMM_C() (in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.ADMM_A">ADMM_A() (in module pybbtd.solvers.covll1_admm)</a>
 </li>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.ADMM_B">ADMM_B() (in module pybbtd.solvers.covll1_admm)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.ADMM_C">ADMM_C() (in module pybbtd.solvers.covll1_admm)</a>
+
+      <ul>
+        <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_C">(in module pybbtd.solvers.stokes_admm)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_btd.html#pybbtd.btd.BTD">BTD (class in pybbtd.btd)</a>
+      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD">BBTD (class in pybbtd.bbtd)</a>
+</li>
+      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS">BBTD_ALS() (in module pybbtd.solvers.bbtd_vanilla_als)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM">BBTD_COV_ADMM() (in module pybbtd.solvers.bbtd_cov_admm)</a>
+</li>
+      <li><a href="reference_btd.html#pybbtd.btd.BTD">BTD (class in pybbtd.btd)</a>
+</li>
       <li><a href="reference_solvers.html#pybbtd.solvers.btd_als.BTD_ALS">BTD_ALS() (in module pybbtd.solvers.btd_als)</a>
 </li>
   </ul></td>
@@ -310,8 +326,12 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference_stokes.html#pybbtd.stokes.check_stokes_constraints">check_stokes_constraints() (in module pybbtd.stokes)</a>
 </li>
-      <li><a href="reference_btd.html#pybbtd.btd.BTD.check_uniqueness">check_uniqueness() (pybbtd.btd.BTD method)</a>
+      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD.check_uniqueness">check_uniqueness() (pybbtd.bbtd.BBTD method)</a>
+
+      <ul>
+        <li><a href="reference_btd.html#pybbtd.btd.BTD.check_uniqueness">(pybbtd.btd.BTD method)</a>
 </li>
+      </ul></li>
       <li><a href="reference_uniqueness.html#pybbtd.uniqueness.check_uniqueness_BBTD">check_uniqueness_BBTD() (in module pybbtd.uniqueness)</a>
 </li>
   </ul></td>
@@ -322,17 +342,25 @@ document.write(`
 </li>
       <li><a href="reference_covll1.html#pybbtd.covll1.CovLL1">CovLL1 (class in pybbtd.covll1)</a>
 </li>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.COVLL1_ADMM">COVLL1_ADMM() (in module pybbtd.solvers.covll1_admm)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_btd.html#pybbtd.btd.factors_to_tensor">factors_to_tensor() (in module pybbtd.btd)</a>
-</li>
-      <li><a href="reference_btd.html#pybbtd.btd.BTD.fit">fit() (pybbtd.btd.BTD method)</a>
+      <li><a href="reference_bbtd.html#pybbtd.bbtd.factors_to_tensor">factors_to_tensor() (in module pybbtd.bbtd)</a>
 
       <ul>
+        <li><a href="reference_btd.html#pybbtd.btd.factors_to_tensor">(in module pybbtd.btd)</a>
+</li>
+      </ul></li>
+      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD.fit">fit() (pybbtd.bbtd.BBTD method)</a>
+
+      <ul>
+        <li><a href="reference_btd.html#pybbtd.btd.BTD.fit">(pybbtd.btd.BTD method)</a>
+</li>
         <li><a href="reference_covll1.html#pybbtd.covll1.CovLL1.fit">(pybbtd.covll1.CovLL1 method)</a>
 </li>
         <li><a href="reference_stokes.html#pybbtd.stokes.Stokes.fit">(pybbtd.stokes.Stokes method)</a>
@@ -354,6 +382,8 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference_stokes.html#pybbtd.stokes.Stokes.generate_stokes_tensor">generate_stokes_tensor() (pybbtd.stokes.Stokes method)</a>
 </li>
+      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD.get_constraint_matrices">get_constraint_matrices() (pybbtd.bbtd.BBTD method)</a>
+</li>
       <li><a href="reference_btd.html#pybbtd.btd.BTD.get_constraint_matrix">get_constraint_matrix() (pybbtd.btd.BTD method)</a>
 
       <ul>
@@ -366,11 +396,17 @@ document.write(`
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors">init_BBTD_cov_factors() (in module pybbtd.solvers.bbtd_cov_admm)</a>
+</li>
+      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors">init_BBTD_factors() (in module pybbtd.solvers.bbtd_vanilla_als)</a>
+</li>
       <li><a href="reference_solvers.html#pybbtd.solvers.btd_als.init_BTD_factors">init_BTD_factors() (in module pybbtd.solvers.btd_als)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.init_Stokes_factors">init_Stokes_factors() (in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.init_COVLL1_factors">init_COVLL1_factors() (in module pybbtd.solvers.covll1_admm)</a>
+</li>
+      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.init_STOKES_factors">init_STOKES_factors() (in module pybbtd.solvers.stokes_admm)</a>
 </li>
       <li><a href="reference_covll1.html#pybbtd.covll1.is_valid_covariance">is_valid_covariance() (in module pybbtd.covll1)</a>
 </li>
@@ -380,8 +416,12 @@ document.write(`
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.kmeans_init">kmeans_init() (in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.kmeans_init">kmeans_init() (in module pybbtd.solvers.covll1_admm)</a>
+
+      <ul>
+        <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.kmeans_init">(in module pybbtd.solvers.stokes_admm)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -394,11 +434,19 @@ document.write(`
       <ul>
         <li><a href="reference_api.html#module-pybbtd">pybbtd</a>
 </li>
+        <li><a href="reference_bbtd.html#module-pybbtd.bbtd">pybbtd.bbtd</a>
+</li>
         <li><a href="reference_btd.html#module-pybbtd.btd">pybbtd.btd</a>
 </li>
         <li><a href="reference_covll1.html#module-pybbtd.covll1">pybbtd.covll1</a>
 </li>
+        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_cov_admm">pybbtd.solvers.bbtd_cov_admm</a>
+</li>
+        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_vanilla_als">pybbtd.solvers.bbtd_vanilla_als</a>
+</li>
         <li><a href="reference_solvers.html#module-pybbtd.solvers.btd_als">pybbtd.solvers.btd_als</a>
+</li>
+        <li><a href="reference_solvers.html#module-pybbtd.solvers.covll1_admm">pybbtd.solvers.covll1_admm</a>
 </li>
         <li><a href="reference_solvers.html#module-pybbtd.solvers.stokes_admm">pybbtd.solvers.stokes_admm</a>
 </li>
@@ -406,7 +454,11 @@ document.write(`
 </li>
         <li><a href="reference_uniqueness.html#module-pybbtd.uniqueness">pybbtd.uniqueness</a>
 </li>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization">pybbtd.visualization</a>
+        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_bbtd">pybbtd.visualization.draw_bbtd</a>
+</li>
+        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_metrics">pybbtd.visualization.draw_metrics</a>
+</li>
+        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_stokes">pybbtd.visualization.draw_stokes</a>
 </li>
       </ul></li>
   </ul></td>
@@ -415,13 +467,28 @@ document.write(`
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_stokes.html#pybbtd.stokes.projPSD">projPSD() (in module pybbtd.stokes)</a>
+      <li><a href="reference_visualization.html#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms">plot_BBTD_cov_terms() (in module pybbtd.visualization.draw_bbtd)</a>
+</li>
+      <li><a href="reference_visualization.html#pybbtd.visualization.draw_metrics.plot_error">plot_error() (in module pybbtd.visualization.draw_metrics)</a>
+</li>
+      <li><a href="reference_visualization.html#pybbtd.visualization.draw_stokes.plot_stokes_terms">plot_stokes_terms() (in module pybbtd.visualization.draw_stokes)</a>
+</li>
+      <li><a href="reference_stokes.html#pybbtd.stokes.proj_psd">proj_psd() (in module pybbtd.stokes)</a>
+</li>
+      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.project_to_psd">project_to_psd() (in module pybbtd.solvers.covll1_admm)</a>
 </li>
       <li>
     pybbtd
 
       <ul>
         <li><a href="reference_api.html#module-pybbtd">module</a>
+</li>
+      </ul></li>
+      <li>
+    pybbtd.bbtd
+
+      <ul>
+        <li><a href="reference_bbtd.html#module-pybbtd.bbtd">module</a>
 </li>
       </ul></li>
       <li>
@@ -439,14 +506,35 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    pybbtd.solvers.bbtd_cov_admm
+
+      <ul>
+        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_cov_admm">module</a>
+</li>
+      </ul></li>
+      <li>
+    pybbtd.solvers.bbtd_vanilla_als
+
+      <ul>
+        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_vanilla_als">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
     pybbtd.solvers.btd_als
 
       <ul>
         <li><a href="reference_solvers.html#module-pybbtd.solvers.btd_als">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    pybbtd.solvers.covll1_admm
+
+      <ul>
+        <li><a href="reference_solvers.html#module-pybbtd.solvers.covll1_admm">module</a>
+</li>
+      </ul></li>
       <li>
     pybbtd.solvers.stokes_admm
 
@@ -469,10 +557,24 @@ document.write(`
 </li>
       </ul></li>
       <li>
-    pybbtd.visualization
+    pybbtd.visualization.draw_bbtd
 
       <ul>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization">module</a>
+        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_bbtd">module</a>
+</li>
+      </ul></li>
+      <li>
+    pybbtd.visualization.draw_metrics
+
+      <ul>
+        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_metrics">module</a>
+</li>
+      </ul></li>
+      <li>
+    pybbtd.visualization.draw_stokes
+
+      <ul>
+        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_stokes">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -487,17 +589,11 @@ document.write(`
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.Stokes_ADMM">Stokes_ADMM() (in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.STOKES_ADMM">STOKES_ADMM() (in module pybbtd.solvers.stokes_admm)</a>
 </li>
-      <li><a href="reference_stokes.html#pybbtd.stokes.stokesProjection">stokesProjection() (in module pybbtd.stokes)</a>
+      <li><a href="reference_stokes.html#pybbtd.stokes.stokes_projection">stokes_projection() (in module pybbtd.stokes)</a>
 </li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_btd.html#pybbtd.btd.BTD.to_cpd_format">to_cpd_format() (pybbtd.btd.BTD method)</a>
+      <li><a href="reference_visualization.html#pybbtd.visualization.draw_stokes.stokes_to_ellipse">stokes_to_ellipse() (in module pybbtd.visualization.draw_stokes)</a>
 </li>
   </ul></td>
 </tr></table>

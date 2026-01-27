@@ -152,17 +152,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_solvers.html">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -279,6 +280,33 @@ document.write(`
 <div class="viewcode-block" id="BTD_ALS">
 <a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.btd_als.BTD_ALS">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">BTD_ALS</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Alternating Least Squares (ALS) solver for the BTD decomposition.</span>
+
+<span class="sd">    Supports all three block modes (``&quot;LL1&quot;``, ``&quot;L1L&quot;``, ``&quot;1LL&quot;``).</span>
+<span class="sd">    Internally transposes non-LL1 tensors so the ALS updates always</span>
+<span class="sd">    operate in LL1 form.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        BTD_model: BTD</span>
+<span class="sd">            An instance of the :class:`~pybbtd.btd.BTD` class.</span>
+<span class="sd">        T: np.ndarray</span>
+<span class="sd">            Input 3D tensor to be decomposed, shape matching ``BTD_model.dims``.</span>
+<span class="sd">        init: str</span>
+<span class="sd">            Initialization strategy (default: ``&quot;random&quot;``).</span>
+<span class="sd">            Options: ``&quot;random&quot;``, ``&quot;svd&quot;``.</span>
+<span class="sd">        max_iter: int</span>
+<span class="sd">            Maximum number of ALS iterations (default: 1000).</span>
+<span class="sd">        abs_tol: float</span>
+<span class="sd">            Absolute tolerance for convergence (default: 1e-8).</span>
+<span class="sd">        rel_tol: float</span>
+<span class="sd">            Relative tolerance for convergence (default: 1e-3).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[list, np.ndarray]:</span>
+<span class="sd">            ``(factors, fit_error)`` where ``factors = [A, B, C]`` and</span>
+<span class="sd">            ``fit_error`` is a 1-D array of squared reconstruction errors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Check that BTD_model is an instance of the BTD class</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">,</span> <span class="n">btd</span><span class="o">.</span><span class="n">BTD</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;BTD_model must be an instance of the BTD class.&quot;</span><span class="p">)</span>
@@ -377,19 +405,21 @@ document.write(`
 <div class="viewcode-block" id="init_BTD_factors">
 <a class="viewcode-back" href="../../../reference_solvers.html#pybbtd.solvers.btd_als.init_BTD_factors">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">init_BTD_factors</span><span class="p">(</span><span class="n">BTD_model</span><span class="p">,</span> <span class="n">strat</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;LL1-based init</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize factor matrices for the BTD decomposition.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        BTD_model (_type_): _description_</span>
-<span class="sd">        strat (str, optional): _description_. Defaults to &quot;random&quot;.</span>
-<span class="sd">        T (_type_, optional): _description_. Defaults to None.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: _description_</span>
-<span class="sd">        ValueError: _description_</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        BTD_model: BTD</span>
+<span class="sd">            An instance of the :class:`~pybbtd.btd.BTD` class.</span>
+<span class="sd">        strat: str</span>
+<span class="sd">            Initialization strategy (default: ``&quot;random&quot;``).</span>
+<span class="sd">            Options: ``&quot;random&quot;``, ``&quot;svd&quot;``.</span>
+<span class="sd">        T: np.ndarray or None</span>
+<span class="sd">            Input tensor (required for ``&quot;svd&quot;`` initialization).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        _type_: _description_</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">            Initialized factor matrices ``(A, B, C)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># get BTD model params</span>

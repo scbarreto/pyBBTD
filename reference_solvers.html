@@ -44,7 +44,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Visualization" href="reference_visualization.html" />
-    <link rel="prev" title="Stokes Class" href="reference_stokes.html" />
+    <link rel="prev" title="Uniqueness" href="reference_uniqueness.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -153,17 +153,18 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">BBTD tutorial (Vanilla ALS)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">BBTD tutorial (Constrained ADMM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Solvers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
 </ul>
 </details></li>
 </ul>
@@ -314,12 +315,38 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.Stokes_ADMM"><code class="docutils literal notranslate"><span class="pre">Stokes_ADMM()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.init_Stokes_factors"><code class="docutils literal notranslate"><span class="pre">init_Stokes_factors()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.BTD_ALS"><code class="docutils literal notranslate"><span class="pre">BTD_ALS()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.init_BTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BTD_factors()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#btd-als">BTD – ALS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.BTD_ALS"><code class="docutils literal notranslate"><span class="pre">BTD_ALS()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.init_BTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BTD_factors()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cov-ll1-admm">Cov-LL1 – ADMM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.ADMM_A"><code class="docutils literal notranslate"><span class="pre">ADMM_A()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.ADMM_B"><code class="docutils literal notranslate"><span class="pre">ADMM_B()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.COVLL1_ADMM"><code class="docutils literal notranslate"><span class="pre">COVLL1_ADMM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.init_COVLL1_factors"><code class="docutils literal notranslate"><span class="pre">init_COVLL1_factors()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.project_to_psd"><code class="docutils literal notranslate"><span class="pre">project_to_psd()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-admm">Stokes – ADMM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.STOKES_ADMM"><code class="docutils literal notranslate"><span class="pre">STOKES_ADMM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.init_STOKES_factors"><code class="docutils literal notranslate"><span class="pre">init_STOKES_factors()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bbtd-vanilla-als">BBTD – Vanilla ALS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS"><code class="docutils literal notranslate"><span class="pre">BBTD_ALS()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BBTD_factors()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bbtd-constrained-admm">BBTD – Constrained ADMM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM"><code class="docutils literal notranslate"><span class="pre">BBTD_COV_ADMM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors"><code class="docutils literal notranslate"><span class="pre">init_BBTD_cov_factors()</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -331,73 +358,688 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-pybbtd.solvers.stokes_admm">
-<span id="solvers"></span><span id="reference-solvers"></span><h1>Solvers<a class="headerlink" href="#module-pybbtd.solvers.stokes_admm" title="Link to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.ADMM_C">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">ADMM_C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ctinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitermax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#ADMM_C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.ADMM_C" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.Stokes_ADMM">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">Stokes_ADMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Stokes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_admm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admm_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#Stokes_ADMM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.Stokes_ADMM" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.init_Stokes_factors">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">init_Stokes_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Stokes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#init_Stokes_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.init_Stokes_factors" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.kmeans_init">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">kmeans_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#kmeans_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.kmeans_init" title="Link to this definition">#</a></dt>
-<dd><p>Full initializer that:
-1. Runs KMeans on unfolded T to get cluster maps and cluster spectra.
-2. Runs NMF on those maps to get nonnegative spatial factors A, B.
-3. Builds C from the projected cluster centers (Stokes vectors).</p>
-<p>Inputs:
-- T: data tensor
-- R: number of clusters / block terms
-- Lr: list/array where Lr[0] is the NMF rank per block matching the rank of the spatial maps
-- theta: model parameter passed to btd.factors_to_tensor</p>
-<p>Outputs:
-- kmeansA (initA): nonnegative factor A
-- kmeansB (initB): nonnegative factor B
-- kmeansC (initC): Each column is a Stokes vector (after projection)</p>
-</dd></dl>
-
+  <section id="solvers">
+<span id="reference-solvers"></span><h1>Solvers<a class="headerlink" href="#solvers" title="Link to this heading">#</a></h1>
+<section id="btd-als">
+<h2>BTD – ALS<a class="headerlink" href="#btd-als" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.btd_als.BTD_ALS" title="pybbtd.solvers.btd_als.BTD_ALS"><code class="xref py py-func docutils literal notranslate"><span class="pre">BTD_ALS()</span></code></a></p></td>
+<td><p>Alternating Least Squares solver for the BTD decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.btd_als.init_BTD_factors" title="pybbtd.solvers.btd_als.init_BTD_factors"><code class="xref py py-func docutils literal notranslate"><span class="pre">init_BTD_factors()</span></code></a></p></td>
+<td><p>Initialize factor matrices for the BTD decomposition.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <dl class="py function" id="module-pybbtd.solvers.btd_als">
 <dt class="sig sig-object py" id="pybbtd.solvers.btd_als.BTD_ALS">
 <span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.btd_als.</span></span><span class="sig-name descname"><span class="pre">BTD_ALS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/btd_als.html#BTD_ALS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.btd_als.BTD_ALS" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pybbtd.solvers.btd_als.init_BTD_factors">
-<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.btd_als.</span></span><span class="sig-name descname"><span class="pre">init_BTD_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/btd_als.html#init_BTD_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.btd_als.init_BTD_factors" title="Link to this definition">#</a></dt>
-<dd><p>LL1-based init</p>
+<dd><p>Alternating Least Squares (ALS) solver for the BTD decomposition.</p>
+<p>Supports all three block modes (<code class="docutils literal notranslate"><span class="pre">&quot;LL1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;L1L&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;1LL&quot;</span></code>).
+Internally transposes non-LL1 tensors so the ALS updates always
+operate in LL1 form.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>BTD_model</strong> (<em>_type_</em>) – _description_</p></li>
-<li><p><strong>strat</strong> (<em>str</em><em>, </em><em>optional</em>) – _description_. Defaults to “random”.</p></li>
-<li><p><strong>T</strong> (<em>_type_</em><em>, </em><em>optional</em>) – _description_. Defaults to None.</p></li>
+<li><p><strong>BTD_model</strong> – BTD
+An instance of the <a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD" title="pybbtd.btd.BTD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BTD</span></code></a> class.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+Input 3D tensor to be decomposed, shape matching <code class="docutils literal notranslate"><span class="pre">BTD_model.dims</span></code>.</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy (default: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>).
+Options: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;svd&quot;</span></code>.</p></li>
+<li><p><strong>max_iter</strong> – int
+Maximum number of ALS iterations (default: 1000).</p></li>
+<li><p><strong>abs_tol</strong> – float
+Absolute tolerance for convergence (default: 1e-8).</p></li>
+<li><p><strong>rel_tol</strong> – float
+Relative tolerance for convergence (default: 1e-3).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – _description_</p></li>
-<li><p><strong>ValueError</strong> – _description_</p></li>
-</ul>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(factors,</span> <span class="pre">fit_error)</span></code> where <code class="docutils literal notranslate"><span class="pre">factors</span> <span class="pre">=</span> <span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fit_error</span></code> is a 1-D array of squared reconstruction errors.</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>_description_</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>_type_</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[list, np.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.btd_als.init_BTD_factors">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.btd_als.</span></span><span class="sig-name descname"><span class="pre">init_BTD_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/btd_als.html#init_BTD_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.btd_als.init_BTD_factors" title="Link to this definition">#</a></dt>
+<dd><p>Initialize factor matrices for the BTD decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BTD_model</strong> – BTD
+An instance of the <a class="reference internal" href="reference_btd.html#pybbtd.btd.BTD" title="pybbtd.btd.BTD"><code class="xref py py-class docutils literal notranslate"><span class="pre">BTD</span></code></a> class.</p></li>
+<li><p><strong>strat</strong> – str
+Initialization strategy (default: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>).
+Options: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;svd&quot;</span></code>.</p></li>
+<li><p><strong>T</strong> – np.ndarray or None
+Input tensor (required for <code class="docutils literal notranslate"><span class="pre">&quot;svd&quot;</span></code> initialization).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized factor matrices <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="cov-ll1-admm">
+<h2>Cov-LL1 – ADMM<a class="headerlink" href="#cov-ll1-admm" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.COVLL1_ADMM" title="pybbtd.solvers.covll1_admm.COVLL1_ADMM"><code class="xref py py-func docutils literal notranslate"><span class="pre">COVLL1_ADMM()</span></code></a></p></td>
+<td><p>AO-ADMM solver for the Cov-LL1 decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.ADMM_A" title="pybbtd.solvers.covll1_admm.ADMM_A"><code class="xref py py-func docutils literal notranslate"><span class="pre">ADMM_A()</span></code></a></p></td>
+<td><p>Inner ADMM update for factor A with non-negativity constraint.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.ADMM_B" title="pybbtd.solvers.covll1_admm.ADMM_B"><code class="xref py py-func docutils literal notranslate"><span class="pre">ADMM_B()</span></code></a></p></td>
+<td><p>Inner ADMM update for factor B with non-negativity constraint.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.ADMM_C" title="pybbtd.solvers.covll1_admm.ADMM_C"><code class="xref py py-func docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></p></td>
+<td><p>Inner ADMM update for factor C with PSD covariance constraint.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.init_COVLL1_factors" title="pybbtd.solvers.covll1_admm.init_COVLL1_factors"><code class="xref py py-func docutils literal notranslate"><span class="pre">init_COVLL1_factors()</span></code></a></p></td>
+<td><p>Initialize factor matrices for the Cov-LL1 decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.kmeans_init" title="pybbtd.solvers.covll1_admm.kmeans_init"><code class="xref py py-func docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></p></td>
+<td><p>K-means based initialization for the Cov-LL1 decomposition.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.covll1_admm.project_to_psd" title="pybbtd.solvers.covll1_admm.project_to_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">project_to_psd()</span></code></a></p></td>
+<td><p>Project a covariance matrix onto the PSD cone.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.solvers.covll1_admm">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.ADMM_A">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">ADMM_A</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ck</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ainit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Atinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitermax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#ADMM_A"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.ADMM_A" title="Link to this definition">#</a></dt>
+<dd><p>Inner ADMM update for factor A with non-negativity constraint.</p>
+<p>Solves the augmented Lagrangian subproblem for A using the first
+mode unfolding, with a proximal non-negativity projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Y1</strong> – np.ndarray
+First mode unfolding of the input tensor.</p></li>
+<li><p><strong>Bk</strong> – np.ndarray
+Current estimate of factor B.</p></li>
+<li><p><strong>Ck</strong> – np.ndarray
+Current estimate of factor C (pre-multiplied by theta).</p></li>
+<li><p><strong>Ainit</strong> – np.ndarray
+Initial primal variable for A.</p></li>
+<li><p><strong>Atinit</strong> – np.ndarray
+Initial projected (non-negative) variable for A.</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter.</p></li>
+<li><p><strong>L</strong> – int
+Rank of the spatial maps.</p></li>
+<li><p><strong>nitermax</strong> – int
+Maximum number of inner ADMM iterations (default: 100).</p></li>
+<li><p><strong>tol</strong> – float
+Convergence tolerance (default: 1e-14).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(Atilde,</span> <span class="pre">A,</span> <span class="pre">primal_residue)</span></code> where <code class="docutils literal notranslate"><span class="pre">Atilde</span></code> is the
+non-negative projected factor, <code class="docutils literal notranslate"><span class="pre">A</span></code> is the unconstrained
+factor, and <code class="docutils literal notranslate"><span class="pre">primal_residue</span></code> is the final primal residual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.ADMM_B">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">ADMM_B</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ck</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Binit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Btinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitermax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#ADMM_B"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.ADMM_B" title="Link to this definition">#</a></dt>
+<dd><p>Inner ADMM update for factor B with non-negativity constraint.</p>
+<p>Solves the augmented Lagrangian subproblem for B using the second
+mode unfolding, with a proximal non-negativity projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Y2</strong> – np.ndarray
+Second mode unfolding of the input tensor.</p></li>
+<li><p><strong>Ak</strong> – np.ndarray
+Current estimate of factor A.</p></li>
+<li><p><strong>Ck</strong> – np.ndarray
+Current estimate of factor C (pre-multiplied by theta).</p></li>
+<li><p><strong>Binit</strong> – np.ndarray
+Initial primal variable for B.</p></li>
+<li><p><strong>Btinit</strong> – np.ndarray
+Initial projected (non-negative) variable for B.</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter.</p></li>
+<li><p><strong>L</strong> – int
+Rank of the spatial maps.</p></li>
+<li><p><strong>nitermax</strong> – int
+Maximum number of inner ADMM iterations (default: 100).</p></li>
+<li><p><strong>tol</strong> – float
+Convergence tolerance (default: 1e-14).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(Btilde,</span> <span class="pre">B,</span> <span class="pre">primal_residue)</span></code> where <code class="docutils literal notranslate"><span class="pre">Btilde</span></code> is the
+non-negative projected factor, <code class="docutils literal notranslate"><span class="pre">B</span></code> is the unconstrained
+factor, and <code class="docutils literal notranslate"><span class="pre">primal_residue</span></code> is the final primal residual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.ADMM_C">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">ADMM_C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ctinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitermax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#ADMM_C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.ADMM_C" title="Link to this definition">#</a></dt>
+<dd><p>Inner ADMM update for factor C with PSD covariance constraint.</p>
+<p>Solves the augmented Lagrangian subproblem for C using the third
+mode unfolding, projecting each column onto the positive
+semidefinite cone via <a class="reference internal" href="#pybbtd.solvers.covll1_admm.project_to_psd" title="pybbtd.solvers.covll1_admm.project_to_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">project_to_psd()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Y3</strong> – np.ndarray
+Third mode unfolding of the input tensor.</p></li>
+<li><p><strong>Ak</strong> – np.ndarray
+Current estimate of factor A.</p></li>
+<li><p><strong>Bk</strong> – np.ndarray
+Current estimate of factor B.</p></li>
+<li><p><strong>Cinit</strong> – np.ndarray
+Initial primal variable for C.</p></li>
+<li><p><strong>Ctinit</strong> – np.ndarray
+Initial projected (PSD) variable for C.</p></li>
+<li><p><strong>theta</strong> – np.ndarray
+Constraint matrix from the BTD model.</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter.</p></li>
+<li><p><strong>L</strong> – int
+Rank of the spatial maps.</p></li>
+<li><p><strong>R</strong> – int
+Number of block terms.</p></li>
+<li><p><strong>nitermax</strong> – int
+Maximum number of inner ADMM iterations (default: 100).</p></li>
+<li><p><strong>tol</strong> – float
+Convergence tolerance (default: 1e-14).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(Ctilde,</span> <span class="pre">C,</span> <span class="pre">primal_residue)</span></code> where <code class="docutils literal notranslate"><span class="pre">Ctilde</span></code> is the
+PSD-projected factor, <code class="docutils literal notranslate"><span class="pre">C</span></code> is the unconstrained factor,
+and <code class="docutils literal notranslate"><span class="pre">primal_residue</span></code> is the final primal residual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.COVLL1_ADMM">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">COVLL1_ADMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CovLL1_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_admm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admm_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#COVLL1_ADMM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.COVLL1_ADMM" title="Link to this definition">#</a></dt>
+<dd><p>AO-ADMM solver for the Cov-LL1 decomposition.</p>
+<p>Enforces non-negativity on spatial factors A, B and positive
+semidefiniteness on the covariance columns of C via alternating
+ADMM updates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CovLL1_model</strong> – CovLL1
+An instance of the <a class="reference internal" href="reference_covll1.html#pybbtd.covll1.CovLL1" title="pybbtd.covll1.CovLL1"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovLL1</span></code></a> class.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+Input tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K^2)</span></code> to be decomposed.</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy (default: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>).
+Options: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;kmeans&quot;</span></code>.</p></li>
+<li><p><strong>max_iter</strong> – int
+Maximum number of outer iterations (default: 1000).</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter (default: 1).</p></li>
+<li><p><strong>max_admm</strong> – int
+Maximum number of inner ADMM iterations per factor update
+(default: 1).</p></li>
+<li><p><strong>rel_tol</strong> – float
+Relative tolerance for outer convergence (default: 1e-10).</p></li>
+<li><p><strong>abs_tol</strong> – float
+Absolute tolerance for outer convergence (default: 1e-10).</p></li>
+<li><p><strong>admm_tol</strong> – float
+Tolerance for inner ADMM convergence (default: 1e-8).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(factors,</span> <span class="pre">fit_error)</span></code> where <code class="docutils literal notranslate"><span class="pre">factors</span> <span class="pre">=</span> <span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fit_error</span></code> is a list of normalized squared reconstruction
+errors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[list, list]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.init_COVLL1_factors">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">init_COVLL1_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CovLL1_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#init_COVLL1_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.init_COVLL1_factors" title="Link to this definition">#</a></dt>
+<dd><p>Initialize factor matrices for the Cov-LL1 decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CovLL1_model</strong> – CovLL1
+An instance of the <a class="reference internal" href="reference_covll1.html#pybbtd.covll1.CovLL1" title="pybbtd.covll1.CovLL1"><code class="xref py py-class docutils literal notranslate"><span class="pre">CovLL1</span></code></a> class.</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy (default: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>).
+Options: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;kmeans&quot;</span></code>.</p></li>
+<li><p><strong>T</strong> – np.ndarray or None
+Input tensor (required for <code class="docutils literal notranslate"><span class="pre">&quot;kmeans&quot;</span></code> initialization).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized factor matrices <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code> where A, B are
+non-negative and C contains vectorized covariance columns.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.kmeans_init">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">kmeans_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#kmeans_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.kmeans_init" title="Link to this definition">#</a></dt>
+<dd><p>K-means based initialization for the Cov-LL1 decomposition.</p>
+<p>Clusters the spatial pixels by their covariance vectors using K-means,
+then applies NMF on each cluster’s spatial map to obtain non-negative
+factors A, B. The covariance factor C is initialized from the cluster
+centers projected onto the PSD cone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – np.ndarray
+Input tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K^2)</span></code> to be decomposed.</p></li>
+<li><p><strong>R</strong> – int
+Number of block terms.</p></li>
+<li><p><strong>L1</strong> – int
+Rank of the spatial maps (NMF rank per cluster).</p></li>
+<li><p><strong>theta</strong> – np.ndarray
+Constraint matrix from the BTD model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized factor matrices <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code> where A, B are
+non-negative and C contains vectorized PSD covariance columns.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.covll1_admm.project_to_psd">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.covll1_admm.</span></span><span class="sig-name descname"><span class="pre">project_to_psd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov_matrix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/covll1_admm.html#project_to_psd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.covll1_admm.project_to_psd" title="Link to this definition">#</a></dt>
+<dd><p>Project a covariance matrix onto the PSD (positive semidefinite) cone.</p>
+<p>Computes the SVD and clips negative singular values to zero, then
+reconstructs the matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cov_matrix</strong> – np.ndarray
+Covariance matrix of shape <code class="docutils literal notranslate"><span class="pre">(K,</span> <span class="pre">K)</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(vec_cov_psd,</span> <span class="pre">cov_matrix_psd)</span></code> where <code class="docutils literal notranslate"><span class="pre">vec_cov_psd</span></code> is
+the vectorized PSD-projected matrix of shape <code class="docutils literal notranslate"><span class="pre">(K^2,)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cov_matrix_psd</span></code> is the <code class="docutils literal notranslate"><span class="pre">(K,</span> <span class="pre">K)</span></code> PSD matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="stokes-admm">
+<h2>Stokes – ADMM<a class="headerlink" href="#stokes-admm" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.stokes_admm.STOKES_ADMM" title="pybbtd.solvers.stokes_admm.STOKES_ADMM"><code class="xref py py-func docutils literal notranslate"><span class="pre">STOKES_ADMM()</span></code></a></p></td>
+<td><p>AO-ADMM solver for the Stokes-constrained BTD-LL1 decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.stokes_admm.ADMM_C" title="pybbtd.solvers.stokes_admm.ADMM_C"><code class="xref py py-func docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></p></td>
+<td><p>Inner ADMM update for factor C with Stokes constraint.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.stokes_admm.init_STOKES_factors" title="pybbtd.solvers.stokes_admm.init_STOKES_factors"><code class="xref py py-func docutils literal notranslate"><span class="pre">init_STOKES_factors()</span></code></a></p></td>
+<td><p>Initialize factor matrices for the Stokes-BTD decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.stokes_admm.kmeans_init" title="pybbtd.solvers.stokes_admm.kmeans_init"><code class="xref py py-func docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></p></td>
+<td><p>K-means based initialization for the Stokes-BTD decomposition.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.solvers.stokes_admm">
+<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.ADMM_C">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">ADMM_C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Y3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ctinit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitermax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#ADMM_C"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.ADMM_C" title="Link to this definition">#</a></dt>
+<dd><p>Inner ADMM update for factor C with Stokes constraint.</p>
+<p>Solves the augmented Lagrangian subproblem for C using the third
+mode unfolding, projecting each column onto the set of physically
+valid Stokes vectors via
+<a class="reference internal" href="reference_stokes.html#pybbtd.stokes.stokes_projection" title="pybbtd.stokes.stokes_projection"><code class="xref py py-func docutils literal notranslate"><span class="pre">stokes_projection()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Y3</strong> – np.ndarray
+Third mode unfolding of the input tensor.</p></li>
+<li><p><strong>Ak</strong> – np.ndarray
+Current estimate of factor A.</p></li>
+<li><p><strong>Bk</strong> – np.ndarray
+Current estimate of factor B.</p></li>
+<li><p><strong>Cinit</strong> – np.ndarray
+Initial primal variable for C.</p></li>
+<li><p><strong>Ctinit</strong> – np.ndarray
+Initial projected (valid Stokes) variable for C.</p></li>
+<li><p><strong>theta</strong> – np.ndarray
+Constraint matrix from the BTD model.</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter.</p></li>
+<li><p><strong>L</strong> – int
+Rank of the spatial maps.</p></li>
+<li><p><strong>R</strong> – int
+Number of block terms.</p></li>
+<li><p><strong>nitermax</strong> – int
+Maximum number of inner ADMM iterations (default: 100).</p></li>
+<li><p><strong>tol</strong> – float
+Convergence tolerance (default: 1e-14).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(Ctilde,</span> <span class="pre">C,</span> <span class="pre">primal_residue)</span></code> where <code class="docutils literal notranslate"><span class="pre">Ctilde</span></code> is the
+Stokes-projected factor, <code class="docutils literal notranslate"><span class="pre">C</span></code> is the unconstrained factor,
+and <code class="docutils literal notranslate"><span class="pre">primal_residue</span></code> is the final primal residual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.STOKES_ADMM">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">STOKES_ADMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Stokes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_admm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admm_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#STOKES_ADMM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.STOKES_ADMM" title="Link to this definition">#</a></dt>
+<dd><p>AO-ADMM solver for the Stokes-constrained BTD-LL1 decomposition.</p>
+<p>Enforces non-negativity on spatial factors A, B and Stokes
+physical constraints on C via alternating ADMM updates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Stokes_model</strong> – Stokes
+An instance of the <a class="reference internal" href="reference_stokes.html#pybbtd.stokes.Stokes" title="pybbtd.stokes.Stokes"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stokes</span></code></a> class.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+Input tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code> to be decomposed.</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy (default: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>).
+Options: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;kmeans&quot;</span></code>.</p></li>
+<li><p><strong>max_iter</strong> – int
+Maximum number of outer iterations (default: 1000).</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter (default: 1).</p></li>
+<li><p><strong>max_admm</strong> – int
+Maximum number of inner ADMM iterations per factor update
+(default: 1).</p></li>
+<li><p><strong>rel_tol</strong> – float
+Relative tolerance for outer convergence (default: 1e-10).</p></li>
+<li><p><strong>abs_tol</strong> – float
+Absolute tolerance for outer convergence (default: 1e-10).</p></li>
+<li><p><strong>admm_tol</strong> – float
+Tolerance for inner ADMM convergence (default: 1e-8).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(factors,</span> <span class="pre">fit_error)</span></code> where <code class="docutils literal notranslate"><span class="pre">factors</span> <span class="pre">=</span> <span class="pre">[A,</span> <span class="pre">B,</span> <span class="pre">C]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">fit_error</span></code> is a list of squared reconstruction errors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[list, list]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.init_STOKES_factors">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">init_STOKES_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Stokes_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#init_STOKES_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.init_STOKES_factors" title="Link to this definition">#</a></dt>
+<dd><p>Initialize factor matrices for the Stokes-BTD decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Stokes_model</strong> – Stokes
+An instance of the <a class="reference internal" href="reference_stokes.html#pybbtd.stokes.Stokes" title="pybbtd.stokes.Stokes"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stokes</span></code></a> class.</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy (default: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>).
+Options: <code class="docutils literal notranslate"><span class="pre">&quot;random&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;kmeans&quot;</span></code>.</p></li>
+<li><p><strong>T</strong> – np.ndarray or None
+Input tensor (required for <code class="docutils literal notranslate"><span class="pre">&quot;kmeans&quot;</span></code> initialization).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized factor matrices <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code> where A, B are
+non-negative and each column of C is a valid Stokes vector.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.stokes_admm.kmeans_init">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.stokes_admm.</span></span><span class="sig-name descname"><span class="pre">kmeans_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/stokes_admm.html#kmeans_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.stokes_admm.kmeans_init" title="Link to this definition">#</a></dt>
+<dd><p>K-means based initialization for the Stokes-BTD decomposition.</p>
+<p>Clusters spatial pixels via K-means, applies NMF on each cluster’s
+spatial map to obtain non-negative factors A, B, and builds C from
+the projected cluster centers (valid Stokes vectors).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – np.ndarray
+Input tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code>.</p></li>
+<li><p><strong>R</strong> – int
+Number of clusters / block terms.</p></li>
+<li><p><strong>Lr</strong> – list[int] or np.ndarray
+Rank of the spatial maps. Uses <code class="docutils literal notranslate"><span class="pre">Lr[0]</span></code> as the NMF rank.</p></li>
+<li><p><strong>theta</strong> – np.ndarray
+Constraint matrix from the BTD model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initialized factors <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code> where A, B are non-negative
+and each column of C is a valid Stokes vector.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="bbtd-vanilla-als">
+<h2>BBTD – Vanilla ALS<a class="headerlink" href="#bbtd-vanilla-als" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS" title="pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS"><code class="xref py py-func docutils literal notranslate"><span class="pre">BBTD_ALS()</span></code></a></p></td>
+<td><p>Vanilla ALS solver for the unconstrained BBTD decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors" title="pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors"><code class="xref py py-func docutils literal notranslate"><span class="pre">init_BBTD_factors()</span></code></a></p></td>
+<td><p>Initialize factor matrices for the BBTD decomposition.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.solvers.bbtd_vanilla_als">
+<dt class="sig sig-object py" id="pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.bbtd_vanilla_als.</span></span><span class="sig-name descname"><span class="pre">BBTD_ALS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BBTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/bbtd_vanilla_als.html#BBTD_ALS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS" title="Link to this definition">#</a></dt>
+<dd><p>Vanilla ALS solver for the unconstrained BBTD decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BBTD_model</strong> – BBTD
+An instance of the BBTD class containing model parameters.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+The input 4D tensor to be decomposed.</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy. Options: “random”, “svd”.</p></li>
+<li><p><strong>max_iter</strong> – int
+Maximum number of iterations.</p></li>
+<li><p><strong>abs_tol</strong> – float
+Absolute tolerance for convergence.</p></li>
+<li><p><strong>rel_tol</strong> – float
+Relative tolerance for convergence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>list</dt><dd><p>List of factor matrices [A, B, C, D].</p>
+</dd>
+<dt>fit_error: np.ndarray</dt><dd><p>Array of fitting errors at each iteration.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>factors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.bbtd_vanilla_als.</span></span><span class="sig-name descname"><span class="pre">init_BBTD_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BBTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/bbtd_vanilla_als.html#init_BBTD_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors" title="Link to this definition">#</a></dt>
+<dd><p>Initialize factor matrices for BBTD decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BBTD_model</strong> – BBTD
+An instance of the BBTD class.</p></li>
+<li><p><strong>strat</strong> – str
+Initialization strategy. Options: “random”, “svd”.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+Input tensor (required for SVD initialization).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>tuple of np.ndarray</dt><dd><p>Initialized factor matrices.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A, B, C, D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="bbtd-constrained-admm">
+<h2>BBTD – Constrained ADMM<a class="headerlink" href="#bbtd-constrained-admm" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM" title="pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM"><code class="xref py py-func docutils literal notranslate"><span class="pre">BBTD_COV_ADMM()</span></code></a></p></td>
+<td><p>ADMM solver for the constrained BBTD decomposition.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors" title="pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors"><code class="xref py py-func docutils literal notranslate"><span class="pre">init_BBTD_cov_factors()</span></code></a></p></td>
+<td><p>Initialize factor matrices for the constrained BBTD decomposition.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function" id="module-pybbtd.solvers.bbtd_cov_admm">
+<dt class="sig sig-object py" id="pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.bbtd_cov_admm.</span></span><span class="sig-name descname"><span class="pre">BBTD_COV_ADMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BBTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_admm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_admm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/bbtd_cov_admm.html#BBTD_COV_ADMM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM" title="Link to this definition">#</a></dt>
+<dd><p>ADMM solver for the constrained BBTD decomposition with:
+- Non-negativity on spatial maps (A, B)
+- Conjugate symmetry on C and D (D = C*)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BBTD_model</strong> – BBTD
+An instance of the BBTD class containing model parameters.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+The input 4D tensor to be decomposed, shape (I, J, K, K).</p></li>
+<li><p><strong>init</strong> – str
+Initialization strategy. Options: “random”, “svd”, “kmeans”.</p></li>
+<li><p><strong>max_iter</strong> – int
+Maximum number of outer iterations.</p></li>
+<li><p><strong>gamma</strong> – float
+Penalty parameter for the A, B spatial map coupling.</p></li>
+<li><p><strong>rho</strong> – float
+ADMM penalty parameter for the C, D conjugate constraint.</p></li>
+<li><p><strong>inner_admm</strong> – int
+Maximum number of inner ADMM iterations for C update.</p></li>
+<li><p><strong>tol_admm</strong> – float
+Tolerance for inner ADMM convergence.</p></li>
+<li><p><strong>rel_tol</strong> – float
+Relative tolerance for outer convergence.</p></li>
+<li><p><strong>abs_tol</strong> – float
+Absolute tolerance for outer convergence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>list</dt><dd><p>List of factor matrices [A, B, C, D].</p>
+</dd>
+<dt>fit_error: np.ndarray</dt><dd><p>Array of fitting errors at each iteration.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>factors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors">
+<span class="sig-prename descclassname"><span class="pre">pybbtd.solvers.bbtd_cov_admm.</span></span><span class="sig-name descname"><span class="pre">init_BBTD_cov_factors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BBTD_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybbtd/solvers/bbtd_cov_admm.html#init_BBTD_cov_factors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors" title="Link to this definition">#</a></dt>
+<dd><p>Initialize factor matrices for the constrained BBTD decomposition.</p>
+<p>Generates non-negative A, B and complex C (with D = C*).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BBTD_model</strong> – BBTD
+An instance of the BBTD class.</p></li>
+<li><p><strong>strat</strong> – str
+Initialization strategy. Options: “random”, “svd”, “kmeans”.</p></li>
+<li><p><strong>T</strong> – np.ndarray
+Input tensor (required for “svd” and “kmeans” initialization).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>tuple of np.ndarray</dt><dd><p>Initialized factor matrices. D = C.conj() is implicit.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A, B, C</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -412,12 +1054,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="reference_stokes.html"
+       href="reference_uniqueness.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Stokes Class</p>
+        <p class="prev-next-title">Uniqueness</p>
       </div>
     </a>
     <a class="right-next"
@@ -445,12 +1087,38 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.Stokes_ADMM"><code class="docutils literal notranslate"><span class="pre">Stokes_ADMM()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.init_Stokes_factors"><code class="docutils literal notranslate"><span class="pre">init_Stokes_factors()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.BTD_ALS"><code class="docutils literal notranslate"><span class="pre">BTD_ALS()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.init_BTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BTD_factors()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#btd-als">BTD – ALS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.BTD_ALS"><code class="docutils literal notranslate"><span class="pre">BTD_ALS()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.btd_als.init_BTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BTD_factors()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cov-ll1-admm">Cov-LL1 – ADMM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.ADMM_A"><code class="docutils literal notranslate"><span class="pre">ADMM_A()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.ADMM_B"><code class="docutils literal notranslate"><span class="pre">ADMM_B()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.COVLL1_ADMM"><code class="docutils literal notranslate"><span class="pre">COVLL1_ADMM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.init_COVLL1_factors"><code class="docutils literal notranslate"><span class="pre">init_COVLL1_factors()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.covll1_admm.project_to_psd"><code class="docutils literal notranslate"><span class="pre">project_to_psd()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes-admm">Stokes – ADMM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.ADMM_C"><code class="docutils literal notranslate"><span class="pre">ADMM_C()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.STOKES_ADMM"><code class="docutils literal notranslate"><span class="pre">STOKES_ADMM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.init_STOKES_factors"><code class="docutils literal notranslate"><span class="pre">init_STOKES_factors()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.stokes_admm.kmeans_init"><code class="docutils literal notranslate"><span class="pre">kmeans_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bbtd-vanilla-als">BBTD – Vanilla ALS</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS"><code class="docutils literal notranslate"><span class="pre">BBTD_ALS()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors"><code class="docutils literal notranslate"><span class="pre">init_BBTD_factors()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bbtd-constrained-admm">BBTD – Constrained ADMM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM"><code class="docutils literal notranslate"><span class="pre">BBTD_COV_ADMM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors"><code class="docutils literal notranslate"><span class="pre">init_BBTD_cov_factors()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

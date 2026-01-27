@@ -23,7 +23,7 @@ Define Stokes-BTD parameters and spatial map dimensions
 
     R = 3  # Number of components
     L = 5  # Rank of Spatial maps
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
 
     # Define spatial maps of size 25x25.
     X = stokes.Stokes([25, 25], R, L)
@@ -92,8 +92,7 @@ Load required libraries
     import numpy as np
     import pybbtd.stokes as stokes
     import pybbtd.btd as btd
-    import matplotlib.pyplot as plt
-    import pybbtd as pybbtd
+    from pybbtd.visualization import draw_metrics, draw_stokes
 
 Load the data tensor and define parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -105,7 +104,7 @@ Load the data tensor and define parameters
     # Create Stokes model
     R = 5
     L = 25
-    btd.validate_R_L(R, L)
+    btd._validate_R_L(R, L)
     X = stokes.Stokes([tensor.shape[0], tensor.shape[1]], R, L)
 
 Fit the Stokes-BTD model to the data tensor
@@ -115,6 +114,16 @@ Fit the Stokes-BTD model to the data tensor
 
     X.fit(data=tensor,algorithm="ADMM",init="kmeans",max_iter=5000,rho=1,max_admm=2,rel_tol=10**-5, abs_tol=10**-7, admm_tol=10**-5)
 
-Visualize the results, module pybbtd.draw will be soon have a method to plot the Stokes vectors as ellipses.
+Visualize the results
+^^^^^^^^^^^^^^^^^^^^^^
+
+We use :func:`~pybbtd.visualization.draw_stokes.plot_stokes_terms` to display the
+recovered spatial maps :math:`A_r B_r^{\top}` and the corresponding polarization
+ellipses for each component.
+
+.. code:: python3
+
+    Afit, Bfit, Cfit = X.factors[0], X.factors[1], X.factors[2]
+    draw_stokes.plot_stokes_terms(Afit, Bfit, Cfit, R, L)
 
 .. image:: stokes_files/bbtd_board_results.png

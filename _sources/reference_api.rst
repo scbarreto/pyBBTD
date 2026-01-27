@@ -20,6 +20,8 @@ API Overview
    reference_btd
    reference_covll1
    reference_stokes
+   reference_bbtd
+   reference_uniqueness
    reference_solvers
    reference_visualization
-   reference_uniqueness
+   
