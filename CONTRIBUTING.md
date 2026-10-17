@@ -56,6 +56,10 @@ The figure at the top of `README.md` and of the documentation home page,
 
 ## Continuous integration
 
-GitHub Actions runs the linter, the tests on Python 3.11 to 3.13, the notebooks and the
-documentation build on every pull request. Pushes to `main` also publish the
-documentation to GitHub Pages.
+GitHub Actions has two workflows:
+
+- **Tests** (`.github/workflows/tests.yml`): the linter, the tests on Python 3.11 to 3.13
+  and a run of the documentation notebooks. It runs only when code, tests or notebooks
+  change.
+- **Docs** (`.github/workflows/docs.yml`): builds the site on pull requests and, after a
+  merge to `main`, publishes it to GitHub Pages without waiting for the tests.
