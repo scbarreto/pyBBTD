@@ -42,7 +42,7 @@ The values can have any sign. The factors are stored as `A` (I × R·L), `B` (J 
 ```python
 from pybbtd import BTD
 
-model = BTD((60, 80, 6), R=3, L=2)
+model = BTD((80, 100, 4), R=3, L=5)
 model.fit(data, init="svd", max_iter=3000, rel_tol=1e-10)
 A, B, C = model.factors
 ```

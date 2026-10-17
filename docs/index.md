@@ -1,11 +1,20 @@
 # pyBBTD
 
-**Split images that have several numbers per pixel into a few parts you can interpret.**
+**Decompose images with a vector or a matrix at each pixel into a few interpretable components.**
 
-Many instruments record more than one number at each pixel: several spectral channels, the
-polarization of light, or a whole covariance matrix. pyBBTD explains such an image as a sum
-of a few **terms**. Each term is a **spatial map**, showing where it is present, times a
-**signature**, describing what it puts in each pixel.
+Digital images have moved from one value per pixel (grayscale) to three (RGB), to a vector
+of spectral measurements (hyperspectral) and to a whole matrix, such as the covariance
+matrices of diffusion tensor imaging or polarimetric radar. pyBBTD writes such an image as a
+sum of a few **terms**. Each term is a **spatial map**, showing where it is present, times a
+**signature**: the vector or matrix it contributes to each pixel. These are block term
+tensor decompositions.
+
+```{figure} images/image-representations.png
+:alt: A grayscale image with one value per pixel, an RGB image with three, a hyperspectral image with a vector per pixel and a diffusion tensor image with a 3 x 3 matrix per pixel
+
+Images with one value, three values, a vector and a matrix per pixel. See
+[Tensors in plain words](getting-started/tensors).
+```
 
 ```{figure} images/bbtd-board-terms.png
 :alt: Five spatial maps (the background and the letters B, B, T, D) above five polarization ellipses

@@ -26,26 +26,6 @@ for _ in range(5):
         best = (model.fit_error[-1], model.factors)
 ```
 
-## When a fit stops
-
-A fit stops at the first of three events: the error stops decreasing (`rel_tol`), the
-error is small enough (`abs_tol`), or `max_iter` iterations are done. In the last case a
-`RuntimeWarning` reports it, since the solver may not have converged.
-
-The error measure and the exact rules depend on the solver. In this table, $e_k$ is
-`fit_error[k]` and $\hat{\mathcal{T}}$ the fitted tensor:
-
-| Solver | `fit_error` | Stops when | Defaults (`max_iter`, `rel_tol`, `abs_tol`) |
-|---|---|---|---|
-| BTD, ALS | $\lVert\mathcal{T}-\hat{\mathcal{T}}\rVert^2$ | $\lvert e_k-e_{k-1}\rvert / e_k$ < `rel_tol` or $e_k / \lVert\mathcal{T}\rVert$ < `abs_tol` | 1000, 1e-3, 1e-8 |
-| BBTD, ALS | $\lVert\mathcal{T}-\hat{\mathcal{T}}\rVert / \lVert\mathcal{T}\rVert$ | $\lvert e_k-e_{k-1}\rvert / e_{k-1}$ < `rel_tol` or $e_k$ < `abs_tol` | 1000, 1e-3, 1e-8 |
-| BBTD, ADMM | $\lVert\mathcal{T}-\hat{\mathcal{T}}\rVert / \lVert\mathcal{T}\rVert$ | $\lvert e_k-e_{k-1}\rvert$ divided by $e_k$ or by $e_{k-1}$ < `rel_tol`, or $e_k$ < `abs_tol` | 1000, 1e-6, 1e-12 |
-| Stokes, ADMM | $\lVert\mathcal{T}-\hat{\mathcal{T}}\rVert^2$ | $\lvert e_k-e_{k-1}\rvert / e_k$ < `rel_tol` or $e_k / \lVert\mathcal{T}\rVert$ < `abs_tol` | 1000, 1e-10, 1e-10 |
-| Cov-LL1, ADMM | $\lVert\mathcal{T}-\hat{\mathcal{T}}\rVert^2 / \lVert\mathcal{T}\rVert^2$ | $\lvert e_k-e_{k-1}\rvert / e_k$ < `rel_tol` or $e_k / \lVert\mathcal{T}\rVert$ < `abs_tol` | 1000, 1e-10, 1e-10 |
-
-`fit_error[0]` is the error of the starting point, except for BBTD with ADMM, whose list
-starts after the first iteration.
-
 ## ADMM settings
 
 The AO-ADMM solvers update one factor at a time with a few inner ADMM iterations, which

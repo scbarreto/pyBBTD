@@ -7,8 +7,8 @@ use that number. Otherwise, fit a few values of R and compare the final fit erro
 recovered maps.
 
 **L** (or **L1** for BBTD) is the rank of each spatial map, which limits how complex its
-shape can be. A rank-1 map is a column profile times a row profile, such as a blob or a
-rectangle aligned with the image axes. Shapes made of several such pieces, or letters,
+shape can be. A rank-1 map is a column profile times a row profile, such as a rectangle
+aligned with the image axes. Shapes made of several such pieces, or letters,
 need a higher rank: the [BBTD board tutorial](../tutorials/stokes-bbtd-board.ipynb) uses
 L = 25 for 160 × 160 images of letters.
 
