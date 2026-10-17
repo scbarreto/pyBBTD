@@ -43,9 +43,9 @@ $$
 ```python
 from pybbtd import CovLL1
 
-model = CovLL1((40, 40, 9), R=3, L1=2, L2=2)
-model.fit(data, init="kmeans", max_iter=2000, max_admm=50)
-A, B, C = model.factors  # C[:, r].reshape(3, 3) is the covariance matrix of term r
+model = CovLL1((20, 20, 4), R=2, L1=5, L2=2)
+model.fit(data, init="kmeans", max_iter=10000, max_admm=50)
+A, B, C = model.factors  # C[:, r].reshape(2, 2) is the covariance matrix of term r
 ```
 
 To constrain the rank of the covariance matrices as well, use the fourth-order

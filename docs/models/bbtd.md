@@ -47,10 +47,10 @@ is the covariance matrix $\mathbf{C}_r \mathbf{C}_r^{H}$.
 from pybbtd import BBTD
 from pybbtd.visualization import plot_bbtd_cov_terms
 
-model = BBTD((40, 40, 4, 4), R=3, L1=2, L2=2)
+model = BBTD((20, 25, 4, 4), R=3, L1=3, L2=2)
 model.fit(data, algorithm="ADMM", init="kmeans", max_iter=1000)
 A, B, C, D = model.factors
-plot_bbtd_cov_terms(A, B, C, R=3, L1=2, L2=2)
+plot_bbtd_cov_terms(A, B, C, R=3, L1=3, L2=2)
 ```
 
 **Tutorials:** [one matrix per pixel (ALS)](../tutorials/bbtd-als.ipynb) and
