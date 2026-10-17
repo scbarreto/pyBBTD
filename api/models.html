@@ -1,0 +1,1080 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Models &#8212; pyBBTD</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/models';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Solvers" href="solvers.html" />
+    <link rel="prev" title="API reference" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">pyBBTD</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    pyBBTD
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/tensors.html">Tensors in plain words</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Models</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../models/index.html">Choosing a model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/btd.html">BTD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/covll1.html">Cov-LL1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/stokes.html">Stokes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/bbtd.html">BBTD</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/btd.html">BTD: separate a multichannel image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/covll1.html">Cov-LL1: covariance images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/stokes-synthetic.html">Stokes: a synthetic polarization image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/stokes-bbtd-board.html">Stokes: the BBTD board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/bbtd-als.html">BBTD: one matrix per pixel (ALS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/bbtd-admm.html">BBTD for covariance images (ADMM)</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../guides/ranks-and-uniqueness.html">Ranks and uniqueness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/fitting.html">Initialization and convergence</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uniqueness.html">Uniqueness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html">Datasets</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">Papers</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/scbarreto/pyBBTD" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/scbarreto/pyBBTD/issues/new?title=Issue%20on%20page%20%2Fapi/models.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/models.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Models</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#btd">BTD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cov-ll1">Cov-LL1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes">Stokes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bbtd">BBTD</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="models">
+<h1>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h1>
+<section id="btd">
+<h2>BTD<a class="headerlink" href="#btd" title="Link to this heading">#</a></h2>
+<p>.. py:module:: pybbtd.btd</p>
+<p>Block term decomposition (BTD) of third-order tensors into rank-(L, L, 1) terms.</p>
+<p>.. py:class:: BTD(dims, R, L, block_mode=’LL1’)
+:module: pybbtd.btd</p>
+<p>Third-order tensor model made of R rank-(L, L, 1) block terms.</p>
+<p>Each term is the outer product of a rank-L matrix and a vector. With the
+default <code class="docutils literal notranslate"><span class="pre">&quot;LL1&quot;</span></code> block mode, a tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code> is written as</p>
+<p>.. math::</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   \mathcal{T} = \sum_{r=1}^{R} (\mathbf{A}_r \mathbf{B}_r^{\top})
+   \circ \mathbf{c}_r,
+</pre></div>
+</div>
+<p>with :math:<code class="docutils literal notranslate"><span class="pre">\mathbf{A}_r</span></code> of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">L)</span></code>, :math:<code class="docutils literal notranslate"><span class="pre">\mathbf{B}_r</span></code> of
+shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">L)</span></code> and :math:<code class="docutils literal notranslate"><span class="pre">\mathbf{c}_r</span></code> of length <code class="docutils literal notranslate"><span class="pre">K</span></code>. The modes
+<code class="docutils literal notranslate"><span class="pre">&quot;L1L&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;1LL&quot;</span></code> put the vector in the second or first mode instead.</p>
+<p>:param dims: Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K)</span></code> of the tensor.
+:type dims: tuple of int
+:param R: Number of block terms.
+:type R: int
+:param L: Rank of the matrix part of each term. A single integer is used for
+all R terms.
+:type L: int or sequence of int
+:param block_mode: Which mode holds the vector part of each term.
+:type block_mode: {“LL1”, “L1L”, “1LL”}, default “LL1”</p>
+<p>.. attribute:: dims</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Shape of the tensor.
+
+  :type: tuple of int
+</pre></div>
+</div>
+<p>.. attribute:: rank</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Number of block terms R.
+
+  :type: int
+</pre></div>
+</div>
+<p>.. attribute:: L</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Rank of each term, shape ``(R,)``.
+
+  :type: np.ndarray
+</pre></div>
+</div>
+<p>.. attribute:: block_mode</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Block mode of the decomposition.
+
+  :type: str
+</pre></div>
+</div>
+<p>.. attribute:: factors</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Factor matrices ``[A, B, C]`` estimated by :meth:`fit`.
+
+  :type: list of np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: tensor</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Tensor rebuilt from ``factors`` by :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: fit_error</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Fit error at each iteration of the last :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. py:method:: BTD.check_uniqueness()
+:module: pybbtd.btd</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Check a sufficient condition for the decomposition to be unique.
+
+  A warning is issued when uniqueness cannot be guaranteed.
+
+  :returns: ``True`` if uniqueness is guaranteed, ``False`` if it cannot be
+            guaranteed, and ``None`` if the check is not available (it is
+            only implemented when all terms share the same L).
+  :rtype: bool or None
+</pre></div>
+</div>
+<p>.. py:method:: BTD.fit(data, algorithm=’ALS’, **kwargs)
+:module: pybbtd.btd</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Estimate the factors that best explain ``data``.
+
+  Updates :attr:`factors`, :attr:`tensor` and :attr:`fit_error`.
+
+  :param data: Tensor of shape :attr:`dims` to decompose.
+  :type data: np.ndarray
+  :param algorithm: Fitting algorithm (see :func:`~pybbtd.solvers.btd_als.fit_btd_als`).
+  :type algorithm: {"ALS"}, default "ALS"
+  :param \*\*kwargs: Passed to the solver, e.g. ``init``, ``max_iter``, ``rel_tol``,
+                     ``abs_tol``.
+
+  :returns: The fitted model.
+  :rtype: BTD
+</pre></div>
+</div>
+<p>.. py:method:: BTD.get_constraint_matrix()
+:module: pybbtd.btd</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return the matrix :math:`\Theta` that writes the BTD as a CP model.
+
+  :math:`\Theta` repeats each column of the vector factor ``L[r]``
+  times, so the BTD can be computed as a CP decomposition with
+  ``sum(L)`` rank-one terms.
+
+  :returns: Constraint matrix of shape ``(R, sum(L))``.
+  :rtype: np.ndarray
+</pre></div>
+</div>
+<p>.. py:function:: factors_to_tensor(A, B, C, theta, block_mode=’LL1’)
+:module: pybbtd.btd</p>
+<p>Rebuild the full tensor from BTD factors.</p>
+<p>:param A: Factor matrices. With <code class="docutils literal notranslate"><span class="pre">block_mode=&quot;LL1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> have
+<code class="docutils literal notranslate"><span class="pre">sum(L)</span></code> columns and <code class="docutils literal notranslate"><span class="pre">C</span></code> has <code class="docutils literal notranslate"><span class="pre">R</span></code> columns; the other modes move
+the R-column factor accordingly.
+:type A: np.ndarray
+:param B: Factor matrices. With <code class="docutils literal notranslate"><span class="pre">block_mode=&quot;LL1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> have
+<code class="docutils literal notranslate"><span class="pre">sum(L)</span></code> columns and <code class="docutils literal notranslate"><span class="pre">C</span></code> has <code class="docutils literal notranslate"><span class="pre">R</span></code> columns; the other modes move
+the R-column factor accordingly.
+:type B: np.ndarray
+:param C: Factor matrices. With <code class="docutils literal notranslate"><span class="pre">block_mode=&quot;LL1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> have
+<code class="docutils literal notranslate"><span class="pre">sum(L)</span></code> columns and <code class="docutils literal notranslate"><span class="pre">C</span></code> has <code class="docutils literal notranslate"><span class="pre">R</span></code> columns; the other modes move
+the R-column factor accordingly.
+:type C: np.ndarray
+:param theta: Constraint matrix from :meth:<code class="docutils literal notranslate"><span class="pre">BTD.get_constraint_matrix</span></code>.
+:type theta: np.ndarray
+:param block_mode: Block mode of the decomposition.
+:type block_mode: {“LL1”, “L1L”, “1LL”}, default “LL1”</p>
+<p>:returns: Tensor of shape <code class="docutils literal notranslate"><span class="pre">(A.shape[0],</span> <span class="pre">B.shape[0],</span> <span class="pre">C.shape[0])</span></code>.
+:rtype: np.ndarray</p>
+<p>.. py:function:: spatial_maps(A, B, L)
+:module: pybbtd.btd</p>
+<p>Return the matrix part :math:<code class="docutils literal notranslate"><span class="pre">\mathbf{A}_r</span> <span class="pre">\mathbf{B}_r^{\top}</span></code> of each term.</p>
+<p>For imaging data these are the R spatial maps: images showing where
+each term is present.</p>
+<p>:param A: Factor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">R</span> <span class="pre">*</span> <span class="pre">L)</span></code>, with the columns of term <code class="docutils literal notranslate"><span class="pre">r</span></code> in
+the <code class="docutils literal notranslate"><span class="pre">r</span></code>-th block of <code class="docutils literal notranslate"><span class="pre">L</span></code> columns.
+:type A: np.ndarray
+:param B: Factor of shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">R</span> <span class="pre">*</span> <span class="pre">L)</span></code> with the same block structure.
+:type B: np.ndarray
+:param L: Number of columns per term.
+:type L: int</p>
+<p>:returns: Array of shape <code class="docutils literal notranslate"><span class="pre">(R,</span> <span class="pre">I,</span> <span class="pre">J)</span></code>.
+:rtype: np.ndarray</p>
+</section>
+<section id="cov-ll1">
+<h2>Cov-LL1<a class="headerlink" href="#cov-ll1" title="Link to this heading">#</a></h2>
+<p>.. py:module:: pybbtd.covll1</p>
+<p>Cov-LL1 model: a BTD-LL1 for covariance imaging.</p>
+<p>In covariance imaging, every pixel holds a <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">x</span> <span class="pre">K</span></code> covariance matrix. The
+matrices are vectorized so the data form a tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K**2)</span></code>,
+decomposed into R terms, each a non-negative spatial map times one
+vectorized covariance matrix.</p>
+<p>.. py:class:: CovLL1(dims, R, L1, L2, block_mode=’LL1’)
+:module: pybbtd.covll1</p>
+<p>Bases: :py:class:<code class="docutils literal notranslate"><span class="pre">~pybbtd.btd.BTD</span></code></p>
+<p>BTD-LL1 model whose vector factor holds vectorized covariance matrices.</p>
+<p>Extends :class:<code class="docutils literal notranslate"><span class="pre">~pybbtd.btd.BTD</span></code>. Each column of the factor C, of length
+<code class="docutils literal notranslate"><span class="pre">K**2</span></code>, is a vectorized <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">x</span> <span class="pre">K</span></code> covariance matrix.</p>
+<p>:param dims: Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K**2)</span></code> of the tensor. The last dimension must be a
+perfect square.
+:type dims: tuple of int
+:param R: Number of terms.
+:type R: int
+:param L1: Rank of the spatial maps.
+:type L1: int
+:param L2: Rank of the covariance matrices. Only used to generate synthetic
+data with :meth:<code class="docutils literal notranslate"><span class="pre">generate_covll1_tensor</span></code>; the fit does not constrain it.
+:type L2: int
+:param block_mode: Block mode of the decomposition.
+:type block_mode: {“LL1”, “L1L”, “1LL”}, default “LL1”</p>
+<p>.. attribute:: L1, L2</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Ranks of the spatial maps and of the covariance matrices.
+
+  :type: int
+</pre></div>
+</div>
+<p>.. attribute:: factors</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Factor matrices ``[A, B, C]`` estimated by :meth:`fit`; ``A`` has
+  shape ``(I, L1 * R)``, ``B`` has shape ``(J, L1 * R)`` and ``C`` has
+  shape ``(K**2, R)``.
+
+  :type: list of np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: tensor</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Tensor rebuilt from ``factors`` by :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: fit_error</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Fit error at each iteration of the last :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. py:method:: CovLL1.generate_covll1_tensor()
+:module: pybbtd.covll1</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Draw random Cov-LL1 factors and store them with their tensor.
+
+  Updates :attr:`factors` and :attr:`tensor`.
+
+  :returns: * **factors** (*list of np.ndarray*) -- ``[A, B, C]`` from :func:`generate_covll1_factors`.
+            * **tensor** (*np.ndarray*) -- Tensor of shape :attr:`dims`.
+</pre></div>
+</div>
+<p>.. py:method:: CovLL1.fit(data, algorithm=’ADMM’, **kwargs)
+:module: pybbtd.covll1</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Estimate the factors that best explain ``data``.
+
+  Updates :attr:`factors`, :attr:`tensor` and :attr:`fit_error`.
+
+  :param data: Tensor of shape ``(I, J, K**2)`` to decompose.
+  :type data: np.ndarray
+  :param algorithm: Fitting algorithm (see
+                    :func:`~pybbtd.solvers.covll1_admm.fit_covll1_admm`).
+  :type algorithm: {"ADMM"}, default "ADMM"
+  :param \*\*kwargs: Passed to the solver, e.g. ``init``, ``max_iter``, ``rho``,
+                     ``max_admm``, ``rel_tol``, ``abs_tol``, ``admm_tol``.
+
+  :returns: The fitted model.
+  :rtype: CovLL1
+</pre></div>
+</div>
+<p>.. py:function:: generate_covll1_factors(dims, R, L1, L2)
+:module: pybbtd.covll1</p>
+<p>Draw random factors for a Cov-LL1 model.</p>
+<p>The spatial factors A, B are uniform on [0, 1). Each column of C is a
+vectorized <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">x</span> <span class="pre">K</span></code> positive semidefinite Hermitian matrix of rank L2.</p>
+<p>:param dims: Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K**2)</span></code> of the tensor.
+:type dims: tuple of int
+:param R: Number of terms.
+:type R: int
+:param L1: Rank of the spatial maps.
+:type L1: int
+:param L2: Rank of the covariance matrices.
+:type L2: int</p>
+<p>:returns: * <strong>A</strong> (<em>np.ndarray</em>) – Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">L1</span> <span class="pre">*</span> <span class="pre">R)</span></code>, non-negative.
+* <strong>B</strong> (<em>np.ndarray</em>) – Shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">L1</span> <span class="pre">*</span> <span class="pre">R)</span></code>, non-negative.
+* <strong>C</strong> (<em>np.ndarray</em>) – Shape <code class="docutils literal notranslate"><span class="pre">(K**2,</span> <span class="pre">R)</span></code>, one vectorized covariance matrix per column.</p>
+<p>.. py:function:: validate_covariance_tensor(T)
+:module: pybbtd.covll1</p>
+<p>Check that every pixel of a tensor holds a valid covariance matrix.</p>
+<p>Each pixel <code class="docutils literal notranslate"><span class="pre">T[i,</span> <span class="pre">j,</span> <span class="pre">:]</span></code> is reshaped to <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">x</span> <span class="pre">K</span></code> and tested with
+:func:<code class="docutils literal notranslate"><span class="pre">is_valid_covariance</span></code>. Warns with the percentage of invalid pixels,
+if any.</p>
+<p>:param T: Tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K**2)</span></code>.
+:type T: np.ndarray</p>
+<p>:returns: <code class="docutils literal notranslate"><span class="pre">True</span></code> if all pixels are valid.
+:rtype: bool</p>
+<p>.. py:function:: is_valid_covariance(Sigma, tol=1e-10)
+:module: pybbtd.covll1</p>
+<p>Check that a matrix is a valid covariance matrix.</p>
+<p>A valid covariance matrix is square, Hermitian and positive semidefinite.</p>
+<p>:param Sigma: Matrix to test.
+:type Sigma: np.ndarray
+:param tol: Tolerance on the Hermitian symmetry and on negative eigenvalues.
+:type tol: float, default 1e-10</p>
+<p>:rtype: bool</p>
+</section>
+<section id="stokes">
+<h2>Stokes<a class="headerlink" href="#stokes" title="Link to this heading">#</a></h2>
+<p>.. py:module:: pybbtd.stokes</p>
+<p>Stokes model: a BTD-LL1 for polarization images.</p>
+<p>Each pixel of a polarization image is described by a Stokes vector
+<code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>: total intensity, and three numbers describing how the
+light is polarized. The tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code> is decomposed into R
+terms, each a non-negative spatial map times one Stokes vector.</p>
+<p>.. py:class:: Stokes(spatial_dims, R, L)
+:module: pybbtd.stokes</p>
+<p>Bases: :py:class:<code class="docutils literal notranslate"><span class="pre">~pybbtd.btd.BTD</span></code></p>
+<p>BTD-LL1 model for polarization images, with valid Stokes vectors.</p>
+<p>Extends :class:<code class="docutils literal notranslate"><span class="pre">~pybbtd.btd.BTD</span></code> with the third mode fixed to size 4.
+Each column of the factor C is a physically valid Stokes vector
+(see :func:<code class="docutils literal notranslate"><span class="pre">is_valid_stokes</span></code>), and the spatial factors are non-negative.</p>
+<p>:param spatial_dims: Image size <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J)</span></code>. The tensor has shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code>.
+:type spatial_dims: tuple of int
+:param R: Number of terms (polarization states).
+:type R: int
+:param L: Rank of the spatial map of each term.
+:type L: int or sequence of int</p>
+<p>.. attribute:: factors</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Factor matrices ``[A, B, C]`` estimated by :meth:`fit`; ``C`` has
+  shape ``(4, R)``.
+
+  :type: list of np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: tensor</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Tensor rebuilt from ``factors`` by :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: fit_error</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Fit error at each iteration of the last :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. py:method:: Stokes.generate_stokes_tensor()
+:module: pybbtd.stokes</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Draw random Stokes factors and store them with their tensor.
+
+  Updates :attr:`factors` and :attr:`tensor`.
+
+  :returns: * **factors** (*list of np.ndarray*) -- ``[A, B, C]`` from :func:`generate_stokes_factors`.
+            * **tensor** (*np.ndarray*) -- Tensor of shape ``(I, J, 4)``.
+</pre></div>
+</div>
+<p>.. py:method:: Stokes.fit(data, algorithm=’ADMM’, **kwargs)
+:module: pybbtd.stokes</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Estimate the factors that best explain ``data``.
+
+  Updates :attr:`factors`, :attr:`tensor` and :attr:`fit_error`.
+
+  :param data: Tensor of shape ``(I, J, 4)`` to decompose.
+  :type data: np.ndarray
+  :param algorithm: Fitting algorithm (see
+                    :func:`~pybbtd.solvers.stokes_admm.fit_stokes_admm`).
+  :type algorithm: {"ADMM"}, default "ADMM"
+  :param \*\*kwargs: Passed to the solver, e.g. ``init``, ``max_iter``, ``rho``,
+                     ``max_admm``, ``rel_tol``, ``abs_tol``, ``admm_tol``.
+
+  :returns: The fitted model.
+  :rtype: Stokes
+</pre></div>
+</div>
+<p>.. py:function:: generate_stokes_factors(dims, R, L)
+:module: pybbtd.stokes</p>
+<p>Draw random factors for a Stokes model.</p>
+<p>The spatial factors A, B are uniform on [0, 1). Each column of C is the
+Stokes vector of a random fully polarized state.</p>
+<p>:param dims: Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code> of the tensor.
+:type dims: tuple of int
+:param R: Number of terms.
+:type R: int
+:param L: Rank of the spatial maps; <code class="docutils literal notranslate"><span class="pre">L[0]</span></code> is used for every term.
+:type L: sequence of int</p>
+<p>:returns: * <strong>A</strong> (<em>np.ndarray</em>) – Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">L[0]</span> <span class="pre">*</span> <span class="pre">R)</span></code>, non-negative.
+* <strong>B</strong> (<em>np.ndarray</em>) – Shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">L[0]</span> <span class="pre">*</span> <span class="pre">R)</span></code>, non-negative.
+* <strong>C</strong> (<em>np.ndarray</em>) – Shape <code class="docutils literal notranslate"><span class="pre">(4,</span> <span class="pre">R)</span></code>, one valid Stokes vector per column.</p>
+<p>.. py:function:: validate_stokes_tensor(T)
+:module: pybbtd.stokes</p>
+<p>Check that every pixel of a tensor holds a valid Stokes vector.</p>
+<p>Warns with the percentage of invalid pixels, if any.</p>
+<p>:param T: Tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">4)</span></code>.
+:type T: np.ndarray</p>
+<p>:returns: <code class="docutils literal notranslate"><span class="pre">True</span></code> if all pixels are valid.
+:rtype: bool</p>
+<p>.. py:function:: is_valid_stokes(S)
+:module: pybbtd.stokes</p>
+<p>Check that a Stokes vector is physically valid.</p>
+<p>A valid Stokes vector has :math:<code class="docutils literal notranslate"><span class="pre">S_0</span> <span class="pre">\geq</span> <span class="pre">0</span></code> and
+:math:<code class="docutils literal notranslate"><span class="pre">S_0^2</span> <span class="pre">\geq</span> <span class="pre">S_1^2</span> <span class="pre">+</span> <span class="pre">S_2^2</span> <span class="pre">+</span> <span class="pre">S_3^2</span></code> (the polarized part cannot carry
+more power than the total intensity). The comparison is rounded to 5
+decimals.</p>
+<p>:param S: Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.
+:type S: np.ndarray</p>
+<p>:rtype: bool</p>
+<p>.. py:function:: stokes_to_coherency(S)
+:module: pybbtd.stokes</p>
+<p>Convert a Stokes vector to its 2 x 2 coherency matrix.</p>
+<p>:param S: Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.
+:type S: np.ndarray</p>
+<p>:returns: Complex Hermitian matrix of shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code>.
+:rtype: np.ndarray</p>
+<p>.. py:function:: coherency_to_stokes(coh)
+:module: pybbtd.stokes</p>
+<p>Convert a 2 x 2 coherency matrix to its Stokes vector.</p>
+<p>:param coh: Complex Hermitian matrix of shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code>.
+:type coh: np.ndarray</p>
+<p>:returns: Real Stokes vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.
+:rtype: np.ndarray</p>
+<p>.. py:function:: project_stokes(S)
+:module: pybbtd.stokes</p>
+<p>Project a vector onto the set of valid Stokes vectors.</p>
+<p>The vector is converted to a coherency matrix, projected onto the
+positive semidefinite matrices, and converted back.</p>
+<p>:param S: Vector <code class="docutils literal notranslate"><span class="pre">[S0,</span> <span class="pre">S1,</span> <span class="pre">S2,</span> <span class="pre">S3]</span></code>.
+:type S: np.ndarray</p>
+<p>:returns: The closest valid Stokes vector.
+:rtype: np.ndarray</p>
+</section>
+<section id="bbtd">
+<h2>BBTD<a class="headerlink" href="#bbtd" title="Link to this heading">#</a></h2>
+<p>.. py:module:: pybbtd.bbtd</p>
+<p>Block-block term decomposition (BBTD) of fourth-order tensors.</p>
+<p>.. py:class:: BBTD(dims, R, L1, L2)
+:module: pybbtd.bbtd</p>
+<p>Fourth-order tensor model made of R rank-(L1, L1, L2, L2) terms.</p>
+<p>A tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K,</span> <span class="pre">M)</span></code> is written as</p>
+<p>.. math::</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>   \mathcal{T} = \sum_{r=1}^{R} (\mathbf{A}_r \mathbf{B}_r^{\top})
+   \circ (\mathbf{C}_r \mathbf{D}_r^{\top}),
+</pre></div>
+</div>
+<p>where :math:<code class="docutils literal notranslate"><span class="pre">\mathbf{A}_r</span> <span class="pre">\mathbf{B}_r^{\top}</span></code> is a rank-L1 matrix of
+shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J)</span></code> (for imaging data, a spatial map) and
+:math:<code class="docutils literal notranslate"><span class="pre">\mathbf{C}_r</span> <span class="pre">\mathbf{D}_r^{\top}</span></code> is a rank-L2 matrix of shape
+<code class="docutils literal notranslate"><span class="pre">(K,</span> <span class="pre">M)</span></code>. For covariance imaging, <code class="docutils literal notranslate"><span class="pre">K</span> <span class="pre">=</span> <span class="pre">M</span></code> and
+:math:<code class="docutils literal notranslate"><span class="pre">\mathbf{D}_r</span> <span class="pre">=</span> <span class="pre">\mathbf{C}_r^*</span></code>, so the second block is a
+covariance matrix :math:<code class="docutils literal notranslate"><span class="pre">\mathbf{C}_r</span> <span class="pre">\mathbf{C}_r^{H}</span></code>.</p>
+<p>:param dims: Shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K,</span> <span class="pre">M)</span></code> of the tensor.
+:type dims: tuple of int
+:param R: Number of terms.
+:type R: int
+:param L1: Rank of the first block (shared by A and B).
+:type L1: int
+:param L2: Rank of the second block (shared by C and D).
+:type L2: int</p>
+<p>.. attribute:: dims</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Shape of the tensor.
+
+  :type: tuple of int
+</pre></div>
+</div>
+<p>.. attribute:: rank</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Number of terms R.
+
+  :type: int
+</pre></div>
+</div>
+<p>.. attribute:: L1, L2</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Block ranks.
+
+  :type: int
+</pre></div>
+</div>
+<p>.. attribute:: factors</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Factor matrices ``[A, B, C, D]`` estimated by :meth:`fit`.
+
+  :type: list of np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: tensor</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Tensor rebuilt from ``factors`` by :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. attribute:: fit_error</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Fit error at each iteration of the last :meth:`fit`.
+
+  :type: np.ndarray or None
+</pre></div>
+</div>
+<p>.. py:method:: BBTD.check_uniqueness()
+:module: pybbtd.bbtd</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Check a sufficient condition for the decomposition to be unique.
+
+  A warning is issued when uniqueness cannot be guaranteed.
+
+  :returns: ``True`` if uniqueness is guaranteed.
+  :rtype: bool
+</pre></div>
+</div>
+<p>.. py:method:: BBTD.get_constraint_matrices()
+:module: pybbtd.bbtd</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Return the matrices :math:`\Phi` and :math:`\Psi` that write the BBTD as a CP model.
+
+  With them, the BBTD equals a CP decomposition with ``L1 * L2 * R``
+  rank-one terms and factors ``A @ phi``, ``B @ phi``, ``C @ psi`` and
+  ``D @ psi``.
+
+  :returns: * **phi** (*np.ndarray*) -- Shape ``(L1 * R, L1 * L2 * R)``.
+            * **psi** (*np.ndarray*) -- Shape ``(L2 * R, L1 * L2 * R)``.
+</pre></div>
+</div>
+<p>.. py:method:: BBTD.fit(data, algorithm=’ALS’, **kwargs)
+:module: pybbtd.bbtd</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  Estimate the factors that best explain ``data``.
+
+  Updates :attr:`factors`, :attr:`tensor` and :attr:`fit_error`.
+
+  :param data: Tensor of shape :attr:`dims` to decompose.
+  :type data: np.ndarray
+  :param algorithm: ``"ALS"`` fits an unconstrained BBTD
+                    (:func:`~pybbtd.solvers.bbtd_als.fit_bbtd_als`). ``"ADMM"`` fits
+                    the covariance model, with non-negative spatial maps and
+                    ``D = C*`` (:func:`~pybbtd.solvers.bbtd_cov_admm.fit_bbtd_cov_admm`).
+  :type algorithm: {"ALS", "ADMM"}, default "ALS"
+  :param \*\*kwargs: Passed to the solver, e.g. ``init``, ``max_iter``, ``rel_tol``,
+                     ``abs_tol``.
+
+  :returns: The fitted model.
+  :rtype: BBTD
+</pre></div>
+</div>
+<p>.. py:function:: factors_to_tensor(A, B, C, D, phi, psi)
+:module: pybbtd.bbtd</p>
+<p>Rebuild the full fourth-order tensor from BBTD factors.</p>
+<p>:param A: Factor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">L1</span> <span class="pre">*</span> <span class="pre">R)</span></code>.
+:type A: np.ndarray
+:param B: Factor of shape <code class="docutils literal notranslate"><span class="pre">(J,</span> <span class="pre">L1</span> <span class="pre">*</span> <span class="pre">R)</span></code>.
+:type B: np.ndarray
+:param C: Factor of shape <code class="docutils literal notranslate"><span class="pre">(K,</span> <span class="pre">L2</span> <span class="pre">*</span> <span class="pre">R)</span></code>.
+:type C: np.ndarray
+:param D: Factor of shape <code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">L2</span> <span class="pre">*</span> <span class="pre">R)</span></code>.
+:type D: np.ndarray
+:param phi: Constraint matrices from :meth:<code class="docutils literal notranslate"><span class="pre">BBTD.get_constraint_matrices</span></code>.
+:type phi: np.ndarray
+:param psi: Constraint matrices from :meth:<code class="docutils literal notranslate"><span class="pre">BBTD.get_constraint_matrices</span></code>.
+:type psi: np.ndarray</p>
+<p>:returns: Tensor of shape <code class="docutils literal notranslate"><span class="pre">(I,</span> <span class="pre">J,</span> <span class="pre">K,</span> <span class="pre">M)</span></code>.
+:rtype: np.ndarray</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">API reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="solvers.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Solvers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#btd">BTD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cov-ll1">Cov-LL1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stokes">Stokes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bbtd">BBTD</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Saulo Barreto
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Saulo Barreto.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

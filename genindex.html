@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; pyBBTD  documentation</title>
+    <title>Index &#8212; pyBBTD</title>
   
   
   
@@ -15,63 +15,69 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
     <script src="_static/documentation_options.js?v=9eb32ce0"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -79,7 +85,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -87,15 +92,55 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
     </header>
   
 
@@ -106,7 +151,8 @@
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -131,41 +177,70 @@
   
   
   
-    <p class="title logo__title">pyBBTD  documentation</p>
+    <p class="title logo__title">pyBBTD</p>
   
 </a></div>
         <div class="sidebar-primary-item">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script></div>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html"><strong>Tutorials</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/btd.html">BTD tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1 tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/stokes.html">Stokes Tutorials</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_vanilla.html">ALS for Unconstrained BBTD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/bbtd_cov.html">AO-ADMM for Constrained BBTD</a></li>
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    pyBBTD
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="getting-started/tensors.html">Tensors in plain words</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started/quickstart.html">Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Models</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="models/index.html">Choosing a model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/btd.html">BTD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/covll1.html">Cov-LL1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/stokes.html">Stokes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/bbtd.html">BBTD</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tutorials/btd.html">BTD: separate a multichannel image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/covll1.html">Cov-LL1: covariance images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/stokes-synthetic.html">Stokes: a synthetic polarization image</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/stokes-bbtd-board.html">Stokes: the BBTD board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/bbtd-als.html">BBTD: one matrix per pixel (ALS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/bbtd-admm.html">BBTD for covariance images (ADMM)</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="guides/ranks-and-uniqueness.html">Ranks and uniqueness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/fitting.html">Initialization and convergence</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">API reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/models.html">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/solvers.html">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/uniqueness.html">Uniqueness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/visualization.html">Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/datasets.html">Datasets</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="reference_api.html"><strong>Reference API</strong></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference_btd.html">BTD Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_covll1.html">Cov-LL1 Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_stokes.html">Stokes Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_bbtd.html">BBTD Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_uniqueness.html">Uniqueness</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_solvers.html">Solvers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference_visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">Papers</a></li>
 </ul>
-</details></li>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 
     </div>
@@ -174,9 +249,14 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -210,8 +290,55 @@
 
 
 
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/scbarreto/pyBBTD" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/scbarreto/pyBBTD/issues/new?title=Issue%20on%20page%20%2Fgenindex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
 <button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
@@ -225,24 +352,23 @@
 
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
-`);
-</script>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
 
 
-<script>
-document.write(`
-  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-  </button>
-`);
-</script>
+</button>
 
 </div></div>
       
@@ -276,47 +402,41 @@ document.write(`
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#F"><strong>F</strong></a>
- | <a href="#G"><strong>G</strong></a>
- | <a href="#I"><strong>I</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#V"><strong>V</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.ADMM_A">ADMM_A() (in module pybbtd.solvers.covll1_admm)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.ADMM_B">ADMM_B() (in module pybbtd.solvers.covll1_admm)</a>
+      <li><a href="glossary.html#term-ADMM"><strong>ADMM</strong></a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.ADMM_C">ADMM_C() (in module pybbtd.solvers.covll1_admm)</a>
-
-      <ul>
-        <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.ADMM_C">(in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="glossary.html#term-ALS"><strong>ALS</strong></a>
 </li>
-      </ul></li>
+      <li><a href="glossary.html#term-AO-ADMM"><strong>AO-ADMM</strong></a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD">BBTD (class in pybbtd.bbtd)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_vanilla_als.BBTD_ALS">BBTD_ALS() (in module pybbtd.solvers.bbtd_vanilla_als)</a>
+      <li><a href="glossary.html#term-BBTD"><strong>BBTD</strong></a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_cov_admm.BBTD_COV_ADMM">BBTD_COV_ADMM() (in module pybbtd.solvers.bbtd_cov_admm)</a>
-</li>
-      <li><a href="reference_btd.html#pybbtd.btd.BTD">BTD (class in pybbtd.btd)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.btd_als.BTD_ALS">BTD_ALS() (in module pybbtd.solvers.btd_als)</a>
+      <li><a href="glossary.html#term-BTD"><strong>BTD</strong></a>
 </li>
   </ul></td>
 </tr></table>
@@ -324,25 +444,15 @@ document.write(`
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_stokes.html#pybbtd.stokes.check_stokes_constraints">check_stokes_constraints() (in module pybbtd.stokes)</a>
+      <li><a href="glossary.html#term-Coherency-matrix"><strong>Coherency matrix</strong></a>
 </li>
-      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD.check_uniqueness">check_uniqueness() (pybbtd.bbtd.BBTD method)</a>
-
-      <ul>
-        <li><a href="reference_btd.html#pybbtd.btd.BTD.check_uniqueness">(pybbtd.btd.BTD method)</a>
-</li>
-      </ul></li>
-      <li><a href="reference_uniqueness.html#pybbtd.uniqueness.check_uniqueness_BBTD">check_uniqueness_BBTD() (in module pybbtd.uniqueness)</a>
+      <li><a href="glossary.html#term-Constraint-matrix"><strong>Constraint matrix</strong></a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_uniqueness.html#pybbtd.uniqueness.check_uniqueness_LL1">check_uniqueness_LL1() (in module pybbtd.uniqueness)</a>
+      <li><a href="glossary.html#term-Covariance-matrix"><strong>Covariance matrix</strong></a>
 </li>
-      <li><a href="reference_stokes.html#pybbtd.stokes.coh2stokes">coh2stokes() (in module pybbtd.stokes)</a>
-</li>
-      <li><a href="reference_covll1.html#pybbtd.covll1.CovLL1">CovLL1 (class in pybbtd.covll1)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.COVLL1_ADMM">COVLL1_ADMM() (in module pybbtd.solvers.covll1_admm)</a>
+      <li><a href="glossary.html#term-CP-decomposition"><strong>CP decomposition</strong></a>
 </li>
   </ul></td>
 </tr></table>
@@ -350,65 +460,19 @@ document.write(`
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_bbtd.html#pybbtd.bbtd.factors_to_tensor">factors_to_tensor() (in module pybbtd.bbtd)</a>
-
-      <ul>
-        <li><a href="reference_btd.html#pybbtd.btd.factors_to_tensor">(in module pybbtd.btd)</a>
+      <li><a href="glossary.html#term-Factor-matrices"><strong>Factor matrices</strong></a>
 </li>
-      </ul></li>
-      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD.fit">fit() (pybbtd.bbtd.BBTD method)</a>
-
-      <ul>
-        <li><a href="reference_btd.html#pybbtd.btd.BTD.fit">(pybbtd.btd.BTD method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-Fit-error"><strong>Fit error</strong></a>
 </li>
-        <li><a href="reference_covll1.html#pybbtd.covll1.CovLL1.fit">(pybbtd.covll1.CovLL1 method)</a>
-</li>
-        <li><a href="reference_stokes.html#pybbtd.stokes.Stokes.fit">(pybbtd.stokes.Stokes method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
-<h2 id="G">G</h2>
+<h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_covll1.html#pybbtd.covll1.generate_covll1_factors">generate_covll1_factors() (in module pybbtd.covll1)</a>
-</li>
-      <li><a href="reference_covll1.html#pybbtd.covll1.CovLL1.generate_covll1_tensor">generate_covll1_tensor() (pybbtd.covll1.CovLL1 method)</a>
-</li>
-      <li><a href="reference_stokes.html#pybbtd.stokes.generate_stokes_factors">generate_stokes_factors() (in module pybbtd.stokes)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_stokes.html#pybbtd.stokes.Stokes.generate_stokes_tensor">generate_stokes_tensor() (pybbtd.stokes.Stokes method)</a>
-</li>
-      <li><a href="reference_bbtd.html#pybbtd.bbtd.BBTD.get_constraint_matrices">get_constraint_matrices() (pybbtd.bbtd.BBTD method)</a>
-</li>
-      <li><a href="reference_btd.html#pybbtd.btd.BTD.get_constraint_matrix">get_constraint_matrix() (pybbtd.btd.BTD method)</a>
-
-      <ul>
-        <li><a href="reference_covll1.html#pybbtd.covll1.CovLL1.get_constraint_matrix">(pybbtd.covll1.CovLL1 method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="I">I</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_cov_admm.init_BBTD_cov_factors">init_BBTD_cov_factors() (in module pybbtd.solvers.bbtd_cov_admm)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.bbtd_vanilla_als.init_BBTD_factors">init_BBTD_factors() (in module pybbtd.solvers.bbtd_vanilla_als)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.btd_als.init_BTD_factors">init_BTD_factors() (in module pybbtd.solvers.btd_als)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.init_COVLL1_factors">init_COVLL1_factors() (in module pybbtd.solvers.covll1_admm)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.init_STOKES_factors">init_STOKES_factors() (in module pybbtd.solvers.stokes_admm)</a>
-</li>
-      <li><a href="reference_covll1.html#pybbtd.covll1.is_valid_covariance">is_valid_covariance() (in module pybbtd.covll1)</a>
+      <li><a href="glossary.html#term-Hermitian"><strong>Hermitian</strong></a>
 </li>
   </ul></td>
 </tr></table>
@@ -416,196 +480,103 @@ document.write(`
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.kmeans_init">kmeans_init() (in module pybbtd.solvers.covll1_admm)</a>
-
-      <ul>
-        <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.kmeans_init">(in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="glossary.html#term-K-means"><strong>K-means</strong></a>
 </li>
-      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-Khatri-Rao-product"><strong>Khatri-Rao product</strong></a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-LL1"><strong>LL1</strong></a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    module
+      <li><a href="glossary.html#term-Mode"><strong>Mode</strong></a>
+</li>
+  </ul></td>
+</tr></table>
 
-      <ul>
-        <li><a href="reference_api.html#module-pybbtd">pybbtd</a>
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-NMF"><strong>NMF</strong></a>
 </li>
-        <li><a href="reference_bbtd.html#module-pybbtd.bbtd">pybbtd.bbtd</a>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-Order"><strong>Order</strong></a>
 </li>
-        <li><a href="reference_btd.html#module-pybbtd.btd">pybbtd.btd</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-Outer-product"><strong>Outer product</strong></a>
 </li>
-        <li><a href="reference_covll1.html#module-pybbtd.covll1">pybbtd.covll1</a>
-</li>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_cov_admm">pybbtd.solvers.bbtd_cov_admm</a>
-</li>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_vanilla_als">pybbtd.solvers.bbtd_vanilla_als</a>
-</li>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.btd_als">pybbtd.solvers.btd_als</a>
-</li>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.covll1_admm">pybbtd.solvers.covll1_admm</a>
-</li>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.stokes_admm">pybbtd.solvers.stokes_admm</a>
-</li>
-        <li><a href="reference_stokes.html#module-pybbtd.stokes">pybbtd.stokes</a>
-</li>
-        <li><a href="reference_uniqueness.html#module-pybbtd.uniqueness">pybbtd.uniqueness</a>
-</li>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_bbtd">pybbtd.visualization.draw_bbtd</a>
-</li>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_metrics">pybbtd.visualization.draw_metrics</a>
-</li>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_stokes">pybbtd.visualization.draw_stokes</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_visualization.html#pybbtd.visualization.draw_bbtd.plot_BBTD_cov_terms">plot_BBTD_cov_terms() (in module pybbtd.visualization.draw_bbtd)</a>
+      <li><a href="glossary.html#term-Positive-semidefinite"><strong>Positive semidefinite</strong></a>
 </li>
-      <li><a href="reference_visualization.html#pybbtd.visualization.draw_metrics.plot_error">plot_error() (in module pybbtd.visualization.draw_metrics)</a>
-</li>
-      <li><a href="reference_visualization.html#pybbtd.visualization.draw_stokes.plot_stokes_terms">plot_stokes_terms() (in module pybbtd.visualization.draw_stokes)</a>
-</li>
-      <li><a href="reference_stokes.html#pybbtd.stokes.proj_psd">proj_psd() (in module pybbtd.stokes)</a>
-</li>
-      <li><a href="reference_solvers.html#pybbtd.solvers.covll1_admm.project_to_psd">project_to_psd() (in module pybbtd.solvers.covll1_admm)</a>
-</li>
-      <li>
-    pybbtd
-
-      <ul>
-        <li><a href="reference_api.html#module-pybbtd">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.bbtd
-
-      <ul>
-        <li><a href="reference_bbtd.html#module-pybbtd.bbtd">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.btd
-
-      <ul>
-        <li><a href="reference_btd.html#module-pybbtd.btd">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.covll1
-
-      <ul>
-        <li><a href="reference_covll1.html#module-pybbtd.covll1">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.solvers.bbtd_cov_admm
-
-      <ul>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_cov_admm">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.solvers.bbtd_vanilla_als
-
-      <ul>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.bbtd_vanilla_als">module</a>
-</li>
-      </ul></li>
   </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    pybbtd.solvers.btd_als
-
-      <ul>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.btd_als">module</a>
+      <li><a href="glossary.html#term-Rank"><strong>Rank</strong></a>
 </li>
-      </ul></li>
-      <li>
-    pybbtd.solvers.covll1_admm
-
-      <ul>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.covll1_admm">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.solvers.stokes_admm
-
-      <ul>
-        <li><a href="reference_solvers.html#module-pybbtd.solvers.stokes_admm">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.stokes
-
-      <ul>
-        <li><a href="reference_stokes.html#module-pybbtd.stokes">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.uniqueness
-
-      <ul>
-        <li><a href="reference_uniqueness.html#module-pybbtd.uniqueness">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.visualization.draw_bbtd
-
-      <ul>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_bbtd">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.visualization.draw_metrics
-
-      <ul>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_metrics">module</a>
-</li>
-      </ul></li>
-      <li>
-    pybbtd.visualization.draw_stokes
-
-      <ul>
-        <li><a href="reference_visualization.html#module-pybbtd.visualization.draw_stokes">module</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_stokes.html#pybbtd.stokes.Stokes">Stokes (class in pybbtd.stokes)</a>
+      <li><a href="glossary.html#term-Signature"><strong>Signature</strong></a>
 </li>
-      <li><a href="reference_stokes.html#pybbtd.stokes.stokes2coh">stokes2coh() (in module pybbtd.stokes)</a>
+      <li><a href="glossary.html#term-Spatial-map"><strong>Spatial map</strong></a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_solvers.html#pybbtd.solvers.stokes_admm.STOKES_ADMM">STOKES_ADMM() (in module pybbtd.solvers.stokes_admm)</a>
+      <li><a href="glossary.html#term-Stokes-vector"><strong>Stokes vector</strong></a>
 </li>
-      <li><a href="reference_stokes.html#pybbtd.stokes.stokes_projection">stokes_projection() (in module pybbtd.stokes)</a>
-</li>
-      <li><a href="reference_visualization.html#pybbtd.visualization.draw_stokes.stokes_to_ellipse">stokes_to_ellipse() (in module pybbtd.visualization.draw_stokes)</a>
+      <li><a href="glossary.html#term-SVD"><strong>SVD</strong></a>
 </li>
   </ul></td>
 </tr></table>
 
-<h2 id="V">V</h2>
+<h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_covll1.html#pybbtd.covll1.validate_cov_matrices">validate_cov_matrices() (in module pybbtd.covll1)</a>
+      <li><a href="glossary.html#term-Tensor"><strong>Tensor</strong></a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference_stokes.html#pybbtd.stokes.validate_stokes_tensor">validate_stokes_tensor() (in module pybbtd.stokes)</a>
+      <li><a href="glossary.html#term-Term"><strong>Term</strong></a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-Unfolding"><strong>Unfolding</strong></a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="glossary.html#term-Uniqueness"><strong>Uniqueness</strong></a>
 </li>
   </ul></td>
 </tr></table>
@@ -672,8 +643,8 @@ By Saulo Barreto
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
   </footer>
