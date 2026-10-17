@@ -1,18 +1,18 @@
-import pytest
 import numpy as np
 import numpy.testing as npt
+import pytest
+
+from pybbtd.btd import BTD, factors_to_tensor
+from pybbtd.solvers.stokes_admm import fit_stokes_admm
 from pybbtd.stokes import (
     Stokes,
-    validate_stokes_tensor,
+    coherency_to_stokes,
     generate_stokes_factors,
-    check_stokes_constraints,
-    stokes2coh,
-    coh2stokes,
-    stokes_projection,
+    is_valid_stokes,
+    project_stokes,
+    stokes_to_coherency,
+    validate_stokes_tensor,
 )
-from pybbtd.btd import BTD, factors_to_tensor
-from pybbtd.solvers.stokes_admm import STOKES_ADMM
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Section 1: Stokes class (stokes.py)
@@ -85,54 +85,54 @@ def test_validate_stokes_tensor_warning():
 
 def test_fit_invalid_algorithm():
     model = Stokes([10, 10], R=2, L=[1, 1])
-    with pytest.raises(UserWarning, match="Algorithm not implemented yet"):
+    with pytest.raises(ValueError, match="Unknown algorithm"):
         model.fit("dummy_data", algorithm="INVALID")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Section 2: Stokes utilities (stokes2coh, coh2stokes, constraints, projection)
+# Section 2: Stokes utilities (stokes_to_coherency, coherency_to_stokes, constraints, projection)
 # ──────────────────────────────────────────────────────────────────────────────
 
 
 def test_stokes_constraints_valid_vector():
     S = np.array([1.0, 0.5, 0.5, 0.5])
-    assert check_stokes_constraints(S) == 1
+    assert is_valid_stokes(S)
 
 
 def test_stokes_constraints_invalid_negative_S0():
     S = np.array([-1.0, 0.0, 0.0, 0.0])
-    assert check_stokes_constraints(S) == 0
+    assert not is_valid_stokes(S)
 
 
 def test_stokes_constraints_invalid_norm():
     S = np.array([0.1, 0.5, 0.5, 0.5])
-    assert check_stokes_constraints(S) == 0
+    assert not is_valid_stokes(S)
 
 
 def test_stokes2coh_coh2stokes_roundtrip():
     S_orig = np.array([1.0, 0.3, 0.4, 0.2])
-    coh = stokes2coh(S_orig)
-    S_rec = coh2stokes(coh)
+    coh = stokes_to_coherency(S_orig)
+    S_rec = coherency_to_stokes(coh)
     npt.assert_allclose(S_rec, S_orig, atol=1e-12)
 
 
 def test_coh2stokes_stokes2coh_roundtrip():
     coh_orig = np.array([[0.6, 0.2 + 0.1j], [0.2 - 0.1j, 0.4]])
-    S = coh2stokes(coh_orig)
-    coh_rec = stokes2coh(S)
+    S = coherency_to_stokes(coh_orig)
+    coh_rec = stokes_to_coherency(S)
     npt.assert_allclose(coh_rec, coh_orig, atol=1e-12)
 
 
 def test_stokes_projection_valid_vector_unchanged():
     S = np.array([1.0, 0.5, 0.5, 0.5])
-    S_proj = stokes_projection(S)
+    S_proj = project_stokes(S)
     npt.assert_allclose(S_proj, S, atol=1e-10)
 
 
 def test_stokes_projection_produces_valid_vector():
     S_invalid = np.array([0.1, 0.5, 0.5, 0.5])
-    S_proj = stokes_projection(S_invalid)
-    assert check_stokes_constraints(S_proj) == 1
+    S_proj = project_stokes(S_invalid)
+    assert is_valid_stokes(S_proj)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -143,27 +143,27 @@ def test_stokes_projection_produces_valid_vector():
 def test_admm_invalid_model_type():
     T = np.random.rand(10, 10, 4)
     with pytest.raises(TypeError, match="must be an instance of the Stokes class"):
-        STOKES_ADMM(Stokes_model=0, T=T)
+        fit_stokes_admm(model=0, T=T)
 
 
 def test_admm_invalid_tensor_type():
     model = Stokes([10, 10], R=2, L=2)
     with pytest.raises(TypeError, match="must be a numpy"):
-        STOKES_ADMM(model, T=None)
+        fit_stokes_admm(model, T=None)
 
 
 def test_admm_mismatched_dims():
     model = Stokes([2, 3], R=2, L=2)
     T_wrong = np.random.rand(3, 2, 5)
     with pytest.raises(ValueError, match="do not match"):
-        STOKES_ADMM(model, T=T_wrong)
+        fit_stokes_admm(model, T=T_wrong)
 
 
 def test_admm_invalid_init_strategy():
     model = Stokes([2, 3], R=2, L=2)
     T = np.random.rand(2, 3, 4)
-    with pytest.raises(ValueError, match="not implemented"):
-        STOKES_ADMM(model, T=T, init="wrong_one")
+    with pytest.raises(ValueError, match="Unknown initialization"):
+        fit_stokes_admm(model, T=T, init="wrong_one")
 
 
 def test_admm_fit_random_init():
@@ -250,7 +250,7 @@ def test_admm_stokes_constraints_after_fit():
     )
     C_est = X.factors[2]
     for r in range(X.rank):
-        assert check_stokes_constraints(C_est[:, r]) == 1, (
+        assert is_valid_stokes(C_est[:, r]), (
             f"Column {r} of C does not satisfy Stokes constraints"
         )
 
@@ -264,7 +264,7 @@ def test_admm_max_iter_warning():
         A0, B0, C0, theta, block_mode="LL1"
     ) + 0 * 1e-5 * np.random.randn(*X.dims)
 
-    with pytest.warns(RuntimeWarning, match="max number of iteration"):
+    with pytest.warns(RuntimeWarning, match="max_iter"):
         X.fit(
             data=T_gt,
             algorithm="ADMM",

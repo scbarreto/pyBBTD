@@ -1,11 +1,11 @@
-import pytest
 import numpy as np
 import numpy.testing as npt
+import pytest
 import tensorly as tly
-from tensorly.tenalg import outer, khatri_rao
-from pybbtd.btd import BTD, _validate_R_L, _constraint_matrix, factors_to_tensor
-from pybbtd.solvers.btd_als import BTD_ALS, init_BTD_factors
+from tensorly.tenalg import khatri_rao, outer
 
+from pybbtd.btd import BTD, _constraint_matrix, _validate_ranks, factors_to_tensor
+from pybbtd.solvers.btd_als import fit_btd_als, init_btd_factors
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Section 1: BTD class
@@ -112,13 +112,13 @@ def test_factors_to_tensor_shape():
 def test_fit_invalid_algorithm():
     model = BTD(dims=(10, 10, 10), R=2, L=2, block_mode="LL1")
     T = np.random.randn(10, 10, 10)
-    with pytest.raises(UserWarning, match="Algorithm not implemented yet"):
+    with pytest.raises(ValueError, match="Unknown algorithm"):
         model.fit(T, algorithm="INVALID")
 
 
 def test_unfoldings():
     np.random.seed(42)
-    R, L = _validate_R_L(3, 2)
+    R, L = _validate_ranks(3, 2)
     Lsum = np.array(L).sum()
     dims = (13, 12, 11)
     theta = _constraint_matrix(R, L)
@@ -158,7 +158,7 @@ def test_als_init_random_shapes():
     R, L = 3, 2
     model = BTD(dims=dims, R=R, L=L, block_mode="LL1")
     Lsum = np.array(model.L).sum()
-    A, B, C = init_BTD_factors(model, strat="random")
+    A, B, C = init_btd_factors(model, strategy="random")
     assert A.shape == (dims[0], Lsum)
     assert B.shape == (dims[1], Lsum)
     assert C.shape == (dims[2], R)
@@ -171,7 +171,7 @@ def test_als_init_svd_shapes():
     model = BTD(dims=dims, R=R, L=L, block_mode="LL1")
     Lsum = np.array(model.L).sum()
     T = np.random.randn(*dims)
-    A, B, C = init_BTD_factors(model, strat="svd", T=T)
+    A, B, C = init_btd_factors(model, strategy="svd", T=T)
     assert A.shape == (dims[0], Lsum)
     assert B.shape == (dims[1], Lsum)
     assert C.shape == (dims[2], R)
@@ -180,32 +180,32 @@ def test_als_init_svd_shapes():
 def test_als_init_svd_requires_T():
     model = BTD(dims=(15, 14, 10), R=3, L=2, block_mode="LL1")
     with pytest.raises(ValueError, match="SVD init requires input data T"):
-        init_BTD_factors(model, strat="svd", T=None)
+        init_btd_factors(model, strategy="svd", T=None)
 
 
 def test_als_init_invalid_strategy():
     model = BTD(dims=(15, 14, 10), R=3, L=2, block_mode="LL1")
-    with pytest.raises(ValueError, match="not implemented"):
-        init_BTD_factors(model, strat="bad")
+    with pytest.raises(ValueError, match="Unknown initialization"):
+        init_btd_factors(model, strategy="bad")
 
 
 def test_als_invalid_model_type():
     T = np.random.randn(10, 10, 10)
     with pytest.raises(TypeError, match="must be an instance of the BTD class"):
-        BTD_ALS("not_a_model", T)
+        fit_btd_als("not_a_model", T)
 
 
 def test_als_invalid_tensor_type():
     model = BTD(dims=(10, 10, 10), R=2, L=2, block_mode="LL1")
     with pytest.raises(TypeError, match="must be a numpy array"):
-        BTD_ALS(model, None)
+        fit_btd_als(model, None)
 
 
 def test_als_mismatched_dims():
     model = BTD(dims=(10, 10, 10), R=2, L=2, block_mode="LL1")
     T = np.random.randn(5, 5, 5)
     with pytest.raises(ValueError, match="do not match"):
-        BTD_ALS(model, T)
+        fit_btd_als(model, T)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -217,7 +217,7 @@ def test_fit_LL1():
     np.random.seed(202505)
     X = BTD([20, 18, 16], 3, 2, block_mode="LL1")
 
-    A0, B0, C0 = init_BTD_factors(X)
+    A0, B0, C0 = init_btd_factors(X)
     theta = X.get_constraint_matrix()
     T_gt = factors_to_tensor(A0, B0, C0, theta)
 

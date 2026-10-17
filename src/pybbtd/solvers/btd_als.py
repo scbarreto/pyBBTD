@@ -1,88 +1,83 @@
+"""Alternating least squares (ALS) solver for the BTD model."""
+
+import logging
+
 import numpy as np
-from tensorly import unfold, transpose
-from tensorly.tenalg import khatri_rao
 from scipy.linalg import solve
-import pybbtd.btd as btd
-from copy import deepcopy
+from tensorly import transpose, unfold
+from tensorly.tenalg import khatri_rao
+
+from pybbtd._utils import check_solver_inputs, unknown_option_error, warn_user
+from pybbtd.btd import BTD, _constraint_matrix, factors_to_tensor
+
+logger = logging.getLogger(__name__)
+
+INIT_STRATEGIES = ("random", "svd")
+
+# The ALS updates are written for the LL1 mode. The other modes are solved
+# as the LL1 problem of the tensor with its axes permuted by these orders.
+_LL1_AXES = {"LL1": (0, 1, 2), "L1L": (0, 2, 1), "1LL": (1, 2, 0)}
 
 
-def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e-3):
+def fit_btd_als(model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e-3):
+    """Fit a BTD with alternating least squares (ALS).
+
+    Each iteration solves a least-squares problem for A, then B, then C,
+    keeping the other factors fixed. All three block modes are supported.
+
+    Parameters
+    ----------
+    model : BTD
+        Model defining the dimensions, ranks and block mode.
+    T : np.ndarray
+        Tensor of shape ``model.dims`` to decompose.
+    init : {"random", "svd"}, default "random"
+        Initialization strategy (see :func:`init_btd_factors`).
+    max_iter : int, default 1000
+        Maximum number of iterations.
+    abs_tol : float, default 1e-8
+        Stop when ``fit_error / ||T||`` falls below this value.
+    rel_tol : float, default 1e-3
+        Stop when the relative decrease of the fit error falls below this
+        value.
+
+    Returns
+    -------
+    factors : list of np.ndarray
+        Estimated ``[A, B, C]``.
+    fit_error : np.ndarray
+        Squared reconstruction error :math:`\\|\\mathcal{T} - \\hat{\\mathcal{T}}\\|^2`
+        at initialization and after each iteration.
     """
-    Alternating Least Squares (ALS) solver for the BTD decomposition.
+    check_solver_inputs(model, BTD, T)
 
-    Supports all three block modes (``"LL1"``, ``"L1L"``, ``"1LL"``).
-    Internally transposes non-LL1 tensors so the ALS updates always
-    operate in LL1 form.
-
-    Parameters:
-        BTD_model: BTD
-            An instance of the :class:`~pybbtd.btd.BTD` class.
-        T: np.ndarray
-            Input 3D tensor to be decomposed, shape matching ``BTD_model.dims``.
-        init: str
-            Initialization strategy (default: ``"random"``).
-            Options: ``"random"``, ``"svd"``.
-        max_iter: int
-            Maximum number of ALS iterations (default: 1000).
-        abs_tol: float
-            Absolute tolerance for convergence (default: 1e-8).
-        rel_tol: float
-            Relative tolerance for convergence (default: 1e-3).
-
-    Returns:
-        Tuple[list, np.ndarray]:
-            ``(factors, fit_error)`` where ``factors = [A, B, C]`` and
-            ``fit_error`` is a 1-D array of squared reconstruction errors.
-    """
-    # Check that BTD_model is an instance of the BTD class
-    if not isinstance(BTD_model, btd.BTD):
-        raise TypeError("BTD_model must be an instance of the BTD class.")
-
-    # Check that T is a numpy array
-    if not isinstance(T, np.ndarray):
-        raise TypeError("T must be a numpy array.")
-
-    # Check that T's dimensions match BTD_model.dims
-    if T.shape != BTD_model.dims:
-        raise ValueError(
-            f"T's dimensions ({T.shape}) do not match BTD_model.dims ({BTD_model.dims})."
-        )
-    # algo is for LL1; convert to equivalent LL1 if not
-    if BTD_model.block_mode == "1LL":
-        newdims = (BTD_model.dims[1], BTD_model.dims[2], BTD_model.dims[0])
-        transp_BTD_model = btd.BTD(dims=newdims, R=BTD_model.rank, L=BTD_model.L)
-        transp_T = transpose(T, (1, 2, 0))
-    elif BTD_model.block_mode == "L1L":
-        newdims = (BTD_model.dims[0], BTD_model.dims[2], BTD_model.dims[1])
-        transp_BTD_model = btd.BTD(dims=newdims, R=BTD_model.rank, L=BTD_model.L)
-        transp_T = transpose(T, (0, 2, 1))
-    else:
-        transp_BTD_model = deepcopy(BTD_model)
-        transp_T = deepcopy(T)
+    # algo is for LL1; permute to the equivalent LL1 problem if needed
+    axes = _LL1_AXES[model.block_mode]
+    T_ll1 = transpose(T, axes)
+    dims_ll1 = tuple(model.dims[axis] for axis in axes)
 
     # precompute unfoldings
-    T0 = unfold(transp_T, 0)
-    T1 = unfold(transp_T, 1)
-    T2 = unfold(transp_T, 2)
+    T0 = unfold(T_ll1, 0)
+    T1 = unfold(T_ll1, 1)
+    T2 = unfold(T_ll1, 2)
 
     # init factors
-    Ak, Bk, Ck = init_BTD_factors(transp_BTD_model, strat=init, T=transp_T)
-    theta = transp_BTD_model.get_constraint_matrix()
+    Ak, Bk, Ck = _init_factors(dims_ll1, model.rank, model.L, init, T_ll1)
+    theta = _constraint_matrix(model.rank, model.L)
 
     k = 0
     exit_criterion = False
-    Tfit_0 = btd.factors_to_tensor(Ak, Bk, Ck, theta)
-    fit_error = [np.linalg.norm(Tfit_0 - transp_T) ** 2]
+    Tfit_0 = factors_to_tensor(Ak, Bk, Ck, theta)
+    fit_error = [np.linalg.norm(Tfit_0 - T_ll1) ** 2]
 
-    while exit_criterion is False:
-        # udpdate A
+    while not exit_criterion:
+        # update A
         M0 = khatri_rao([Bk, Ck @ theta])
-
         LHS = M0.T @ M0
         RHS = M0.T @ T0.T
         Ak1 = solve(LHS, RHS).T
 
-        # udpdate B
+        # update B
         M1 = khatri_rao([Ak1, Ck @ theta])
         LHS = M1.T @ M1
         RHS = M1.T @ T1.T
@@ -95,91 +90,78 @@ def BTD_ALS(BTD_model, T, init="random", max_iter=1000, abs_tol=1e-8, rel_tol=1e
         Ck1 = solve(LHS, RHS).T
 
         # compute reconstruction error
-        Tfit_k = btd.factors_to_tensor(Ak1, Bk1, Ck1, theta)
-        fit_error.append(np.linalg.norm(Tfit_k - transp_T) ** 2)
+        Tfit_k = factors_to_tensor(Ak1, Bk1, Ck1, theta)
+        fit_error.append(np.linalg.norm(Tfit_k - T_ll1) ** 2)
 
         # exit criterion
         k += 1
-
         if np.abs(fit_error[-1] - fit_error[-2]) / fit_error[-1] < rel_tol:
-            print("Exiting early due to unsufficient decrease of cost")
+            logger.info("Iteration %d: fit error stopped decreasing (rel_tol).", k)
             exit_criterion = True
-        if fit_error[-1] / np.linalg.norm(transp_T) < abs_tol:
-            print("Reached absolute tolerance threshold. Exiting.")
+        if fit_error[-1] / np.linalg.norm(T_ll1) < abs_tol:
+            logger.info("Iteration %d: fit error below abs_tol.", k)
             exit_criterion = True
-
-        if k >= max_iter:
+        if k >= max_iter and not exit_criterion:
+            warn_user(
+                f"Reached max_iter={max_iter} before converging. Check the fit error.",
+                RuntimeWarning,
+            )
             exit_criterion = True
-            print("Reached max number of iteration. Check convergence.")
 
         # pass variables
-        Ak = Ak1.copy()
-        Bk = Bk1.copy()
-        Ck = Ck1.copy()
+        Ak, Bk, Ck = Ak1, Bk1, Ck1
 
-    # transpose variables back to actual model
-    if BTD_model.block_mode == "LL1":
-        factors = [Ak, Bk, Ck]
-    elif BTD_model.block_mode == "1LL":
-        factors = [Ck, Ak, Bk]
-    elif BTD_model.block_mode == "L1L":
-        factors = [Ak, Ck, Bk]
+    # put the factors back in the order of the model's modes
+    factors = [None, None, None]
+    for factor, axis in zip([Ak, Bk, Ck], axes, strict=True):
+        factors[axis] = factor
 
     return factors, np.array(fit_error)
 
 
-def init_BTD_factors(BTD_model, strat="random", T=None):
+def init_btd_factors(model, strategy="random", T=None):
+    """Initialize the BTD factors.
+
+    The factors are returned in the LL1 layout: ``A`` and ``B`` have
+    ``sum(L)`` columns and ``C`` has ``R`` columns.
+
+    Parameters
+    ----------
+    model : BTD
+        Model defining the dimensions and ranks.
+    strategy : {"random", "svd"}, default "random"
+        ``"random"`` draws standard Gaussian entries. ``"svd"`` uses the
+        leading singular vectors of each unfolding of ``T``.
+    T : np.ndarray, optional
+        Data tensor, required for ``"svd"``.
+
+    Returns
+    -------
+    A, B, C : np.ndarray
+        Initial factor matrices.
     """
-    Initialize factor matrices for the BTD decomposition.
+    return _init_factors(model.dims, model.rank, model.L, strategy, T)
 
-    Parameters:
-        BTD_model: BTD
-            An instance of the :class:`~pybbtd.btd.BTD` class.
-        strat: str
-            Initialization strategy (default: ``"random"``).
-            Options: ``"random"``, ``"svd"``.
-        T: np.ndarray or None
-            Input tensor (required for ``"svd"`` initialization).
 
-    Returns:
-        Tuple[np.ndarray, np.ndarray, np.ndarray]:
-            Initialized factor matrices ``(A, B, C)``.
-    """
-
-    # get BTD model params
-    dims = BTD_model.dims
-    R = BTD_model.rank
-    L = BTD_model.L
+def _init_factors(dims, R, L, strategy, T):
+    """Initialize LL1 factors for a tensor of shape ``dims``."""
     Lsum = np.array(L).sum()
 
-    if strat == "random":
-        # init factor matrices and constraint matrix
+    if strategy == "random":
         A = np.random.randn(dims[0], Lsum)
         B = np.random.randn(dims[1], Lsum)
         C = np.random.randn(dims[2], R)
-    elif strat == "svd":
+    elif strategy == "svd":
         if T is None:
             raise ValueError("SVD init requires input data T")
-        u0, s0, __ = np.linalg.svd(unfold(T, 0))
-        u1, s1, __ = np.linalg.svd(unfold(T, 1))
-        u2, s2, __ = np.linalg.svd(unfold(T, 2))
+        u0, s0, _ = np.linalg.svd(unfold(T, 0))
+        u1, s1, _ = np.linalg.svd(unfold(T, 1))
+        u2, s2, _ = np.linalg.svd(unfold(T, 2))
 
         A = u0[:, :Lsum] @ np.diag(s0[:Lsum] ** 0.5)
         B = u1[:, :Lsum] @ np.diag(s1[:Lsum] ** 0.5)
         C = u2[:, :R] @ np.diag(s2[:R] ** 0.5)
-
     else:
-        raise ValueError("not implemented")
-
-    # if normalize is True:
-    #     if T is None:
-    #         raise ValueError("normalization requires input data T")
-    #     Tnorm = np.linalg.norm(T)
-    #     Tnorm_rec = np.linalg.norm(btd.factors_to_tensor(A, B, C, BTD_model.get_constraint_matrix()))
-    #     ratio = Tnorm/Tnorm_rec
-    #     A = A/(ratio)**(1/3)
-    #     B = B/(ratio)**(1/3)
-    #     C = C/(ratio)**(1/3)
-    #     print(np.linalg.norm(btd.factors_to_tensor(A, B, C, BTD_model.get_constraint_matrix()))/Tnorm)
+        raise unknown_option_error("initialization", strategy, INIT_STRATEGIES)
 
     return A, B, C

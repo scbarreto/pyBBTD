@@ -1,204 +1,198 @@
+"""AO-ADMM solver for the BBTD model of covariance images.
+
+The constrained model has non-negative spatial maps ``A_r @ B_r.T`` and
+conjugate-symmetric spectral factors ``D = C*``, so the second block of each
+term is a covariance matrix ``C_r @ C_r^H``.
+"""
+
+import logging
+
 import numpy as np
-import scipy
-from tensorly import unfold
-from tensorly.tenalg import khatri_rao
-from tensorly.cp_tensor import cp_to_tensor
-from sklearn.cluster import KMeans
+from scipy.linalg import block_diag
 from sklearn.decomposition import NMF
-import pybbtd.bbtd as bbtd
+from tensorly import unfold
+from tensorly.cp_tensor import cp_to_tensor
+from tensorly.tenalg import khatri_rao
+
+from pybbtd._linalg import hermitian_to_real, project_psd
+from pybbtd._utils import check_solver_inputs, unknown_option_error, warn_user
+from pybbtd.bbtd import BBTD, _constraint_matrices, factors_to_tensor
+from pybbtd.btd import _constraint_matrix, spatial_maps
+from pybbtd.solvers._kmeans import cluster_maps, cluster_pixels, match_norm, nmf_factors
+
+logger = logging.getLogger(__name__)
+
+INIT_STRATEGIES = ("random", "svd", "kmeans")
 
 
-def BBTD_COV_ADMM(
-    BBTD_model,
+def fit_bbtd_cov_admm(
+    model,
     T,
     init="random",
     max_iter=1000,
     gamma=1.0,
     rho=1.0,
-    inner_admm=50,
-    tol_admm=1e-8,
+    max_admm=50,
+    admm_tol=1e-8,
     rel_tol=1e-6,
     abs_tol=1e-12,
 ):
+    """Fit the covariance BBTD with AO-ADMM.
+
+    Enforces non-negative spatial maps ``A_r @ B_r.T`` and conjugate
+    symmetry ``D = C*``.
+
+    Parameters
+    ----------
+    model : BBTD
+        Model defining the dimensions and ranks. The data have shape
+        ``(I, J, K, K)``.
+    T : np.ndarray
+        Tensor of shape ``model.dims`` whose pixels ``T[i, j]`` are
+        ``K x K`` covariance matrices.
+    init : {"random", "svd", "kmeans"}, default "random"
+        Initialization strategy (see :func:`init_bbtd_cov_factors`).
+    max_iter : int, default 1000
+        Maximum number of outer iterations.
+    gamma : float, default 1.0
+        Weight of the penalty tying ``A_r @ B_r.T`` to its non-negative part.
+    rho : float, default 1.0
+        ADMM penalty parameter for the constraint ``D = C*``.
+    max_admm : int, default 50
+        Maximum number of inner ADMM iterations for the C, D update.
+    admm_tol : float, default 1e-8
+        Tolerance of the inner ADMM loop.
+    rel_tol : float, default 1e-6
+        Stop when the relative change of the fit error falls below this value.
+    abs_tol : float, default 1e-12
+        Stop when the fit error falls below this value.
+
+    Returns
+    -------
+    factors : list of np.ndarray
+        Estimated ``[A, B, C, D]``, with ``D = C.conj()``.
+    fit_error : np.ndarray
+        Relative reconstruction error after each iteration.
     """
-    ADMM solver for the constrained BBTD decomposition with:
-    - Non-negativity on spatial maps (A, B)
-    - Conjugate symmetry on C and D (D = C*)
+    check_solver_inputs(model, BBTD, T)
 
-    Parameters:
-        BBTD_model: BBTD
-            An instance of the BBTD class containing model parameters.
-        T: np.ndarray
-            The input 4D tensor to be decomposed, shape (I, J, K, K).
-        init: str
-            Initialization strategy. Options: "random", "svd", "kmeans".
-        max_iter: int
-            Maximum number of outer iterations.
-        gamma: float
-            Penalty parameter for the A, B spatial map coupling.
-        rho: float
-            ADMM penalty parameter for the C, D conjugate constraint.
-        inner_admm: int
-            Maximum number of inner ADMM iterations for C update.
-        tol_admm: float
-            Tolerance for inner ADMM convergence.
-        rel_tol: float
-            Relative tolerance for outer convergence.
-        abs_tol: float
-            Absolute tolerance for outer convergence.
+    J, M, K, K = model.dims
+    R = model.rank
+    L1 = model.L1
+    L2 = model.L2
 
-    Returns:
-        factors: list
-            List of factor matrices [A, B, C, D].
-        fit_error: np.ndarray
-            Array of fitting errors at each iteration.
-    """
-    # Validate inputs
-    if not isinstance(BBTD_model, bbtd.BBTD):
-        raise TypeError("BBTD_model must be an instance of the BBTD class.")
-    if not isinstance(T, np.ndarray):
-        raise TypeError("T must be a numpy array.")
-    if T.shape != BBTD_model.dims:
-        raise ValueError(
-            f"T's dimensions ({T.shape}) do not match BBTD_model.dims ({BBTD_model.dims})."
-        )
+    # precompute constraint matrices
+    phi, psi = model.get_constraint_matrices()
+    psibtd = _constraint_matrix(R, L2)
 
-    J, M, K, K = BBTD_model.dims
-    R = BBTD_model.rank
-    L1 = BBTD_model.L1
-    L2 = BBTD_model.L2
+    # precompute unfoldings for A, B (4D)
+    T1 = unfold(T, 0)
+    T2 = unfold(T, 1)
 
-    # Precompute constraint matrices
-    phi, psi = BBTD_model.get_constraint_matrices()
-    _, psibtd = bbtd._constraint_matrices(L2, 1, R)
-
-    # Precompute unfoldings for A, B (4D)
-    T1 = unfold(T, 0).T
-    T2 = unfold(T, 1).T
-
-    # Reshape to 3D for C, D updates
+    # reshape to 3D for C, D updates
     T3D = T.reshape(J * M, K, K)
     T3 = unfold(T3D, 1)
     T4 = unfold(T3D, 2)
 
-    # Initialize factors
-    Aest, Best, Cest = init_BBTD_cov_factors(BBTD_model, strat=init, T=T)
+    # init factors
+    Aest, Best, Cest = init_bbtd_cov_factors(model, strategy=init, T=T)
     Dest = Cest.conj()
 
-    # Compute initial spatial maps
-    Sout = np.zeros((R, J, M))
-    for r in range(R):
-        Sout[r] = Aest[:, r * L1 : (r + 1) * L1] @ Best[:, r * L1 : (r + 1) * L1].T
+    # initial spatial maps, scaled to match the data norm
+    Sout = spatial_maps(Aest, Best, L1)
     vecSout = Sout.reshape(R, J * M).T
-
-    # Scale initialization to match data norm
-    factors_init = [vecSout @ psibtd, Cest, Dest]
-    weights = np.ones(L2 * R)
-    tensor_init = cp_to_tensor((weights, factors_init))
+    tensor_init = cp_to_tensor((np.ones(L2 * R), [vecSout @ psibtd, Cest, Dest]))
     scale_factor = np.linalg.norm(T3D) / np.linalg.norm(tensor_init)
     Sout = Sout * scale_factor
 
-    # Initialize metrics
     cost = np.zeros(max_iter)
-    outer_check_interval = int(max_iter / 5) if max_iter >= 5 else 1
+    progress_interval = max(max_iter // 5, 1)
+    eps_zero = 1e-13
 
     for it in range(max_iter):
-        if it != 0 and it % outer_check_interval == 0:
-            print("Progress:", (it / max_iter * 100), "%")
+        if it != 0 and it % progress_interval == 0:
+            logger.info("Progress: %.0f%%", it / max_iter * 100)
 
-        # Update A
+        # update A
         M1 = phi @ khatri_rao((Best @ phi, Cest @ psi, Cest.conj() @ psi)).T
-        Aest = _solve_A(Best, Sout, T1, M1, gamma, L1)
+        Aest = _solve_a(Best, Sout, T1, M1, gamma, L1)
         Aest = np.nan_to_num(Aest, nan=0, posinf=0, neginf=0)
 
-        # Update B
+        # update B
         M2 = phi @ khatri_rao((Aest @ phi, Cest @ psi, Cest.conj() @ psi)).T
-        Best = _solve_B(Aest, Sout, T2, M2, gamma, L1)
+        Best = _solve_b(Aest, Sout, T2, M2, gamma, L1)
         Best = np.nan_to_num(Best, nan=0, posinf=0, neginf=0)
 
-        # Project spatial maps to non-negative
-        Sout = np.zeros((R, J, M))
-        for r in range(R):
-            Sout[r] = np.maximum(
-                0, Aest[:, r * L1 : (r + 1) * L1] @ Best[:, r * L1 : (r + 1) * L1].T
-            )
+        # project spatial maps to non-negative
+        Sout = np.maximum(0, spatial_maps(Aest, Best, L1))
         vecSout = Sout.reshape(R, J * M).T
 
-        # Update C and D via ADMM (enforcing D = C*)
-        Cest, Dest, _, _ = _solve_C(
-            Cest, Dest, T3, T4, vecSout, psibtd, rho, inner_admm, tol_admm, L2, R
+        # update C and D via ADMM (enforcing D = C*)
+        Cest, Dest = _admm_cd(
+            Cest, Dest, T3, T4, vecSout, psibtd, rho, max_admm, admm_tol, L2, R
         )
 
-        # Compute reconstruction error
-        factors_rec = [vecSout @ psibtd, Cest, Dest]
-        weights = np.ones(L2 * R)
-        tensor_rec = cp_to_tensor((weights, factors_rec))
+        # compute reconstruction error
+        tensor_rec = cp_to_tensor((np.ones(L2 * R), [vecSout @ psibtd, Cest, Dest]))
         cost[it] = np.linalg.norm(T3D - tensor_rec) / np.linalg.norm(T3D)
 
-        eps_zero = 1e-13
-        if it > 0 and np.abs(cost[it] - cost[it - 1]) / (cost[it] + eps_zero) < rel_tol:
-            print(f"Exiting early at iteration {it} due to relative tolerance.")
-            cost = cost[: it + 1]
-            break
-        if (
-            it > 0
-            and np.abs(cost[it] - cost[it - 1]) / (cost[it - 1] + eps_zero) < rel_tol
-        ):
-            print(f"Exiting early at iteration {it} due to relative tolerance.")
-            cost = cost[: it + 1]
-            break
+        # exit criterion
+        if it > 0:
+            change = np.abs(cost[it] - cost[it - 1])
+            if (
+                change / (cost[it] + eps_zero) < rel_tol
+                or change / (cost[it - 1] + eps_zero) < rel_tol
+            ):
+                logger.info("Iteration %d: fit error stopped changing (rel_tol).", it)
+                cost = cost[: it + 1]
+                break
         if cost[it] < abs_tol:
-            print(f"Reached absolute tolerance at iteration {it}.")
+            logger.info("Iteration %d: fit error below abs_tol.", it)
             cost = cost[: it + 1]
             break
     else:
-        print("Reached max number of iterations. Check convergence.")
+        warn_user(
+            f"Reached max_iter={max_iter} before converging. Check the fit error.",
+            RuntimeWarning,
+        )
 
-    factors = [Aest, Best, Cest, Dest]
-    return factors, cost
+    return [Aest, Best, Cest, Dest], cost
 
 
-def _solve_A(estB, estS, T1, M1, gamma, L1):
-    """
-    Solve for A with non-negativity coupling penalty.
+def _solve_a(estB, estS, T1, M1, gamma, L1):
+    """Update A: least squares on the first unfolding plus the spatial-map penalty.
 
-    The update minimizes the LS criterion for the first unfolding
-    plus a penalty term gamma * ||S_r - A_r @ B_r^T||^2.
+    Minimizes ``||T1 - A @ M1||^2 + gamma * sum_r ||S_r - A_r @ B_r.T||^2``.
     """
     R = estS.shape[0]
 
     M1_M1H = (M1 @ M1.T.conj()).real
-    RHS = (T1.T.conj() @ M1.T).real
+    RHS = (T1.conj() @ M1.T).real
 
     Brs = []
     SBs = []
     for r in range(R):
-        Brs.append(estB[:, r * L1 : (r + 1) * L1].T @ estB[:, r * L1 : (r + 1) * L1])
-        SBs.append(estS[r, :, :] @ estB[:, r * L1 : (r + 1) * L1])
+        B_r = estB[:, r * L1 : (r + 1) * L1]
+        Brs.append(B_r.T @ B_r)
+        SBs.append(estS[r] @ B_r)
+    BTB = block_diag(*Brs)
     SBfinal = np.hstack(SBs)
-    BTB = scipy.linalg.block_diag(*Brs)
 
-    term1 = M1_M1H + (gamma * BTB)
-    term2 = RHS + (gamma * SBfinal)
+    term1 = np.nan_to_num(M1_M1H + gamma * BTB, nan=0, posinf=0, neginf=0)
+    term2 = np.nan_to_num(RHS + gamma * SBfinal, nan=0, posinf=0, neginf=0)
 
-    term1 = np.nan_to_num(term1, nan=0, posinf=0, neginf=0)
-    term2 = np.nan_to_num(term2, nan=0, posinf=0, neginf=0)
-
-    A_min = np.linalg.solve(term1.T, term2.T)
-    return A_min.T
+    return np.linalg.solve(term1.T, term2.T).T
 
 
-def _solve_B(estA, estS, T2, M2, gamma, L1):
-    """
-    Solve for B with non-negativity coupling penalty.
+def _solve_b(estA, estS, T2, M2, gamma, L1):
+    """Update B: least squares on the second unfolding plus the spatial-map penalty.
 
-    The update minimizes the LS criterion for the second unfolding
-    plus a penalty term gamma * ||S_r - A_r @ B_r^T||^2.
+    Minimizes ``||T2 - B @ M2||^2 + gamma * sum_r ||S_r - A_r @ B_r.T||^2``.
     """
     R = estS.shape[0]
 
-    M2M2H = (M2 @ M2.T.conj()).real
-    RHS = (T2.T.conj() @ M2.T).real
+    M2_M2H = (M2 @ M2.T.conj()).real
+    RHS = (T2.conj() @ M2.T).real
 
     ATA_blocks = []
     SAfinal = np.zeros((estS.shape[2], R * L1))
@@ -206,126 +200,123 @@ def _solve_B(estA, estS, T2, M2, gamma, L1):
         A_r = estA[:, r * L1 : (r + 1) * L1]
         ATA_blocks.append(A_r.T @ A_r)
         SAfinal[:, r * L1 : (r + 1) * L1] = estS[r].T @ A_r
-    ATA = scipy.linalg.block_diag(*ATA_blocks)
+    ATA = block_diag(*ATA_blocks)
 
-    term1 = M2M2H + gamma * ATA
-    term2 = RHS + gamma * SAfinal
+    term1 = np.nan_to_num(M2_M2H + gamma * ATA, nan=0, posinf=0, neginf=0)
+    term2 = np.nan_to_num(RHS + gamma * SAfinal, nan=0, posinf=0, neginf=0)
 
-    term1 = np.nan_to_num(term1, nan=0, posinf=0, neginf=0)
-    term2 = np.nan_to_num(term2, nan=0, posinf=0, neginf=0)
-
-    B_min = np.linalg.solve(term1.T, term2.T)
-    return B_min.T
+    return np.linalg.solve(term1.T, term2.T).T
 
 
-def _solve_C(estC, estD, T3, T4, vecS0, psibtd, rho, inner_admm, tol_admm, L2, R):
-    """
-    ADMM update for C and D enforcing the conjugate constraint D = C*.
+def _admm_cd(estC, estD, T3, T4, vecS0, psibtd, rho, max_admm, admm_tol, L2, R):
+    """ADMM update of C and D enforcing the conjugate constraint ``D = C*``.
 
-    Alternately updates C and D = C* with a dual variable to enforce consistency.
-    After convergence, normalizes each block of C via SVD.
+    C and D are updated in turn, with a dual variable pushing ``D`` towards
+    ``C*``. The result is the average of ``C`` and ``D*``, with each block
+    re-expressed through its SVD.
     """
     talincr = taldecr = 2
     mi = 10
 
-    epsPri = np.size(estC) ** (1 / 2) * tol_admm
-    epsDual = np.size(estC) ** (1 / 2) * tol_admm
+    eps_pri = np.size(estC) ** (1 / 2) * admm_tol
+    eps_dual = np.size(estC) ** (1 / 2) * admm_tol
 
     n = 0
-    primalResidue = np.zeros(inner_admm)
-    dualResidue = np.zeros(inner_admm)
+    primal_residue = np.zeros(max_admm)
+    dual_residue = np.zeros(max_admm)
     Ul = np.zeros_like(estC)
-    exitCriterion = True
+    exit_criterion = False
 
-    while (n < inner_admm) & exitCriterion:
-        # Update C
+    while n < max_admm and not exit_criterion:
+        # update C
         M3 = khatri_rao((vecS0 @ psibtd, estD)).T
         term1 = M3 @ M3.T.conj() + rho * np.eye(estC.shape[1])
         term2 = T3 @ M3.T.conj() + rho * (estD.conj() - Ul)
-
         estC1 = np.linalg.solve(term1.T, term2.T).T
 
-        # Update D
+        # update D
         M4 = khatri_rao((vecS0 @ psibtd, estC1)).T
         term1 = M4 @ M4.T.conj() + rho * np.eye(estD.shape[1])
         term2 = T4 @ M4.T.conj() + rho * (estC1.conj() + Ul.conj())
-
         estD1 = np.linalg.solve(term1.T, term2.T).T
 
-        # Update dual variable
+        # update dual variable
         Ul1 = Ul + estC1 - estD1.conj()
 
-        # Compute primal and dual residuals
-        norm_C1 = np.linalg.norm(estC1)
-        primalResidue[n] = np.linalg.norm(estC1 - estD1.conj()) / norm_C1
-        dualResidue[n] = rho * np.linalg.norm(estD1 - estD) / np.linalg.norm(estD1)
+        # compute primal and dual residuals
+        primal_residue[n] = np.linalg.norm(estC1 - estD1.conj()) / np.linalg.norm(estC1)
+        dual_residue[n] = rho * np.linalg.norm(estD1 - estD) / np.linalg.norm(estD1)
 
         estC = estC1
         estD = estD1
         Ul = Ul1
 
-        if (primalResidue[n] < epsPri) and (dualResidue[n] < epsDual):
-            exitCriterion = False
+        if (primal_residue[n] < eps_pri) and (dual_residue[n] < eps_dual):
+            exit_criterion = True
 
-        # Adjust rho based on residuals
-        if primalResidue[n] > (mi * dualResidue[n]):
+        # adjust rho based on residuals
+        if primal_residue[n] > (mi * dual_residue[n]):
             rho *= talincr
             Ul /= talincr
-        elif dualResidue[n] > (mi * primalResidue[n]):
+        elif dual_residue[n] > (mi * primal_residue[n]):
             rho /= taldecr
             Ul *= taldecr
 
-        # Check for early exit if primal and dual both stagnate
+        # stop early if both residuals stagnate
         if n > 0:
-            incrPri = np.abs(primalResidue[n] - primalResidue[n - 1]) / primalResidue[n]
-            incrDual = np.abs(dualResidue[n] - dualResidue[n - 1]) / dualResidue[n]
-            if (incrPri < tol_admm) and (incrDual < tol_admm):
-                exitCriterion = False
+            incr_pri = (
+                np.abs(primal_residue[n] - primal_residue[n - 1]) / primal_residue[n]
+            )
+            incr_dual = np.abs(dual_residue[n] - dual_residue[n - 1]) / dual_residue[n]
+            if (incr_pri < admm_tol) and (incr_dual < admm_tol):
+                exit_criterion = True
 
         n += 1
 
-    # Average C and D* for final estimate
+    # average C and D* for the final estimate
     estC = (estC1 + estD1.conj()) / 2
 
-    # Normalize each block of C via SVD
+    # re-express each block of C through its SVD
     newC = np.zeros_like(estC)
     for r in range(R):
         U, s, _ = np.linalg.svd(estC[:, r * L2 : (r + 1) * L2])
         newC[:, r * L2 : (r + 1) * L2] = U[:, :L2] @ np.diag(s[:L2])
-    estC = newC
-    estD = estC.conj()
 
-    return estC, estD, primalResidue, dualResidue
+    return newC, newC.conj()
 
 
-def init_BBTD_cov_factors(BBTD_model, strat="random", T=None):
+def init_bbtd_cov_factors(model, strategy="random", T=None):
+    """Initialize the factors of the covariance BBTD.
+
+    A and B are non-negative and C is complex; ``D = C.conj()`` is implied.
+
+    Parameters
+    ----------
+    model : BBTD
+        Model defining the dimensions and ranks.
+    strategy : {"random", "svd", "kmeans"}, default "random"
+        ``"random"`` draws uniform A, B and complex Gaussian C. ``"svd"`` uses
+        the leading singular vectors of the unfoldings of ``T`` (absolute
+        values for A and B). ``"kmeans"`` clusters the pixels by their
+        covariance matrices (see :func:`_kmeans_init`).
+    T : np.ndarray, optional
+        Data tensor, required for ``"svd"`` and ``"kmeans"``.
+
+    Returns
+    -------
+    A, B, C : np.ndarray
+        Initial factor matrices.
     """
-    Initialize factor matrices for the constrained BBTD decomposition.
+    dims = model.dims
+    R = model.rank
+    L1 = model.L1
+    L2 = model.L2
 
-    Generates non-negative A, B and complex C (with D = C*).
-
-    Parameters:
-        BBTD_model: BBTD
-            An instance of the BBTD class.
-        strat: str
-            Initialization strategy. Options: "random", "svd", "kmeans".
-        T: np.ndarray
-            Input tensor (required for "svd" and "kmeans" initialization).
-
-    Returns:
-        A, B, C: tuple of np.ndarray
-            Initialized factor matrices. D = C.conj() is implicit.
-    """
-    dims = BBTD_model.dims
-    R = BBTD_model.rank
-    L1 = BBTD_model.L1
-    L2 = BBTD_model.L2
-
-    if strat == "random":
+    if strategy == "random":
         A = np.random.rand(dims[0], L1 * R)
         B = np.random.rand(dims[1], L1 * R)
         C = np.random.randn(dims[2], L2 * R) + 1j * np.random.randn(dims[2], L2 * R)
-    elif strat == "svd":
+    elif strategy == "svd":
         if T is None:
             raise ValueError("SVD init requires input data T.")
         u0, s0, _ = np.linalg.svd(unfold(T, 0), full_matrices=False)
@@ -340,7 +331,7 @@ def init_BBTD_cov_factors(BBTD_model, strat="random", T=None):
         B = np.abs(u1[:, :n1] @ np.diag(s1[:n1] ** 0.5))
         C = u2[:, :n2] @ np.diag(s2[:n2] ** 0.5)
 
-        # Pad with random columns if SVD did not produce enough
+        # pad with random columns if the SVD did not produce enough
         if n0 < L1 * R:
             A = np.hstack([A, np.random.rand(dims[0], L1 * R - n0)])
         if n1 < L1 * R:
@@ -350,146 +341,46 @@ def init_BBTD_cov_factors(BBTD_model, strat="random", T=None):
                 dims[2], L2 * R - n2
             )
             C = np.hstack([C, pad])
-    elif strat == "kmeans":
+    elif strategy == "kmeans":
         if T is None:
             raise ValueError("K-means init requires input data T.")
         A, B, C = _kmeans_init(T, R, L1, L2)
     else:
-        raise ValueError(f"Initialization strategy '{strat}' not implemented.")
+        raise unknown_option_error("initialization", strategy, INIT_STRATEGIES)
 
     return A, B, C
 
 
 def _kmeans_init(T, R, L1, L2):
-    """
-    K-means based initialization for constrained BBTD.
+    """K-means initialization for the covariance BBTD.
 
-    Clusters the spatial pixels by their covariance vectors using K-means,
-    then applies NMF on each cluster's spatial map to obtain non-negative
-    factors A, B. The covariance factor C is initialized from the cluster
-    centers projected onto the positive semi-definite cone.
-
-    Parameters:
-        T: np.ndarray
-            Input 4D tensor of shape (J, M, K, K).
-        R: int
-            Number of BBTD terms.
-        L1: int
-            Rank of the first block (spatial maps).
-        L2: int
-            Rank of the second block (covariance).
-
-    Returns:
-        A, B, C: tuple of np.ndarray
-            Initialized factor matrices.
+    Clusters the pixels by their covariance matrices, factors each cluster's
+    indicator map with NMF to get non-negative A and B, and builds C from
+    the cluster centers projected onto the positive semidefinite matrices.
     """
     J, M, K, _ = T.shape
 
-    # Convert complex 4D tensor (J, M, K, K) to real 3D tensor (J, M, K²)
-    Treal = _complex_to_real(T)
+    # cluster pixels by their (real-packed) covariance matrices
+    labels, centers = cluster_pixels(hermitian_to_real(T), R)
 
-    # K-means clustering on spatial pixels
-    unfolding = unfold(Treal, 2).T  # (J*M, K²)
-    kmeans = KMeans(n_clusters=R, random_state=0, n_init="auto")
-    kmeans.fit(unfolding)
-    labels = kmeans.labels_
+    # NMF on each cluster's indicator map gives A_r, B_r
+    maps = cluster_maps(labels, R, (J, M), random_weights=False)
+    nmf = NMF(n_components=L1, init="nndsvda", random_state=0, max_iter=5000)
+    initA, initB = nmf_factors(maps, nmf)
 
-    # Build feature maps from cluster assignments
-    Rterms = np.zeros((R, J * M))
-    for idx in range(len(labels)):
-        Rterms[labels[idx], idx] = 1
-
-    featuresMaps = np.zeros((R, J, M))
-    for r in range(R):
-        featuresMaps[r] = Rterms[r].reshape(J, M)
-
-    # NMF on each cluster's feature map to get A_r, B_r
-    model = NMF(n_components=L1, init="nndsvda", random_state=0, max_iter=5000)
-
-    W = np.zeros((R, J, L1))
-    H = np.zeros((R, L1, M))
-    for r in range(R):
-        W[r] = model.fit_transform(featuresMaps[r])
-        H[r] = model.components_
-
-    initA = np.concatenate([W[r] for r in range(R)], axis=1)
-    initB = np.concatenate([H[r].T for r in range(R)], axis=1)
-
-    # Initialize C from cluster centers
+    # initialize C from the cluster centers
     initC = np.zeros((K, L2 * R), dtype=np.complex128)
-    initialC = kmeans.cluster_centers_.T  # (K², R)
-
     for r in range(R):
-        col_C = initialC[:, r]
+        # symmetric matrix from the upper triangle of the center
+        upper = np.triu(centers[:, r].reshape(K, K))
+        center_matrix = (upper + np.triu(upper, 1).T).astype(complex)
 
-        # Reconstruct Hermitian matrix from vectorized representation
-        reconstructed_matrix = np.zeros((K, K), dtype=complex)
-        k = 0
-        for i in range(K):
-            for j in range(K):
-                if i == j:
-                    reconstructed_matrix[i, j] = col_C[k]
-                elif i < j:
-                    reconstructed_matrix[i, j] = col_C[k]
-                else:
-                    reconstructed_matrix[i, j] = reconstructed_matrix[j, i].conjugate()
-                k += 1
-
-        # Project to SDP and truncate via SVD
-        sdp_matrix = _project_to_sdp(reconstructed_matrix)
-        U, S, _ = np.linalg.svd(sdp_matrix)
+        U, S, _ = np.linalg.svd(project_psd(center_matrix))
         initC[:, r * L2 : (r + 1) * L2] = U[:, :L2] @ np.diag(np.sqrt(S[:L2]))
 
-    # Scale to match tensor norm
-    phi, psi = bbtd._constraint_matrices(L1, L2, R)
-    initD = initC.conj()
-    initT = bbtd.factors_to_tensor(initA, initB, initC, initD, phi, psi)
-    lamb = np.linalg.norm(T) / np.linalg.norm(initT)
-    initA = initA * lamb ** (1 / 2)
-    initB = initB * lamb ** (1 / 2)
+    # scale to match the tensor norm
+    phi, psi = _constraint_matrices(R, L1, L2)
+    initT = factors_to_tensor(initA, initB, initC, initC.conj(), phi, psi)
+    initA, initB = match_norm(initA, initB, T, initT)
 
     return initA, initB, initC
-
-
-def _complex_to_real(X):
-    """
-    Convert a complex 4D tensor (J, M, K, K) to a real 3D tensor (J, M, K²).
-
-    Each K x K Hermitian matrix is vectorized into a K² real vector using
-    diagonal (real), upper-triangular (real), and lower-triangular (imaginary)
-    parts.
-    """
-    K = X.shape[2]
-    real_tensor = np.zeros((X.shape[0], X.shape[1], K**2), dtype="float64")
-
-    for x in range(X.shape[0]):
-        for y in range(X.shape[1]):
-            cov_matrix = X[x, y, :, :]
-            vectorized = np.zeros(K * K)
-
-            k = 0
-            for i in range(K):
-                for j in range(K):
-                    if i == j:
-                        vectorized[k] = cov_matrix[i, j].real
-                    elif i < j:
-                        vectorized[k] = cov_matrix[i, j].real
-                    else:
-                        vectorized[k] = cov_matrix[j, i].imag
-                    k += 1
-
-            real_tensor[x, y, :] = vectorized
-
-    return real_tensor
-
-
-def _project_to_sdp(A):
-    """
-    Project a Hermitian matrix onto the positive semi-definite cone.
-
-    Computes the eigenvalue decomposition and clips negative eigenvalues.
-    """
-    A = (A + A.T.conj()) / 2
-    eigenvalues, eigenvectors = np.linalg.eigh(A)
-    eigenvalues[eigenvalues < 0] = 0.0
-    return eigenvectors @ np.diag(eigenvalues) @ eigenvectors.T.conj()
