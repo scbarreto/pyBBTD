@@ -1,58 +1,49 @@
-import numpy as np
+"""Plots for the Stokes model."""
+
 import matplotlib.pyplot as plt
+import numpy as np
 from palettable.cmocean.sequential import Ice_15
+
+from pybbtd.btd import spatial_maps
 
 
 def stokes_to_ellipse(S, n_points=200):
-    """
-    Convert a Stokes vector to a polarization ellipse in the transverse plane.
-
-    Computes the orientation angle :math:`\\psi` and ellipticity angle
-    :math:`\\chi` from a single Stokes vector, then traces out the
-    corresponding normalised polarization ellipse.
+    """Trace the polarization ellipse described by a Stokes vector.
 
     Parameters
     ----------
     S : array-like
         Stokes vector ``[S0, S1, S2, S3]``.
-    n_points : int, optional
-        Number of points used to sample the ellipse (default: 200).
+    n_points : int, default 200
+        Number of points along the ellipse.
 
     Returns
     -------
-    x : np.ndarray
-        Horizontal coordinates of the ellipse, shape ``(n_points,)``.
-    y : np.ndarray
-        Vertical coordinates of the ellipse, shape ``(n_points,)``.
+    x, y : np.ndarray
+        Coordinates of the ellipse, scaled so its largest radius is 1,
+        each of shape ``(n_points,)``.
     psi : float
-        Orientation angle in radians.
+        Orientation angle, in radians.
     chi : float
-        Ellipticity angle in radians.  The sign of ``tan(chi)``
-        encodes the handedness (positive = left-handed,
-        negative = right-handed).
+        Ellipticity angle, in radians. Its sign gives the handedness
+        (positive: left-handed, negative: right-handed).
     """
-    S0, S1, S2, S3 = S
+    _, S1, S2, S3 = S
 
-    # Orientation (psi) and ellipticity angle (chi)
-    psi = 0.5 * np.arctan2(S2, S1)  # radians
+    # orientation (psi) and ellipticity (chi) angles
+    psi = 0.5 * np.arctan2(S2, S1)
     chi = 0.5 * np.arctan2(S3, np.sqrt(S1**2 + S2**2))
 
-    # Semi-axes (unnormalized)
-    a = np.cos(chi)  # major-ish
-    b = np.sin(chi)  # minor-ish, carries handedness sign
-
-    # Parametric ellipse in principal frame
+    # ellipse in its principal frame (sin(chi) carries the handedness sign)
     t = np.linspace(0, 2 * np.pi, n_points)
-    xp = a * np.cos(t)
-    yp = b * np.sin(t)
+    xp = np.cos(chi) * np.cos(t)
+    yp = np.sin(chi) * np.sin(t)
 
-    # Rotate by psi into lab frame
-    cpsi = np.cos(psi)
-    spsi = np.sin(psi)
-    x = xp * cpsi - yp * spsi
-    y = xp * spsi + yp * cpsi
+    # rotate by psi into the lab frame
+    x = xp * np.cos(psi) - yp * np.sin(psi)
+    y = xp * np.sin(psi) + yp * np.cos(psi)
 
-    # Normalize ellipse size for visualization
+    # normalize the size for display
     rmax = np.sqrt(x**2 + y**2).max()
     if rmax > 0:
         x = x / rmax
@@ -61,176 +52,86 @@ def stokes_to_ellipse(S, n_points=200):
     return x, y, psi, chi
 
 
-def plot_stokes_terms(outA, outB, outC, R, L, cmap=None):
-    """
-    Visualise the spatial maps and polarization ellipses of a Stokes-BTD.
+def plot_stokes_terms(A, B, C, R, L, cmap=None):
+    """Show the spatial map and polarization ellipse of each Stokes term.
 
-    For each component *r* the function displays:
-
-    * **Top row** — the rank-*L* spatial reconstruction
-      :math:`A_r B_r^{\\top}`, min–max normalised, as a heatmap.
-    * **Bottom row** — the polarization ellipse derived from the
-      Stokes vector :math:`c_r`, annotated with orientation
-      :math:`\\psi`, ellipticity :math:`\\chi`, and handedness.
+    For each term *r*, the top row shows the spatial map
+    :math:`\\mathbf{A}_r \\mathbf{B}_r^{\\top}` (min-max normalized) and the
+    bottom row shows the polarization ellipse of the Stokes vector
+    :math:`\\mathbf{c}_r`, with its orientation :math:`\\psi`, ellipticity
+    :math:`\\chi` and handedness (LH or RH).
 
     Parameters
     ----------
-    outA : np.ndarray
-        Spatial factor matrix of shape ``(N1, R*L)``.
-        Columns are grouped in contiguous blocks of *L* for each
-        component.
-    outB : np.ndarray
-        Spatial factor matrix of shape ``(N2, R*L)``, with the same
-        block structure as *outA*.
-    outC : np.ndarray
-        Stokes matrix of shape ``(4, R)``.  Each column is a Stokes
-        vector :math:`[S_0, S_1, S_2, S_3]^{\\top}`.
+    A : np.ndarray
+        Spatial factor of shape ``(I, R * L)``; the columns of term *r* are
+        the *r*-th block of ``L`` columns.
+    B : np.ndarray
+        Spatial factor of shape ``(J, R * L)``, with the same blocks as A.
+    C : np.ndarray
+        Stokes factor of shape ``(4, R)``, one Stokes vector per column.
     R : int
-        Number of components (block terms).
+        Number of terms.
     L : int
-        Column rank shared by every component in *outA* / *outB*.
+        Rank of the spatial maps.
     cmap : matplotlib.colors.Colormap, optional
-        Colormap for the heatmaps.  Defaults to
-        ``palettable.cmocean.sequential.Ice_15`` when available,
-        otherwise ``plt.cm.viridis``.
-
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-        The created figure.
-    axes : np.ndarray
-        Array of axes with shape ``(2, R+1)``.  The last column
-        holds the shared colorbar (top) and an empty slot (bottom).
+        Colormap of the spatial maps (cmocean "ice" when ``None``).
     """
+    if C.ndim != 2 or C.shape[0] != 4:
+        raise ValueError("C must have shape (4, R) with rows [S0,S1,S2,S3].")
+    if C.shape[1] != R:
+        raise ValueError(f"C has {C.shape[1]} columns, but R={R}.")
+    if A.ndim != 2 or B.ndim != 2:
+        raise ValueError("A and B must be 2D arrays.")
+    if A.shape[1] != R * L:
+        raise ValueError(f"A has {A.shape[1]} columns, expected R*L = {R * L}.")
+    if B.shape[1] != R * L:
+        raise ValueError(f"B has {B.shape[1]} columns, expected R*L = {R * L}.")
 
-    # ---------- Safety / sanity checks ----------
-    # Check outC
-    if outC.ndim != 2 or outC.shape[0] != 4:
-        raise ValueError("outC must have shape (4, R) with rows [S0,S1,S2,S3].")
-    if outC.shape[1] != R:
-        raise ValueError(f"outC has {outC.shape[1]} columns, but R={R}.")
-
-    # Check outA, outB
-    if outA.ndim != 2 or outB.ndim != 2:
-        raise ValueError("outA and outB must be 2D arrays.")
-
-    N1, colsA = outA.shape
-    N2, colsB = outB.shape
-
-    if colsA != R * L:
-        raise ValueError(f"outA has {colsA} columns, expected R*L = {R * L}.")
-    if colsB != R * L:
-        raise ValueError(f"outB has {colsB} columns, expected R*L = {R * L}.")
-
-    # Set a colormap
     if cmap is None:
-        try:
-            cmap = Ice_15.mpl_colormap
-        except NameError:
-            cmap = plt.cm.viridis
+        cmap = Ice_15.mpl_colormap
 
-    # ---------- Figure layout ----------
-    # R heatmaps in the top row, plus one extra column for the colorbar.
-    # Bottom row: R ellipses + one empty slot.
-    width_ratio = np.ones(R)
-    width_ratio = np.append(width_ratio, 0.35)  # skinny column for colorbar
-
+    # top row: R maps and a narrow column for the colorbar; bottom row: R ellipses
     fig, axes = plt.subplots(
         2,
         R + 1,
         figsize=(3.5 * (2 + 2 * R), 3.5 * 3),
-        gridspec_kw={
-            "width_ratios": width_ratio,
-            "height_ratios": [1, 0.35],
-        },
+        gridspec_kw={"width_ratios": [1] * R + [0.35], "height_ratios": [1, 0.35]},
+        layout="constrained",
     )
 
-    last_im = None
+    # top row: A_r B_r^T maps, min-max normalized so contrast is comparable
+    for r, block in enumerate(spatial_maps(A, B, L)):
+        span = block.max() - block.min()
+        normalized = np.zeros_like(block) if span == 0 else (block - block.min()) / span
 
-    result = np.zeros((R, N1, N2))
+        im = axes[0, r].imshow(normalized, cmap=cmap, origin="upper")
+        axes[0, r].axis("off")
+        axes[0, r].set_title(rf"$A_{{{r + 1}}}B_{{{r + 1}}}^{{\top}}$", fontsize=40)
 
-    # ---------- Top row: A_r B_r^T heatmaps ----------
+    cbar = plt.colorbar(im, ax=axes[0, R], aspect=6, fraction=0.7, location="left")
+    cbar.set_ticks([0.0, 1.0])
+    cbar.ax.tick_params(labelsize=30)
+    axes[0, R].axis("off")
+
+    # bottom row: polarization ellipses
     for r in range(R):
-        # Slice out the r-th block of L columns
-        A_block = outA[:, r * L : (r + 1) * L]  # shape (Na, L)
-        B_block = outB[:, r * L : (r + 1) * L]  # shape (Nb, L)
+        x, y, psi, chi = stokes_to_ellipse(C[:, r])
+        handedness = "LH" if np.tan(chi) > 0 else "RH"
 
-        result[r] = A_block @ B_block.T
-
-        # Min-max normalize for display so contrast is comparable
-        block = result[r]
-        block_min = block.min()
-        block_max = block.max()
-        denom = block_max - block_min
-        if denom == 0:
-            # Avoid division by zero: flat patch
-            normalized_block = np.zeros_like(block)
-        else:
-            normalized_block = (block - block_min) / denom
-
-        # Show the normalized block
-        ax_heat = axes[0, r]
-        im = ax_heat.imshow(normalized_block, cmap=cmap, origin="upper")
-        last_im = im
-
-        # No ticks, just the visual texture
-        ax_heat.axis("off")
-
-        ax_heat.set_title(
-            rf"$A_{{{r + 1}}}B_{{{r + 1}}}^{{\top}}$",
-            fontsize=40,
-        )
-
-    # Add a shared colorbar in the last column of the top row
-    cax = axes[0, R]
-    if last_im is not None:
-        cbar = plt.colorbar(
-            last_im,
-            ax=cax,
-            aspect=6,
-            fraction=0.7,
-            location="left",
-        )
-        cbar.set_ticks([0.0, 1.0])
-        cbar.ax.tick_params(labelsize=30)
-
-    cax.axis("off")
-
-    # ---------- Bottom row: polarization ellipses from Stokes vectors ----------
-    for idx in range(R):
-        ax_ellipse = axes[1, idx]
-
-        S = outC[:, idx]  # [S0, S1, S2, S3]
-        x, y, psi, chi = stokes_to_ellipse(S)
-
-        # Draw the ellipse trace
-        ax_ellipse.plot(x, y)
-
-        # Compute orientation / ellipticity
-        S0, S1, S2, S3 = S
-
-        # Signed ellipticity ratio (minor/major). Sign gives handedness.
-        ellipticity_ratio = np.tan(chi)
-        handed = "LH" if ellipticity_ratio > 0 else "RH"
-
-        # Format subplot title
-        ax_ellipse.set_title(
-            rf"$c_{{{idx + 1}}}$:  "
-            rf"$\psi = {np.degrees(psi):.1f}^\circ$"
+        ax = axes[1, r]
+        ax.plot(x, y)
+        ax.set_title(
+            rf"$c_{{{r + 1}}}$:  $\psi = {np.degrees(psi):.1f}^\circ$"
             "\n"
-            rf"$\chi = {np.degrees(chi):.1f}^\circ$ "
-            rf"({handed})",
+            rf"$\chi = {np.degrees(chi):.1f}^\circ$ ({handedness})",
             fontsize=30,
         )
-
-        # Fixed aspect and clean grid
-        ax_ellipse.set_aspect("equal", "box")
-        ax_ellipse.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
-        ax_ellipse.set_xlim(-1.1, 1.1)
-        ax_ellipse.set_ylim(-1.1, 1.1)
-
-        # Strip ticks and labels to emphasize shape only
-        ax_ellipse.tick_params(
+        ax.set_aspect("equal", "box")
+        ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.5)
+        ax.set_xlim(-1.1, 1.1)
+        ax.set_ylim(-1.1, 1.1)
+        ax.tick_params(
             axis="both",
             which="both",
             bottom=False,
@@ -240,11 +141,6 @@ def plot_stokes_terms(outA, outB, outC, R, L, cmap=None):
             labelbottom=False,
             labelleft=False,
         )
-        ax_ellipse.set_xlabel("")
-        ax_ellipse.set_ylabel("")
-
-    # The final (R+1)-th axis in the bottom row is empty
     axes[1, R].axis("off")
 
-    plt.tight_layout()
     plt.show()

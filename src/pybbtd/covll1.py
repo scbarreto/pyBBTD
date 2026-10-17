@@ -1,141 +1,140 @@
-from pybbtd.btd import BTD
+"""Cov-LL1 model: a BTD-LL1 for covariance imaging.
+
+In covariance imaging, every pixel holds a ``K x K`` covariance matrix. The
+matrices are vectorized so the data form a tensor of shape ``(I, J, K**2)``,
+decomposed into R terms, each a non-negative spatial map times one
+vectorized covariance matrix.
+"""
+
 import numpy as np
-import pybbtd.btd as btd
-import warnings
+
+from pybbtd._utils import unknown_option_error, warn_user
+from pybbtd.btd import BTD, factors_to_tensor
 
 
 class CovLL1(BTD):
+    """BTD-LL1 model whose vector factor holds vectorized covariance matrices.
+
+    Extends :class:`~pybbtd.btd.BTD`. Each column of the factor C, of length
+    ``K**2``, is a vectorized ``K x K`` covariance matrix.
+
+    Parameters
+    ----------
+    dims : tuple of int
+        Shape ``(I, J, K**2)`` of the tensor. The last dimension must be a
+        perfect square.
+    R : int
+        Number of terms.
+    L1 : int
+        Rank of the spatial maps.
+    L2 : int
+        Rank of the covariance matrices. Only used to generate synthetic
+        data with :meth:`generate_covll1_tensor`; the fit does not constrain it.
+    block_mode : {"LL1", "L1L", "1LL"}, default "LL1"
+        Block mode of the decomposition.
+
+    Attributes
+    ----------
+    L1, L2 : int
+        Ranks of the spatial maps and of the covariance matrices.
+    factors : list of np.ndarray or None
+        Factor matrices ``[A, B, C]`` estimated by :meth:`fit`; ``A`` has
+        shape ``(I, L1 * R)``, ``B`` has shape ``(J, L1 * R)`` and ``C`` has
+        shape ``(K**2, R)``.
+    tensor : np.ndarray or None
+        Tensor rebuilt from ``factors`` by :meth:`fit`.
+    fit_error : np.ndarray or None
+        Fit error at each iteration of the last :meth:`fit`.
     """
-    Class for tensors admitting a Cov-LL1 (constrained LL1) decomposition, where each vector of size :math:`K^2` in the rank-one mode corresponds to a :math:`K \\times K` covariance matrix.
 
-    :param dims: Dimensions of the tensor.
-    :type dims: Tuple[int, int, int]
-    :param R: The rank of the decomposition (number of components).
-    :type R: int
-    :param L1: Rank of the spatial maps.
-    :type L1: int
-    :param L2: Rank of the covariance matrices.
-    :type L2: int
-
-    :ivar A: Factor matrix of shape `(dims[0], L1* R)`.
-    :vartype A: np.ndarray
-    :ivar B: Factor matrix of shape `(dims[1], L1 * R)`.
-    :vartype B: np.ndarray
-    :ivar C: Factor matrix of shape `(dims[2], R)`, each column is a vectorized covariance matrix.
-    :vartype C: np.ndarray
-
-
-    """
-
-    def __init__(self, dims, R: int, L1: int, L2: int, block_mode="LL1"):
-        """
-        Initialize Cov-LL1 model.
-
-        Parameters:
-            dims: Tuple[int, int, int]
-                Dimensions ``(I, J, K^2)`` of the tensor, where ``K^2`` is the
-                vectorized covariance dimension.
-            R: int
-                Rank of the decomposition (number of components).
-            L1: int
-                Rank of the spatial maps.
-            L2: int
-                Rank of the covariance matrices.
-            block_mode: str
-                Block mode for the decomposition. One of ``"LL1"``, ``"L1L"``, ``"1LL"``.
-        """
+    def __init__(self, dims, R, L1, L2, block_mode="LL1"):
         super().__init__(dims, R=R, L=L1, block_mode=block_mode)
-        self.dims = tuple(dims)
-        self.L1 = L1
-        self.L2 = L2
+        self.rank, self.L1, self.L2 = _validate_covll1_params(self.dims, R, L1, L2)
 
-        # Validate mode
-        valid_block_modes = {"LL1", "L1L", "1LL"}
-        if block_mode not in valid_block_modes:
-            raise ValueError(
-                f"Invalid mode '{block_mode}'. Block mode must be one of {valid_block_modes}."
-            )
-        self.block_mode = block_mode
-        self.rank, self.L1, self.L2 = _validate_dimensions(dims, R, L1, L2)
-
-        print(
-            f"Cov-LL1 tensor initialized with dimensions {self.dims} on {self.block_mode} mode."
+    def __repr__(self):
+        return (
+            f"CovLL1(dims={self.dims}, R={self.rank}, L1={self.L1}, L2={self.L2}, "
+            f"block_mode='{self.block_mode}')"
         )
 
     def generate_covll1_tensor(self):
-        """
-        Generate a random covariance imaging tensor and store the factors.
+        """Draw random Cov-LL1 factors and store them with their tensor.
 
-        Returns:
-            Tuple[list, np.ndarray]:
-                A tuple ``(factors, tensor)`` where ``factors = [A, B, C]``
-                and ``tensor`` has shape ``dims``.
-        """
+        Updates :attr:`factors` and :attr:`tensor`.
 
+        Returns
+        -------
+        factors : list of np.ndarray
+            ``[A, B, C]`` from :func:`generate_covll1_factors`.
+        tensor : np.ndarray
+            Tensor of shape :attr:`dims`.
+        """
         A, B, C = generate_covll1_factors(self.dims, self.rank, self.L1, self.L2)
-        # Generate the tensor using the factors
         self.factors = [A, B, C]
-        self.tensor = btd.factors_to_tensor(
+        self.tensor = factors_to_tensor(
             A, B, C, self.get_constraint_matrix(), block_mode=self.block_mode
         )
         return self.factors, self.tensor
 
     def fit(self, data, algorithm="ADMM", **kwargs):
-        """
-        Fit a Cov-LL1 model to the given data using the specified algorithm.
+        """Estimate the factors that best explain ``data``.
 
-        Parameters:
-            data: np.ndarray
-                Input tensor data to be decomposed.
-            algorithm: str
-                Algorithm to use for fitting (default: ``"ADMM"``).
-            **kwargs:
-                Additional keyword arguments passed to the solver.
-        """
-        from pybbtd.solvers.covll1_admm import COVLL1_ADMM
+        Updates :attr:`factors`, :attr:`tensor` and :attr:`fit_error`.
 
-        if algorithm == "ADMM":
-            self.factors, self.fit_error = COVLL1_ADMM(self, data, **kwargs)
-            self.tensor = btd.factors_to_tensor(
-                *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
-            )
-        else:
-            raise UserWarning("Algorithm not implemented yet")
+        Parameters
+        ----------
+        data : np.ndarray
+            Tensor of shape ``(I, J, K**2)`` to decompose.
+        algorithm : {"ADMM"}, default "ADMM"
+            Fitting algorithm (see
+            :func:`~pybbtd.solvers.covll1_admm.fit_covll1_admm`).
+        **kwargs
+            Passed to the solver, e.g. ``init``, ``max_iter``, ``rho``,
+            ``max_admm``, ``rel_tol``, ``abs_tol``, ``admm_tol``.
 
-    def get_constraint_matrix(self):
+        Returns
+        -------
+        CovLL1
+            The fitted model.
         """
-        Return the constraint matrix for the CP-equivalent Cov-LL1 model.
-        """
-        return btd.constraint_matrix(self.rank, self.L)
+        if algorithm != "ADMM":
+            raise unknown_option_error("algorithm", algorithm, ["ADMM"])
+
+        from pybbtd.solvers.covll1_admm import fit_covll1_admm
+
+        self.factors, self.fit_error = fit_covll1_admm(self, data, **kwargs)
+        self.tensor = factors_to_tensor(
+            *self.factors, self.get_constraint_matrix(), block_mode=self.block_mode
+        )
+        return self
 
 
 def generate_covll1_factors(dims, R, L1, L2):
+    """Draw random factors for a Cov-LL1 model.
+
+    The spatial factors A, B are uniform on [0, 1). Each column of C is a
+    vectorized ``K x K`` positive semidefinite Hermitian matrix of rank L2.
+
+    Parameters
+    ----------
+    dims : tuple of int
+        Shape ``(I, J, K**2)`` of the tensor.
+    R : int
+        Number of terms.
+    L1 : int
+        Rank of the spatial maps.
+    L2 : int
+        Rank of the covariance matrices.
+
+    Returns
+    -------
+    A : np.ndarray
+        Shape ``(I, L1 * R)``, non-negative.
+    B : np.ndarray
+        Shape ``(J, L1 * R)``, non-negative.
+    C : np.ndarray
+        Shape ``(K**2, R)``, one vectorized covariance matrix per column.
     """
-    Generate random factors that follow Cov-LL1 decomposition.
-
-    Non-negative spatial factors A, B are drawn from a uniform distribution.
-    Each column of C is a vectorized :math:`K \\times K` positive semidefinite
-    Hermitian matrix built from rank-L2 factors.
-
-    Parameters:
-        dims (Tuple[int, int, int]):
-            Dimensions ``(I, J, K^2)`` of the tensor.
-        R (int):
-            The rank of the decomposition (number of components).
-        L1 (int):
-            Rank of the spatial maps.
-        L2 (int):
-            Rank of the covariance matrices.
-
-    Returns:
-        Tuple[np.ndarray, np.ndarray, np.ndarray]:
-            A tuple ``(A, B, C)`` where:
-
-            - A: Shape ``(dims[0], L1 * R)``, non-negative.
-            - B: Shape ``(dims[1], L1 * R)``, non-negative.
-            - C: Shape ``(K^2, R)``, each column is a vectorized covariance matrix.
-    """
-
     if len(dims) != 3:
         raise ValueError("Number of dimensions should be equal to 3.")
 
@@ -143,38 +142,20 @@ def generate_covll1_factors(dims, R, L1, L2):
     B = np.random.rand(dims[1], L1 * R)
 
     K = int(np.sqrt(dims[2]))
-
     cov_factors = np.random.randn(R, K, L2) + 1j * np.random.randn(R, K, L2)
     sigmas = np.zeros((K, K, R), dtype=complex)
-
     for r in range(R):
-        sigmas[:, :, r] = cov_factors[r, :, :] @ cov_factors[r, :, :].conj().T
+        sigmas[:, :, r] = cov_factors[r] @ cov_factors[r].conj().T
     C = sigmas.reshape(K**2, R)
 
     return A, B, C
 
 
-def _validate_dimensions(dims, R, L1, L2):
-    """
-    Validate dimensions and parameters for the Cov-LL1 model.
+def _validate_covll1_params(dims, R, L1, L2):
+    """Check that the Cov-LL1 parameters fit the tensor dimensions.
 
-    Checks that ``dims`` has three elements, the third dimension is a
-    perfect square, and that R, L1, L2 are positive integers consistent
-    with the tensor dimensions.
-
-    Parameters:
-        dims (Tuple[int, int, int]):
-            Dimensions ``(I, J, K^2)`` of the tensor.
-        R (int):
-            The rank of the decomposition (number of components).
-        L1 (int):
-            Rank of the spatial maps.
-        L2 (int):
-            Rank of the covariance matrices.
-
-    Returns:
-        Tuple[int, int, int]:
-            Validated ``(R, L1, L2)``.
+    The third dimension must be a perfect square ``K**2``, ``L1`` cannot
+    exceed the image size and ``L2`` cannot exceed ``K``.
     """
     if len(dims) != 3:
         raise ValueError("dims must be a tuple of three integers (I, J, K^2).")
@@ -187,79 +168,62 @@ def _validate_dimensions(dims, R, L1, L2):
     if L2 <= 0:
         raise ValueError("L2 must be a positive integer.")
     if L1 > dims[0] or L1 > dims[1]:
-        raise ValueError(
-            "L1 must be less than the first and second dimensions (I and J)."
-        )
+        raise ValueError("L1 cannot exceed the first and second dimensions (I and J).")
     if L2 > int(np.sqrt(dims[2])):
-        raise ValueError(
-            "L2 must be less than the square root of the third dimension (K)."
-        )
+        raise ValueError("L2 cannot exceed the square root of the third dimension (K).")
     return R, L1, L2
 
 
-def validate_cov_matrices(T0):
+def validate_covariance_tensor(T):
+    """Check that every pixel of a tensor holds a valid covariance matrix.
+
+    Each pixel ``T[i, j, :]`` is reshaped to ``K x K`` and tested with
+    :func:`is_valid_covariance`. Warns with the percentage of invalid pixels,
+    if any.
+
+    Parameters
+    ----------
+    T : np.ndarray
+        Tensor of shape ``(I, J, K**2)``.
+
+    Returns
+    -------
+    bool
+        ``True`` if all pixels are valid.
     """
-    Check if all covariance matrices in a tensor are valid.
-
-    Each spatial pixel ``T0[i, j, :]`` is reshaped into a :math:`K \\times K`
-    matrix and tested for Hermitian positive semidefiniteness. Emits a
-    warning with the percentage of invalid pixels if any are found.
-
-    Parameters:
-        T0: np.ndarray
-            Tensor of shape ``(I, J, K^2)`` whose third mode contains
-            vectorized covariance matrices.
-    """
-    invalid_count = 0
-    total_pixels = T0.shape[0] * T0.shape[1]
-
-    for i in range(T0.shape[0]):
-        for j in range(T0.shape[1]):
-            cov_matrix = T0[i, j, :].reshape(
-                int(np.sqrt(T0.shape[2])), int(np.sqrt(T0.shape[2]))
-            )
-            if is_valid_covariance(cov_matrix) == 0:
-                invalid_count += 1
+    K = int(np.sqrt(T.shape[2]))
+    matrices = T.reshape(-1, K, K)
+    invalid_count = sum(not is_valid_covariance(Sigma) for Sigma in matrices)
 
     if invalid_count > 0:
-        percentage = (invalid_count / total_pixels) * 100
-        warnings.warn(
-            f"{percentage:.2f}% of pixels do not satisfy the covariance matrix constraints. (must be square, Hermitian, and positive semidefinite)",
-            UserWarning,
+        percentage = invalid_count / len(matrices) * 100
+        warn_user(
+            f"{percentage:.2f}% of pixels do not satisfy the covariance matrix "
+            "constraints (must be square, Hermitian, and positive semidefinite)."
         )
-    else:
-        print("All pixels carry valid covariance matrices.")
+    return invalid_count == 0
 
 
 def is_valid_covariance(Sigma, tol=1e-10):
-    """
-    Check if a matrix is a valid covariance matrix (Square, Hermitian, Positive Semidefinite).
+    """Check that a matrix is a valid covariance matrix.
+
+    A valid covariance matrix is square, Hermitian and positive semidefinite.
 
     Parameters
     ----------
     Sigma : np.ndarray
         Matrix to test.
-    tol : float, optional
-        Numerical tolerance for eigenvalues and symmetry (default 1e-10).
+    tol : float, default 1e-10
+        Tolerance on the Hermitian symmetry and on negative eigenvalues.
 
     Returns
     -------
     bool
-        True if Sigma is a valid covariance matrix.
     """
     Sigma = np.asarray(Sigma)
 
-    # 1. Must be square
     if Sigma.ndim != 2 or Sigma.shape[0] != Sigma.shape[1]:
         return False
-
-    # 2. Must be Hermitian (Sigma == Sigmaᴴ within tolerance)
     if not np.allclose(Sigma, Sigma.conj().T, atol=tol):
         return False
-
-    # 3. Must be positive semidefinite
-    eigvals = np.linalg.eigvalsh(Sigma)  # for Hermitian matrices
-    if np.any(eigvals < -tol):
-        return False
-
-    return True
+    return not np.any(np.linalg.eigvalsh(Sigma) < -tol)
