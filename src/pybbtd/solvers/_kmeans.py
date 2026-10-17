@@ -8,8 +8,11 @@ The K-means initializations assume each pixel belongs mostly to one term:
 3. use the cluster centers to initialize the signature factor.
 """
 
+import warnings
+
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn.exceptions import ConvergenceWarning
 from tensorly import unfold
 
 
@@ -72,7 +75,11 @@ def nmf_factors(maps, nmf):
     """
     W, H = [], []
     for spatial_map in maps:
-        W.append(nmf.fit_transform(spatial_map))
+        # a rough NMF is enough for a starting point, so its convergence
+        # warning is not shown
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", ConvergenceWarning)
+            W.append(nmf.fit_transform(spatial_map))
         H.append(nmf.components_.T)
     return np.concatenate(W, axis=1), np.concatenate(H, axis=1)
 

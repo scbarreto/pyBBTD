@@ -289,7 +289,7 @@ def test_converges_to_truth_from_nearby_start(block_mode, dims, monkeypatch):
     true_factors = random_factors(dims, R, 6, block_mode)
     T = factors_to_tensor(*true_factors, model.get_constraint_matrix(), block_mode)
 
-    # start from the truth plus a 1e-3 relative perturbation
+    # the solver starts from the truth plus a 1e-3 relative perturbation
     start = perturb(to_ll1(true_factors, block_mode), 1e-3)
     monkeypatch.setattr(btd_als, "_init_factors", lambda *args: start)
     model.fit(T, max_iter=500, rel_tol=1e-14, abs_tol=0)
@@ -304,7 +304,7 @@ def test_converges_to_truth_from_nearby_start(block_mode, dims, monkeypatch):
 
 @pytest.mark.filterwarnings("ignore:Reached max_iter")
 def test_best_of_restarts_recovers_terms():
-    # ALS is not convex: run a few random restarts and keep the best fit
+    # ALS is not convex, so the best of a few random restarts is kept
     model = BTD((12, 11, 6), R=3, L=2)
     A0, B0, C0 = init_btd_factors(model)
     T = factors_to_tensor(A0, B0, C0, model.get_constraint_matrix())

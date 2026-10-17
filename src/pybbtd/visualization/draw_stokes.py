@@ -97,6 +97,7 @@ def plot_stokes_terms(A, B, C, R, L, cmap=None):
         R + 1,
         figsize=(3.5 * (2 + 2 * R), 3.5 * 3),
         gridspec_kw={"width_ratios": [1] * R + [0.35], "height_ratios": [1, 0.35]},
+        layout="constrained",
     )
 
     # top row: A_r B_r^T maps, min-max normalized so contrast is comparable
@@ -142,5 +143,4 @@ def plot_stokes_terms(A, B, C, R, L, cmap=None):
         )
     axes[1, R].axis("off")
 
-    fig.tight_layout()
     plt.show()
