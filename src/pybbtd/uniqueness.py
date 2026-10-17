@@ -80,7 +80,12 @@ def check_uniqueness_ll1(N1, N2, N3, R, L):
     if not isinstance(L, (int, np.integer)):
         raise NotImplementedError("L should be an integer")
 
-    conditions = [
+    return any(_ll1_conditions(N1, N2, N3, R, L))
+
+
+def _ll1_conditions(N1, N2, N3, R, L):
+    """Evaluate each of the five sufficient conditions for a rank-(L, L, 1) BTD."""
+    return [
         (min(N1, N2) >= L * R) and (R <= N3),
         (N3 >= R) and (min(floor(N1 / L), R) + min(floor(N2 / L), R) >= R + 2),
         (N1 >= L * R) and (min(floor(N2 / L), R) + min(N3, R) >= R + 2),
@@ -88,8 +93,6 @@ def check_uniqueness_ll1(N1, N2, N3, R, L):
         (floor(N1 * N2 / L**2) >= R)
         and (min(floor(N1 / L), R) + min(floor(N2 / L), R) + min(N3, R) >= 2 * R + 2),
     ]
-
-    return any(conditions)
 
 
 def _report_uniqueness(unique):

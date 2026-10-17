@@ -1,327 +1,258 @@
+import warnings
+
 import numpy as np
 import numpy.testing as npt
 import pytest
+from _helpers import add_noise, bbtd_terms, relative_error, term_recovery_error
 
-from pybbtd.bbtd import BBTD, factors_to_tensor
+from pybbtd.bbtd import BBTD, _constraint_matrices, factors_to_tensor
+from pybbtd.btd import spatial_maps
 from pybbtd.solvers.bbtd_als import fit_bbtd_als, init_bbtd_factors
 from pybbtd.solvers.bbtd_cov_admm import fit_bbtd_cov_admm, init_bbtd_cov_factors
 
+
+def covariance_ground_truth(dims=(10, 12, 4, 4), R=2, L1=2, L2=2):
+    """Non-negative spatial factors and D = C*, as in covariance imaging."""
+    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
+    A0 = np.random.rand(dims[0], L1 * R)
+    B0 = np.random.rand(dims[1], L1 * R)
+    C0 = np.random.randn(dims[2], L2 * R) + 1j * np.random.randn(dims[2], L2 * R)
+    phi, psi = model.get_constraint_matrices()
+    T0 = factors_to_tensor(A0, B0, C0, C0.conj(), phi, psi)
+    return model, T0, (A0, B0, C0, C0.conj())
+
+
 # ──────────────────────────────────────────────────────────────────────────────
-# Section 1: BBTD class
+# BBTD model
 # ──────────────────────────────────────────────────────────────────────────────
 
 
-def test_valid_initialization():
+def test_init():
     model = BBTD(dims=(10, 12, 8, 6), R=2, L1=3, L2=2)
-    npt.assert_equal(model.dims, (10, 12, 8, 6))
-    npt.assert_equal(model.rank, 2)
-    npt.assert_equal(model.L1, 3)
-    npt.assert_equal(model.L2, 2)
+    assert model.dims == (10, 12, 8, 6)
+    assert (model.rank, model.L1, model.L2) == (2, 3, 2)
     assert model.factors is None
     assert model.tensor is None
     assert model.fit_error is None
+    assert repr(model) == "BBTD(dims=(10, 12, 8, 6), R=2, L1=3, L2=2)"
 
 
-def test_invalid_dims_not_list():
+@pytest.mark.parametrize(
+    "dims", ["bad", (10, 10, 10), (10, 10, 0, 5), (10, 10, 2.0, 5)]
+)
+def test_invalid_dims(dims):
     with pytest.raises(ValueError, match="list or tuple of four positive integers"):
-        BBTD(dims="bad", R=2, L1=2, L2=2)
+        BBTD(dims=dims, R=2, L1=2, L2=2)
 
 
-def test_invalid_dims_wrong_length():
-    with pytest.raises(ValueError, match="list or tuple of four positive integers"):
-        BBTD(dims=(10, 10, 10), R=2, L1=2, L2=2)
+@pytest.mark.parametrize(
+    ("R", "L1", "L2", "name"),
+    [(-1, 2, 2, "R"), (2, 0, 2, "L1"), (2, 2, 2.5, "L2"), (2, [2], 2, "L1")],
+)
+def test_invalid_ranks(R, L1, L2, name):
+    with pytest.raises(ValueError, match=f"{name} should be a positive integer"):
+        BBTD(dims=(10, 10, 8, 6), R=R, L1=L1, L2=L2)
 
 
-def test_invalid_dims_non_positive():
-    with pytest.raises(ValueError, match="list or tuple of four positive integers"):
-        BBTD(dims=(10, 10, 0, 5), R=2, L1=2, L2=2)
+def test_check_uniqueness():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert BBTD((20, 25, 4, 4), R=3, L1=3, L2=2).check_uniqueness() is True
+    with pytest.warns(UserWarning, match="Cannot guarantee uniqueness"):
+        BBTD((3, 3, 3, 3), R=5, L1=3, L2=3)
 
 
-def test_invalid_R():
-    with pytest.raises(ValueError, match="R should be a positive integer"):
-        BBTD(dims=(10, 10, 8, 6), R=-1, L1=2, L2=2)
-
-
-def test_invalid_L1():
-    with pytest.raises(ValueError, match="L1 should be a positive integer"):
-        BBTD(dims=(10, 10, 8, 6), R=2, L1=0, L2=2)
-
-
-def test_invalid_L2():
-    with pytest.raises(ValueError, match="L2 should be a positive integer"):
-        BBTD(dims=(10, 10, 8, 6), R=2, L1=2, L2=2.5)
-
-
-def test_constraint_matrices_shapes():
+def test_constraint_matrices_structure():
     R, L1, L2 = 3, 2, 4
-    model = BBTD(dims=(10, 10, 8, 8), R=R, L1=L1, L2=L2)
-    phi, psi = model.get_constraint_matrices()
-    assert phi.shape == (L1 * R, L1 * L2 * R)
-    assert psi.shape == (L2 * R, L1 * L2 * R)
+    phi, psi = BBTD((10, 10, 8, 8), R, L1, L2).get_constraint_matrices()
+    # phi repeats each column of A and B L2 times
+    npt.assert_array_equal(phi, np.kron(np.eye(L1 * R), np.ones((1, L2))))
+    # psi tiles each L2-block of C and D L1 times
+    npt.assert_array_equal(psi, np.kron(np.eye(R), np.tile(np.eye(L2), (1, L1))))
+    npt.assert_array_equal(phi, _constraint_matrices(R, L1, L2)[0])
 
 
-def test_factors_to_tensor():
-    np.random.seed(42)
-    dims = (10, 12, 8, 6)
-    R, L1, L2 = 2, 3, 2
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
+def test_factors_to_tensor_matches_definition():
+    dims, R, L1, L2 = (6, 5, 4, 3), 2, 3, 2
     A = np.random.randn(dims[0], L1 * R)
     B = np.random.randn(dims[1], L1 * R)
     C = np.random.randn(dims[2], L2 * R)
     D = np.random.randn(dims[3], L2 * R)
-    phi, psi = model.get_constraint_matrices()
+    phi, psi = _constraint_matrices(R, L1, L2)
+
     T = factors_to_tensor(A, B, C, D, phi, psi)
-    assert T.shape == dims
+
+    npt.assert_allclose(T, sum(bbtd_terms(A, B, C, D, L1, L2)), atol=1e-12)
 
 
 def test_fit_invalid_algorithm():
     model = BBTD(dims=(10, 10, 8, 6), R=2, L1=2, L2=2)
-    T = np.random.randn(10, 10, 8, 6)
-    with pytest.raises(ValueError, match="Unknown algorithm"):
-        model.fit(T, algorithm="INVALID")
+    with pytest.raises(ValueError, match="Unknown algorithm 'INVALID'"):
+        model.fit(np.random.randn(10, 10, 8, 6), algorithm="INVALID")
+
+
+@pytest.mark.filterwarnings("ignore:Reached max_iter")
+@pytest.mark.parametrize("algorithm", ["ALS", "ADMM"])
+def test_fit_stores_consistent_results(algorithm):
+    model, T, _ = covariance_ground_truth()
+    assert model.fit(T, algorithm=algorithm, max_iter=3) is model
+    assert len(model.factors) == 4
+    phi, psi = model.get_constraint_matrices()
+    npt.assert_allclose(model.tensor, factors_to_tensor(*model.factors, phi, psi))
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Section 2: Vanilla ALS solver
+# Unconstrained ALS solver
 # ──────────────────────────────────────────────────────────────────────────────
 
 
-def test_als_init_random_shapes():
-    np.random.seed(0)
-    dims = (10, 12, 8, 6)
-    R, L1, L2 = 2, 3, 2
+@pytest.mark.parametrize("strategy", ["random", "svd"])
+def test_als_init_shapes(strategy):
+    dims, R, L1, L2 = (10, 12, 8, 6), 2, 3, 2
     model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-    A, B, C, D = init_bbtd_factors(model, strategy="random")
-    assert A.shape == (dims[0], L1 * R)
-    assert B.shape == (dims[1], L1 * R)
-    assert C.shape == (dims[2], L2 * R)
-    assert D.shape == (dims[3], L2 * R)
+    A, B, C, D = init_bbtd_factors(model, strategy=strategy, T=np.random.randn(*dims))
+    assert A.shape == (10, 6)
+    assert B.shape == (12, 6)
+    assert C.shape == (8, 4)
+    assert D.shape == (6, 4)
 
 
-def test_als_init_svd_shapes():
-    np.random.seed(0)
-    dims = (10, 12, 8, 6)
-    R, L1, L2 = 2, 3, 2
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-    T = np.random.randn(*dims)
-    A, B, C, D = init_bbtd_factors(model, strategy="svd", T=T)
-    assert A.shape == (dims[0], L1 * R)
-    assert B.shape == (dims[1], L1 * R)
-    assert C.shape == (dims[2], L2 * R)
-    assert D.shape == (dims[3], L2 * R)
-
-
-def test_als_init_svd_requires_T():
+def test_als_init_errors():
     model = BBTD(dims=(10, 12, 8, 6), R=2, L1=3, L2=2)
     with pytest.raises(ValueError, match="SVD init requires input data T"):
-        init_bbtd_factors(model, strategy="svd", T=None)
-
-
-def test_als_init_invalid_strategy():
-    model = BBTD(dims=(10, 12, 8, 6), R=2, L1=3, L2=2)
-    with pytest.raises(ValueError, match="Unknown initialization"):
+        init_bbtd_factors(model, strategy="svd")
+    with pytest.raises(ValueError, match="Unknown initialization 'bad'"):
         init_bbtd_factors(model, strategy="bad")
 
 
-def test_als_invalid_model_type():
-    T = np.random.randn(10, 10, 8, 6)
+@pytest.mark.parametrize("solver", [fit_bbtd_als, fit_bbtd_cov_admm])
+def test_solvers_reject_invalid_inputs(solver):
+    model = BBTD(dims=(10, 10, 6, 6), R=2, L1=2, L2=2)
     with pytest.raises(TypeError, match="must be an instance of the BBTD class"):
-        fit_bbtd_als("not_a_model", T)
-
-
-def test_als_invalid_tensor_type():
-    model = BBTD(dims=(10, 10, 8, 6), R=2, L1=2, L2=2)
+        solver("not_a_model", np.random.randn(10, 10, 6, 6))
     with pytest.raises(TypeError, match="must be a numpy array"):
-        fit_bbtd_als(model, None)
-
-
-def test_als_mismatched_dims():
-    model = BBTD(dims=(10, 10, 8, 6), R=2, L1=2, L2=2)
-    T = np.random.randn(5, 5, 4, 3)
+        solver(model, None)
     with pytest.raises(ValueError, match="do not match"):
-        fit_bbtd_als(model, T)
+        solver(model, np.random.randn(5, 5, 4, 3))
 
 
-def test_als_fit_random_init():
-    np.random.seed(202505)
-    dims = (15, 14, 10, 8)
-    R, L1, L2 = 2, 2, 2
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-
-    # Generate ground-truth tensor from random factors
-    A0, B0, C0, D0 = init_bbtd_factors(model, strategy="random")
-    phi, psi = model.get_constraint_matrices()
-    T_gt = factors_to_tensor(A0, B0, C0, D0, phi, psi)
-
-    # Fit with random init
-    factors, fit_error = fit_bbtd_als(
-        model, T_gt, init="random", max_iter=2000, abs_tol=1e-14, rel_tol=1e-6
-    )
-    assert fit_error[-1] < 1e-3
+def test_als_fit_error_never_increases():
+    # every ALS step solves its least-squares problem exactly
+    model = BBTD(dims=(8, 7, 6, 5), R=2, L1=2, L2=2)
+    with pytest.warns(RuntimeWarning, match="max_iter=30"):
+        _, fit_error = fit_bbtd_als(
+            model, np.random.randn(8, 7, 6, 5), max_iter=30, rel_tol=0
+        )
+    assert len(fit_error) == 31
+    assert np.all(np.diff(fit_error) <= 1e-10 * fit_error[:-1])
 
 
-def test_als_fit_svd_init():
-    np.random.seed(202505)
-    dims = (15, 14, 10, 8)
-    R, L1, L2 = 2, 2, 2
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-
-    # Generate ground-truth tensor from random factors
-    A0, B0, C0, D0 = init_bbtd_factors(model, strategy="random")
-    phi, psi = model.get_constraint_matrices()
-    T_gt = factors_to_tensor(A0, B0, C0, D0, phi, psi)
-
-    # Fit with SVD init
-    factors, fit_error = fit_bbtd_als(
-        model, T_gt, init="svd", max_iter=2000, abs_tol=1e-14, rel_tol=1e-6
-    )
-    assert fit_error[-1] < 1e-3
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Section 3: Constrained ADMM solver
-# ──────────────────────────────────────────────────────────────────────────────
-
-
-def _make_cov_ground_truth(dims, R, L1, L2, seed=42):
-    """Helper to build a noiseless covariance-structured ground-truth tensor."""
+@pytest.mark.parametrize("seed", [0, 1, 2])
+@pytest.mark.parametrize("init", ["random", "svd"])
+def test_als_recovers_terms(init, seed):
     np.random.seed(seed)
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-
-    # Non-negative spatial factors
-    A0 = np.random.rand(dims[0], L1 * R)
-    B0 = np.random.rand(dims[1], L1 * R)
-    # Complex spectral factor with D = C*
-    C0 = np.random.randn(dims[2], L2 * R) + 1j * np.random.randn(dims[2], L2 * R)
-    D0 = C0.conj()
-
+    model = BBTD((10, 9, 6, 5), R=2, L1=2, L2=2)
+    A0, B0, C0, D0 = init_bbtd_factors(model)
     phi, psi = model.get_constraint_matrices()
-    T_gt = factors_to_tensor(A0, B0, C0, D0, phi, psi)
-    return model, T_gt, (A0, B0, C0, D0)
+    T = factors_to_tensor(A0, B0, C0, D0, phi, psi)
+
+    model.fit(T, init=init, max_iter=3000, rel_tol=1e-12, abs_tol=1e-12)
+
+    assert model.fit_error[-1] < 1e-10
+    estimated = bbtd_terms(*model.factors, 2, 2)
+    assert term_recovery_error(estimated, bbtd_terms(A0, B0, C0, D0, 2, 2)) < 1e-9
 
 
-def test_admm_init_random_shapes():
-    np.random.seed(0)
-    dims = (10, 12, 6, 6)
-    R, L1, L2 = 2, 2, 3
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-    A, B, C = init_bbtd_cov_factors(model, strategy="random")
-    assert A.shape == (dims[0], L1 * R)
-    assert B.shape == (dims[1], L1 * R)
-    assert C.shape == (dims[2], L2 * R)
-    # A and B should be non-negative (random uses rand, not randn)
-    assert np.all(A >= 0)
-    assert np.all(B >= 0)
+def test_als_noisy_data_fit_is_closer_to_truth_than_data():
+    model = BBTD((10, 9, 6, 5), R=2, L1=2, L2=2)
+    A0, B0, C0, D0 = init_bbtd_factors(model)
+    phi, psi = model.get_constraint_matrices()
+    T0 = factors_to_tensor(A0, B0, C0, D0, phi, psi)
+    noise_level = 1e-2
+
+    model.fit(
+        add_noise(T0, noise_level), init="svd", max_iter=2000, rel_tol=1e-12, abs_tol=0
+    )
+
+    assert relative_error(model.tensor, T0) < noise_level
+    estimated = bbtd_terms(*model.factors, 2, 2)
+    assert (
+        term_recovery_error(estimated, bbtd_terms(A0, B0, C0, D0, 2, 2))
+        < 5 * noise_level
+    )
 
 
-def test_admm_init_svd_shapes():
-    np.random.seed(0)
-    dims = (10, 12, 6, 6)
-    R, L1, L2 = 2, 2, 3
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-    T = np.random.randn(*dims)
-    A, B, C = init_bbtd_cov_factors(model, strategy="svd", T=T)
-    assert A.shape == (dims[0], L1 * R)
-    assert B.shape == (dims[1], L1 * R)
-    assert C.shape == (dims[2], L2 * R)
-    # A and B should be non-negative (SVD init uses np.abs)
-    assert np.all(A >= 0)
-    assert np.all(B >= 0)
+# ──────────────────────────────────────────────────────────────────────────────
+# Covariance ADMM solver
+# ──────────────────────────────────────────────────────────────────────────────
 
 
-def test_admm_init_kmeans_shapes():
-    np.random.seed(0)
-    dims = (10, 12, 6, 6)
-    R, L1, L2 = 2, 2, 3
-    model = BBTD(dims=dims, R=R, L1=L1, L2=L2)
-    # kmeans init needs a tensor with covariance-like structure
-    _, T_gt, _ = _make_cov_ground_truth(dims, R, L1, L2, seed=0)
-    A, B, C = init_bbtd_cov_factors(model, strategy="kmeans", T=T_gt)
-    assert A.shape == (dims[0], L1 * R)
-    assert B.shape == (dims[1], L1 * R)
-    assert C.shape == (dims[2], L2 * R)
-    # A and B should be non-negative (NMF produces non-negative factors)
-    assert np.all(A >= 0)
-    assert np.all(B >= 0)
+@pytest.mark.parametrize("strategy", ["random", "svd", "kmeans"])
+def test_admm_init_shapes_and_non_negativity(strategy):
+    model, T, _ = covariance_ground_truth(dims=(10, 12, 6, 6), R=2, L1=2, L2=3)
+    A, B, C = init_bbtd_cov_factors(model, strategy=strategy, T=T)
+    assert A.shape == (10, 4)
+    assert B.shape == (12, 4)
+    assert C.shape == (6, 6)
+    assert np.isrealobj(A)
+    assert np.isrealobj(B)
+    assert A.min() >= 0
+    assert B.min() >= 0
 
 
-def test_admm_init_invalid_strategy():
+@pytest.mark.parametrize("strategy", ["svd", "kmeans"])
+def test_admm_init_requires_T(strategy):
     model = BBTD(dims=(10, 12, 6, 6), R=2, L1=2, L2=3)
-    with pytest.raises(ValueError, match="Unknown initialization"):
+    with pytest.raises(ValueError, match="requires input data T"):
+        init_bbtd_cov_factors(model, strategy=strategy)
+
+
+def test_admm_init_unknown_strategy():
+    model = BBTD(dims=(10, 12, 6, 6), R=2, L1=2, L2=3)
+    with pytest.raises(ValueError, match="Unknown initialization 'bad'"):
         init_bbtd_cov_factors(model, strategy="bad")
 
 
-def test_admm_invalid_model_type():
-    T = np.random.randn(10, 10, 6, 6)
-    with pytest.raises(TypeError, match="must be an instance of the BBTD class"):
-        fit_bbtd_cov_admm("not_a_model", T)
+@pytest.mark.parametrize("seed", [0, 1, 2])
+@pytest.mark.parametrize("init", ["random", "svd", "kmeans"])
+def test_admm_recovers_terms_and_keeps_constraints(init, seed):
+    np.random.seed(seed)
+    model, T, truth = covariance_ground_truth()
 
-
-def test_admm_fit_random_init():
-    dims = (10, 12, 6, 6)
-    R, L1, L2 = 2, 2, 2
-    model, T_gt, _ = _make_cov_ground_truth(dims, R, L1, L2, seed=202505)
-
-    factors, fit_error = fit_bbtd_cov_admm(
-        model,
-        T_gt,
-        init="random",
-        max_iter=500,
-        gamma=1.0,
-        rho=1.0,
-        max_admm=50,
-        rel_tol=1e-8,
-        abs_tol=1e-12,
+    model.fit(
+        T, algorithm="ADMM", init=init, max_iter=500, rel_tol=1e-10, abs_tol=1e-12
     )
-    assert fit_error[-1] < 1e-1
+    A, B, C, D = model.factors
 
-    # Check D ≈ C* constraint
-    C_est, D_est = factors[2], factors[3]
-    npt.assert_allclose(D_est, C_est.conj(), atol=1e-3)
+    assert relative_error(model.tensor, T) < 1e-10
+    assert (
+        term_recovery_error(bbtd_terms(A, B, C, D, 2, 2), bbtd_terms(*truth, 2, 2))
+        < 1e-9
+    )
+    npt.assert_array_equal(D, C.conj())
+    assert spatial_maps(A, B, 2).min() >= 0
 
 
-def test_admm_fit_kmeans_init():
-    dims = (10, 12, 6, 6)
-    R, L1, L2 = 2, 2, 2
-    model, T_gt, (A0, B0, C0, D0) = _make_cov_ground_truth(dims, R, L1, L2, seed=202505)
+def test_admm_noisy_data_fit_is_closer_to_truth_than_data():
+    model, T0, truth = covariance_ground_truth()
+    noise_level = 1e-2
 
-    factors, fit_error = fit_bbtd_cov_admm(
-        model,
-        T_gt,
+    model.fit(
+        add_noise(T0, noise_level),
+        algorithm="ADMM",
         init="kmeans",
         max_iter=500,
-        gamma=1.0,
-        rho=1.0,
-        max_admm=50,
-        rel_tol=1e-8,
-        abs_tol=1e-12,
-    )
-    assert fit_error[-1] < 1e-1
-
-    # Check D ≈ C* constraint
-    C_est, D_est = factors[2], factors[3]
-    npt.assert_allclose(D_est, C_est.conj(), atol=1e-3)
-
-
-def test_admm_nonneg_spatial_maps():
-    dims = (10, 12, 6, 6)
-    R, L1, L2 = 2, 2, 2
-    model, T_gt, _ = _make_cov_ground_truth(dims, R, L1, L2, seed=202505)
-
-    factors, _ = fit_bbtd_cov_admm(
-        model,
-        T_gt,
-        init="random",
-        max_iter=500,
-        gamma=1.0,
-        rho=1.0,
-        max_admm=50,
-        rel_tol=1e-8,
-        abs_tol=1e-12,
+        rel_tol=1e-10,
+        abs_tol=0,
     )
 
-    A_est, B_est = factors[0], factors[1]
-    for r in range(R):
-        S_r = A_est[:, r * L1 : (r + 1) * L1] @ B_est[:, r * L1 : (r + 1) * L1].T
-        # Spatial maps should be approximately non-negative after projection
-        assert np.all(S_r >= -1e-6), f"Spatial map S_{r} has negative entries"
+    assert relative_error(model.tensor, T0) < noise_level
+    estimated = bbtd_terms(*model.factors, 2, 2)
+    assert term_recovery_error(estimated, bbtd_terms(*truth, 2, 2)) < 5 * noise_level
+
+
+def test_admm_warns_when_max_iter_is_reached():
+    model, T, _ = covariance_ground_truth()
+    with pytest.warns(RuntimeWarning, match="max_iter=2"):
+        _, fit_error = fit_bbtd_cov_admm(model, T, max_iter=2, rel_tol=0, abs_tol=0)
+    assert len(fit_error) == 2
