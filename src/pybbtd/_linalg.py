@@ -37,3 +37,23 @@ def hermitian_to_real(X, dtype="float64"):
     below_diagonal = np.tril(np.ones((K, K), dtype=bool), k=-1)
     packed = np.where(below_diagonal, np.swapaxes(X, -1, -2).imag, X.real)
     return packed.reshape(*X.shape[:-2], K * K).astype(dtype)
+
+
+def real_to_hermitian(packed):
+    """Unpack real vectors made by :func:`hermitian_to_real` into Hermitian matrices.
+
+    Parameters
+    ----------
+    packed : np.ndarray
+        Array of shape ``(..., K**2)``.
+
+    Returns
+    -------
+    np.ndarray
+        Complex array of shape ``(..., K, K)``.
+    """
+    K = int(np.sqrt(packed.shape[-1]))
+    P = np.asarray(packed, dtype=np.float64).reshape(*packed.shape[:-1], K, K)
+    upper = np.triu(P, 1) + 1j * np.triu(np.swapaxes(P, -1, -2), 1)
+    diagonal = np.einsum("...ii->...i", P)[..., None] * np.eye(K)
+    return diagonal + upper + np.swapaxes(upper, -1, -2).conj()

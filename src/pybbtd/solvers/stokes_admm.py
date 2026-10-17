@@ -95,13 +95,13 @@ def fit_stokes_admm(
         # update A
         M1 = khatri_rao([Btk, Ctk @ theta]).T
         Atk1, Ak1 = admm_update(
-            T1, M1, Ak, Atk, rho, project_nonnegative, max_iter=max_admm, tol=admm_tol
+            T1, M1, Ak, Atk, rho, project_nonnegative, max_admm, admm_tol, real=True
         )
 
         # update B
         M2 = khatri_rao([Atk1, Ctk @ theta]).T
         Btk1, Bk1 = admm_update(
-            T2, M2, Bk, Btk, rho, project_nonnegative, max_iter=max_admm, tol=admm_tol
+            T2, M2, Bk, Btk, rho, project_nonnegative, max_admm, admm_tol, real=True
         )
 
         # update C

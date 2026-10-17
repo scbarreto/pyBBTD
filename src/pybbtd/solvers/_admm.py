@@ -4,7 +4,9 @@ import numpy as np
 from scipy.linalg import solve
 
 
-def admm_update(Y, M, X_init, Xt_init, rho, project, max_iter=100, tol=1e-14):
+def admm_update(
+    Y, M, X_init, Xt_init, rho, project, max_iter=100, tol=1e-14, real=False
+):
     """Constrained least-squares update of one factor with ADMM.
 
     Approximately solves
@@ -37,6 +39,9 @@ def admm_update(Y, M, X_init, Xt_init, rho, project, max_iter=100, tol=1e-14):
         Maximum number of ADMM iterations.
     tol : float, default 1e-14
         Convergence tolerance on the primal and dual residuals.
+    real : bool, default False
+        Restrict the factor to real values, even when ``Y`` and ``M`` are
+        complex (e.g. non-negative spatial factors of complex data).
 
     Returns
     -------
@@ -50,8 +55,12 @@ def admm_update(Y, M, X_init, Xt_init, rho, project, max_iter=100, tol=1e-14):
     Xtl = Xt_init.copy()
     Ul = np.zeros_like(X_init)
 
-    MMT = M @ M.T
-    RHS = Y @ M.T
+    # normal equations of the least-squares term
+    MMH = M @ M.conj().T
+    RHS = Y @ M.conj().T
+    if real:
+        MMH = MMH.real
+        RHS = RHS.real
 
     eps_pri = np.size(Xl) ** (1 / 2) * tol
     eps_dual = np.size(Xtl) ** (1 / 2) * tol
@@ -60,7 +69,7 @@ def admm_update(Y, M, X_init, Xt_init, rho, project, max_iter=100, tol=1e-14):
     exit_criterion = False
     while n < max_iter and not exit_criterion:
         # update X_{l+1}
-        X_T = solve((MMT + rho * np.eye(X_init.shape[1])).T, (RHS + rho * (Xtl - Ul)).T)
+        X_T = solve((MMH + rho * np.eye(X_init.shape[1])).T, (RHS + rho * (Xtl - Ul)).T)
         Xl1 = X_T.T
 
         # update \tilde{X}_{l+1}

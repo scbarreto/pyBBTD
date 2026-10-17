@@ -3,13 +3,11 @@
 import logging
 
 import numpy as np
-from scipy import linalg
-from scipy.linalg import solve
 from sklearn.decomposition import NMF
 from tensorly import unfold
 from tensorly.tenalg import khatri_rao
 
-from pybbtd._linalg import hermitian_to_real
+from pybbtd._linalg import hermitian_to_real, project_psd, real_to_hermitian
 from pybbtd._utils import check_solver_inputs, unknown_option_error, warn_user
 from pybbtd.btd import factors_to_tensor
 from pybbtd.covll1 import CovLL1, generate_covll1_factors
@@ -35,8 +33,9 @@ def fit_covll1_admm(
     """Fit a Cov-LL1 model with AO-ADMM.
 
     The factors are updated in turn (A, then B, then C), each with a few
-    ADMM iterations. A and B are kept non-negative; each column of C is
-    passed through :func:`_project_psd_svd`.
+    ADMM iterations. A and B are kept real and non-negative, and each
+    column of C is kept a vectorized covariance matrix (Hermitian positive
+    semidefinite).
 
     Parameters
     ----------
@@ -99,18 +98,19 @@ def fit_covll1_admm(
         # update A
         M1 = khatri_rao([Btk, Ctk @ theta]).T
         Atk1, Ak1 = admm_update(
-            T1, M1, Ak, Atk, rho, project_nonnegative, max_iter=max_admm, tol=admm_tol
+            T1, M1, Ak, Atk, rho, project_nonnegative, max_admm, admm_tol, real=True
         )
 
         # update B
         M2 = khatri_rao([Atk1, Ctk @ theta]).T
         Btk1, Bk1 = admm_update(
-            T2, M2, Bk, Btk, rho, project_nonnegative, max_iter=max_admm, tol=admm_tol
+            T2, M2, Bk, Btk, rho, project_nonnegative, max_admm, admm_tol, real=True
         )
 
         # update C
-        Ctk1, Ck1 = _admm_update_c(
-            T3, Atk1, Btk1, Ck, Ctk, theta, rho, max_iter=max_admm, tol=admm_tol
+        M3 = theta @ khatri_rao([Atk1, Btk1]).T
+        Ctk1, Ck1 = admm_update(
+            T3, M3, Ck, Ctk, rho, _project_covariance_columns, max_admm, admm_tol
         )
 
         # update variables
@@ -139,90 +139,10 @@ def fit_covll1_admm(
     return [Atk, Btk, Ctk], np.array(fit_error)
 
 
-def _admm_update_c(Y3, Ak, Bk, Cinit, Ctinit, theta, rho, max_iter=100, tol=1e-14):
-    """ADMM update of the covariance factor C.
-
-    Same loop as :func:`~pybbtd.solvers._admm.admm_update`, except that the
-    dual variable is added to the least-squares variable before the
-    projection, and each column of C goes through :func:`_project_psd_svd`.
-
-    Returns
-    -------
-    Ct : np.ndarray
-        Projected variable (the factor estimate).
-    C : np.ndarray
-        Least-squares variable.
-    """
-    K = int(np.sqrt(Cinit.shape[0]))
-
-    # init variables
-    Cl = Cinit.copy()
-    Ctl = Ctinit.copy()
-    Ul = np.zeros_like(Cl)
-
-    M3 = theta @ khatri_rao([Ak, Bk]).T
-    M3M3T = M3 @ M3.T
-    RHS = Y3 @ M3.T
-
-    eps_pri = np.size(Cl) ** (1 / 2) * tol
-    eps_dual = np.size(Ctl) ** (1 / 2) * tol
-
-    n = 0
-    exit_criterion = False
-    while n < max_iter and not exit_criterion:
-        # update C_(l+1)
-        C_T = solve(
-            (M3M3T + rho * np.eye(Cinit.shape[1])).T, (RHS + rho * (Ctl - Ul)).T
-        )
-        Cl1 = C_T.T
-
-        # update \tilde{C}_{l+1}
-        Ctl1 = np.zeros_like(Ctl)
-        Cl1 += Ul
-        for r in range(Cinit.shape[1]):
-            Ctl1[:, r] = _project_psd_svd(Cl1[:, r].reshape(K, K)).reshape(-1)
-
-        # update dual
-        Ul1 = Ul + Cl1 - Ctl1
-
-        # compute convergence metrics residuals
-        primal_residue = np.linalg.norm(Cl1 - Ctl1)
-        dual_residue = rho * np.linalg.norm(Ctl1 - Ctl)
-
-        if (primal_residue < eps_pri) and (dual_residue < eps_dual):
-            exit_criterion = True
-        if primal_residue > 10 * dual_residue:
-            rho *= 2
-            Ul1 /= 2
-        elif dual_residue > 10 * primal_residue:
-            rho /= 2
-            Ul1 *= 2
-
-        # update all variables
-        Cl = Cl1
-        Ctl = Ctl1
-        Ul = Ul1
-
-        n += 1
-
-    return Ctl, Cl
-
-
-def _project_psd_svd(cov_matrix):
-    """Rebuild a ``K x K`` matrix from its SVD with negative singular values set to zero.
-
-    Parameters
-    ----------
-    cov_matrix : np.ndarray
-        Matrix of shape ``(K, K)``.
-
-    Returns
-    -------
-    np.ndarray
-        Matrix of shape ``(K, K)``.
-    """
-    U, s, Vh = linalg.svd(cov_matrix)
-    return (U * np.clip(s, a_min=0, a_max=None)) @ Vh
+def _project_covariance_columns(C):
+    """Project every column of C onto the vectorized PSD Hermitian matrices."""
+    K = int(np.sqrt(C.shape[0]))
+    return np.column_stack([project_psd(c.reshape(K, K)).reshape(-1) for c in C.T])
 
 
 def init_covll1_factors(model, strategy="random", T=None):
@@ -258,7 +178,7 @@ def _kmeans_init(T, R, L1, theta):
 
     Clusters the pixels by their covariance matrices, factors each cluster's
     map with NMF to get non-negative A and B, and builds C from the cluster
-    centers.
+    centers projected onto the PSD matrices.
     """
     N1, N2, K2 = T.shape
     K = int(np.sqrt(K2))
@@ -276,10 +196,8 @@ def _kmeans_init(T, R, L1, theta):
     # initialize C from the cluster centers
     initC = np.zeros((K2, R), dtype=np.complex128)
     for r in range(R):
-        center = centers[:, r].reshape(K, K).astype(np.float64)
-        lower = 1j * np.tril(center, -1)
-        center_matrix = np.diag(np.diag(center)) + lower + lower.conj().T
-        initC[:, r] = _project_psd_svd(center_matrix).reshape(K2)
+        center_matrix = real_to_hermitian(centers[:, r])
+        initC[:, r] = project_psd(center_matrix).reshape(K2)
 
     # scale to match the tensor norm
     initT = factors_to_tensor(initA, initB, initC, theta)
